@@ -1,0 +1,150 @@
+@import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Bubblegum+Sans&family=Varela+Round&family=Poppins:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --radius: 0.75rem;
+        /* Light blue background: #D6F0FF */
+        --background: 0.93 0.08 220; /* Light blue */
+        --foreground: 0.25 0.02 240; /* Dark text #2B2B2B */
+        /* White cards/sections: #FFFFFF */
+        --card: 0.99 0.00 0;
+        --card-foreground: 0.25 0.02 240;
+        --popover: 0.99 0.00 0;
+        --popover-foreground: 0.25 0.02 240;
+        /* Yellow primary buttons: #FFE066 */
+        --primary: 0.88 0.15 90; /* Yellow */
+        --primary-foreground: 0.25 0.02 240; /* Dark text */
+        --secondary: 0.75 0.28 140;
+        --secondary-foreground: 0.15 0.05 140;
+        --muted: 0.95 0.05 220;
+        --muted-foreground: 0.50 0.02 240;
+        --accent: 0.70 0.30 280;
+        --accent-foreground: 0.98 0.02 280;
+        --destructive: 0.68 0.32 40;
+        --destructive-foreground: 0.98 0.02 40;
+        --border: 0.85 0.05 220;
+        --input: 0.99 0.00 0;
+        --ring: 0.88 0.15 90;
+        --chart-1: 0.88 0.15 90;
+        --chart-2: 0.75 0.28 140;
+        --chart-3: 0.70 0.30 280;
+        --chart-4: 0.68 0.32 40;
+        --chart-5: 0.70 0.25 200;
+        --sidebar: 0.99 0.00 0;
+        --sidebar-foreground: 0.25 0.02 240;
+        --sidebar-primary: 0.88 0.15 90;
+        --sidebar-primary-foreground: 0.25 0.02 240;
+        --sidebar-accent: 0.95 0.05 220;
+        --sidebar-accent-foreground: 0.25 0.02 240;
+        --sidebar-border: 0.85 0.05 220;
+        --sidebar-ring: 0.88 0.15 90;
+    }
+
+    .dark {
+        /* Dark mode with neon glow */
+        --background: 0.25 0.15 260;
+        --background-end: 0.18 0.18 280;
+        --foreground: 0.95 0.05 340;
+        --card: 0.28 0.12 270;
+        --card-foreground: 0.95 0.05 340;
+        --popover: 0.26 0.14 265;
+        --popover-foreground: 0.95 0.05 340;
+        --primary: 0.70 0.32 340;
+        --primary-foreground: 0.15 0.05 340;
+        --secondary: 0.78 0.30 140;
+        --secondary-foreground: 0.15 0.05 140;
+        --muted: 0.30 0.10 270;
+        --muted-foreground: 0.65 0.10 280;
+        --accent: 0.75 0.28 200;
+        --accent-foreground: 0.15 0.05 200;
+        --destructive: 0.72 0.35 40;
+        --destructive-foreground: 0.15 0.05 40;
+        --border: 0.65 0.25 280;
+        --input: 0.28 0.12 270;
+        --ring: 0.70 0.30 280;
+        --chart-1: 0.70 0.32 340;
+        --chart-2: 0.78 0.30 140;
+        --chart-3: 0.75 0.28 200;
+        --chart-4: 0.72 0.32 280;
+        --chart-5: 0.72 0.35 40;
+        --sidebar: 0.26 0.14 265;
+        --sidebar-foreground: 0.95 0.05 340;
+        --sidebar-primary: 0.70 0.32 340;
+        --sidebar-primary-foreground: 0.95 0.05 340;
+        --sidebar-accent: 0.30 0.10 270;
+        --sidebar-accent-foreground: 0.95 0.05 340;
+        --sidebar-border: 0.65 0.25 280;
+        --sidebar-ring: 0.70 0.30 280;
+    }
+
+    * {
+        @apply border-border;
+        font-family: 'Varela Round', 'Poppins', sans-serif;
+    }
+    
+    body {
+        @apply text-foreground;
+        font-family: 'Varela Round', 'Poppins', sans-serif;
+        /* Solid light blue background */
+        background: oklch(var(--background));
+        min-height: 100vh;
+    }
+
+    /* Section titles use Bubblegum Sans with dark color, no glow in light mode */
+    h2, h3, h4, h5, h6 {
+        font-family: 'Bubblegum Sans', cursive;
+        color: #2B2B2B;
+    }
+
+    /* Dark mode: restore glow for headings */
+    .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+        text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+        color: inherit;
+    }
+
+    /* Remove neon glow from buttons in light mode */
+    button, .btn {
+        transition: all 0.3s ease;
+    }
+
+    /* Dark mode: restore glow for buttons */
+    .dark button, .dark .btn {
+        text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+    }
+
+    .dark button:hover, .dark .btn:hover {
+        box-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
+        text-shadow: 0 0 15px currentColor, 0 0 30px currentColor;
+    }
+
+    .neon-border {
+        border: 2px solid;
+        box-shadow: 0 0 12px currentColor, inset 0 0 12px currentColor;
+    }
+
+    .neon-text {
+        text-shadow: 0 0 12px currentColor, 0 0 24px currentColor, 0 0 36px currentColor;
+    }
+
+    .neon-glow {
+        box-shadow: 0 0 18px currentColor, 0 0 36px currentColor, 0 0 54px currentColor;
+    }
+
+    input:focus, textarea:focus, select:focus {
+        box-shadow: 0 0 15px oklch(var(--ring)), 0 0 30px oklch(var(--ring));
+    }
+
+    /* Remove glow from cards in light mode */
+    .card, .dialog, .popover {
+        background: oklch(var(--card));
+    }
+
+    /* Dark mode: restore glow for cards */
+    .dark .card, .dark .dialog, .dark .popover {
+        box-shadow: 0 0 25px oklch(var(--primary) / 0.4), 0 0 50px oklch(var(--accent) / 0.3);
+    }
+}

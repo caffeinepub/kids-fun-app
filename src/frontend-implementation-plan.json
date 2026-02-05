@@ -1,0 +1,74 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Refresh global theme to light-blue background, white cards, dark headings, and yellow primary buttons",
+  "requirements": [
+    {
+      "id": "REQ-4",
+      "summary": "Update app-wide theme tokens and global styles to use the new light palette and remove the gradient/neon styling from the default (light) UI.",
+      "acceptanceCriteria": [
+        "On all pages, the overall page background renders as a solid #D6F0FF (not a purple/pink/blue gradient).",
+        "Components using Tailwind theme colors (e.g., bg-background, bg-card, text-foreground, text-primary-foreground) reflect the new palette: cards/sections appear white and default text is readable on white/light blue.",
+        "Primary headings (h1–h6, or at minimum the existing styled heading selectors) render with #2B2B2B and no neon-glow styling that changes their perceived color away from #2B2B2B."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Replace the current neon/gradient light-theme CSS variables in :root so Tailwind theme colors map to: background=#D6F0FF, card/sections=#FFFFFF, foreground/headings=#2B2B2B, and primary=#FFE066 with dark primary-foreground; convert these hex colors to appropriate OKLCH values to match the existing tailwind.config.js variable usage."
+        },
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Remove/replace the body gradient background styling (linear-gradient using --background/--background-end) so the body (and/or root container) uses a solid background color derived from the updated --background token (targeting #D6F0FF)."
+        },
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Remove neon-glow styling from default heading selectors (currently h2–h6 text-shadow) so headings render as plain #2B2B2B; if glow is desired for dark mode only, scope the glow styles under the .dark selector rather than applying globally."
+        }
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "summary": "Remove the App-level hardcoded gradient wrapper so the top-level UI uses the global theme background consistently across routes/pages.",
+      "acceptanceCriteria": [
+        "The App-level wrapper no longer applies the purple/pink/blue gradient background classes.",
+        "Navigation between modules does not cause background color changes; the background remains #D6F0FF."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Replace the top-level App container classes that apply the gradient background (bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100) with classes that rely on the global theme background (e.g., bg-background) so the solid #D6F0FF applies across all pages."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Update the 'Coming Soon' fallback wrapper (currently using the same gradient background classes) to also rely on the global theme background so the background remains consistent when navigating to not-yet-implemented modules."
+        }
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "summary": "Update primary button styling via theme tokens so primary buttons are yellow with dark text and do not use neon glow in hover/focus states.",
+      "acceptanceCriteria": [
+        "Buttons that use the primary theme color display as yellow (#FFE066) with dark text.",
+        "Hover/focus states do not introduce neon glow/shadows that materially change the perceived button/text color away from yellow/dark text.",
+        "Button text remains readable and meets basic contrast expectations against the yellow background."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Update the light-theme primary tokens so Tailwind 'primary' resolves to #FFE066 and 'primary-foreground' resolves to a dark color equivalent to #2B2B2B (using OKLCH values consistent with tailwind.config.js), ensuring existing shadcn/Tailwind button variants inherit the new palette without changing feature logic."
+        },
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Remove or scope away the global neon button styling (button, .btn text-shadow and hover box-shadow/text-shadow) so hover/focus states keep the button yellow with dark text and do not add glow that alters perceived colors; if any glow is retained, limit it to .dark only."
+        }
+      ]
+    }
+  ]
+}

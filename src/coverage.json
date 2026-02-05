@@ -1,0 +1,68 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-05T08:01:54.880Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 3,
+    "implemented": 3,
+    "items": [
+      {
+        "id": "REQ-4",
+        "summary": "Update the app-wide theme tokens and global styles so the default (light) UI uses: main background #D6F0FF, sections/cards #FFFFFF, primary headings #2B2B2B, and primary buttons #FFE066 with dark text. Implement this by adjusting the CSS variables and base styles in frontend/src/index.css (replace the current neon/gradient token values and gradient body background).",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/index.css",
+          "frontend/src/index.css",
+          "frontend/src/index.css"
+        ],
+        "matchedFiles": [
+          "frontend/src/index.css",
+          "frontend/src/index.css",
+          "frontend/src/index.css"
+        ]
+      },
+      {
+        "id": "REQ-5",
+        "summary": "Remove/replace the hardcoded gradient background wrapper in frontend/src/App.tsx (currently using \"bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100\") so the top-level app container uses the global theme background (the new #D6F0FF background) consistently across all routes/pages.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/App.tsx",
+          "frontend/src/App.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/App.tsx",
+          "frontend/src/App.tsx"
+        ]
+      },
+      {
+        "id": "REQ-6",
+        "summary": "Update primary button styling to match the new theme: primary buttons render with background #FFE066 and dark text (use #2B2B2B or equivalent theme token), including hover/focus states that keep the button yellow and text dark (no neon glow/text-shadow that makes the text appear bright). Apply via theme tokens in frontend/src/index.css so existing button components inherit the new style without changing feature logic.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/index.css",
+          "frontend/src/index.css"
+        ],
+        "matchedFiles": [
+          "frontend/src/index.css",
+          "frontend/src/index.css"
+        ]
+      }
+    ]
+  },
+  "changedFiles": [
+    "build-request.json",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/src/App.tsx",
+    "frontend/src/index.css",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}
