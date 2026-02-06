@@ -1058,10 +1058,12 @@ actor {
     videoChannels.get(channelId);
   };
 
-  // Public: Update video channel views
-  // Note: This is intentionally public to allow anonymous view tracking
-  // for educational content. No sensitive data is exposed or modified.
+  // User-only: Update video channel views (requires authentication to prevent abuse)
   public shared ({ caller }) func updateVideoChannelViews(channelId : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can update video views");
+    };
+
     switch (videoChannels.get(channelId)) {
       case (?channel) {
         let updatedChannel = {

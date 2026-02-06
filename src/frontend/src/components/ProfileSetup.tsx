@@ -36,6 +36,14 @@ export default function ProfileSetup() {
         approvedContacts: [],
         screenTimeLimit: BigInt(120),
         contentFilterLevel: 'medium',
+        avatarUrl: '😊',
+        theme: 'purple',
+        mascotPreference: 'friendly',
+        accessibilitySettings: {
+          readAloudEnabled: false,
+          highContrastMode: false,
+          largeText: false,
+        },
       });
       toast.success('Profile created! Welcome to Kids Fun App! 🎉');
     } catch (error) {

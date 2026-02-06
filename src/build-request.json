@@ -1,72 +1,10 @@
 {
   "kind": "build_request",
-  "title": "Update global UI colors to light-blue background, white cards, dark headings, and yellow buttons",
+  "title": "Untitled request",
   "priority": "normal",
-  "requirements": [
-    {
-      "id": "REQ-4",
-      "text": "Update the app-wide theme tokens and global styles so the default (light) UI uses: main background #D6F0FF, sections/cards #FFFFFF, primary headings #2B2B2B, and primary buttons #FFE066 with dark text. Implement this by adjusting the CSS variables and base styles in frontend/src/index.css (replace the current neon/gradient token values and gradient body background).",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-6"
-        ],
-        "quotes": [
-          "Please make my backround and things these colours.Main background: #D6F0FF (light blue)\n\nSections/cards: #FFFFFF\n\nPrimary headings: #2B2B2B\n\nButtons: #FFE066 (yellow) with dark text"
-        ]
-      },
-      "acceptanceCriteria": [
-        "On all pages, the overall page background renders as a solid #D6F0FF (not a purple/pink/blue gradient).",
-        "Components using Tailwind theme colors (e.g., bg-background, bg-card, text-foreground, text-primary-foreground) reflect the new palette: cards/sections appear white and default text is readable on white/light blue.",
-        "Primary headings (h1–h6, or at minimum the existing styled heading selectors) render with #2B2B2B and no neon-glow styling that changes their perceived color away from #2B2B2B."
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "text": "Remove/replace the hardcoded gradient background wrapper in frontend/src/App.tsx (currently using \"bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100\") so the top-level app container uses the global theme background (the new #D6F0FF background) consistently across all routes/pages.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-6"
-        ],
-        "quotes": [
-          "Make focused changes only. Ensure no other features or CRUD is impacted.Please make my backround and things these colours."
-        ]
-      },
-      "acceptanceCriteria": [
-        "The App-level wrapper no longer applies the purple/pink/blue gradient background classes.",
-        "Navigation between modules does not cause background color changes; the background remains #D6F0FF."
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "text": "Update primary button styling to match the new theme: primary buttons render with background #FFE066 and dark text (use #2B2B2B or equivalent theme token), including hover/focus states that keep the button yellow and text dark (no neon glow/text-shadow that makes the text appear bright). Apply via theme tokens in frontend/src/index.css so existing button components inherit the new style without changing feature logic.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-6"
-        ],
-        "quotes": [
-          "Buttons: #FFE066 (yellow) with dark text"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Buttons that use the primary theme color display as yellow (#FFE066) with dark text.",
-        "Hover/focus states do not introduce neon glow/shadows that materially change the perceived button/text color away from yellow/dark text.",
-        "Button text remains readable and meets basic contrast expectations against the yellow background."
-      ]
-    }
-  ],
-  "constraints": [
-    "Make focused changes only; do not modify or break any existing features, data flows, or CRUD behavior.",
-    "Frontend immutable paths must not be edited (frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui).",
-    "Do not change backend code or schemas for this request."
-  ],
-  "nonGoals": [
-    "No new pages, modules, games, or UI features.",
-    "No refactors unrelated to global theming (e.g., do not address known issues like localStorage BigInt/Principal serialization, Tailwind safelists, or LearnHub localStorage parsing).",
-    "No changes to authentication, approvals, admin tools, or any persistence logic."
-  ],
+  "requirements": [],
+  "constraints": [],
+  "nonGoals": [],
   "imageRequirements": {
     "required": [],
     "edits": []

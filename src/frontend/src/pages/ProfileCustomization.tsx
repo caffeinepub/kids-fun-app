@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,15 +8,28 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { User, Palette, Image as ImageIcon, Trophy } from 'lucide-react';
 import { toast } from 'sonner';
 import { useGetCallerUserProfile, useSaveCallerUserProfile } from '../hooks/useQueries';
+import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { Principal } from '@icp-sdk/core/principal';
 
 export default function ProfileCustomization() {
-  const { data: userProfile } = useGetCallerUserProfile();
+  const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
   const saveProfile = useSaveCallerUserProfile();
+  const { identity } = useInternetIdentity();
 
-  const [name, setName] = useState(userProfile?.name || '');
+  const [name, setName] = useState('');
+  const [age, setAge] = useState<number>(10);
   const [selectedAvatar, setSelectedAvatar] = useState('😊');
   const [selectedTheme, setSelectedTheme] = useState('purple');
+
+  // Initialize form values when profile loads
+  useEffect(() => {
+    if (userProfile) {
+      setName(userProfile.name || '');
+      setAge(Number(userProfile.age) || 10);
+      setSelectedAvatar(userProfile.avatarUrl || '😊');
+      setSelectedTheme(userProfile.theme || 'purple');
+    }
+  }, [userProfile]);
 
   const avatars = [
     '😊', '😄', '😎', '🤓', '🥳', '🤩',
@@ -39,22 +52,49 @@ export default function ProfileCustomization() {
       return;
     }
 
-    if (!userProfile) {
-      toast.error('Profile not loaded');
+    if (!identity) {
+      toast.error('Please log in to save your profile');
       return;
     }
 
     try {
-      await saveProfile.mutateAsync({
-        ...userProfile,
+      // Create profile object with all required fields
+      const profileToSave = {
         name: name.trim(),
-      });
+        age: BigInt(age),
+        parentPrincipal: identity.getPrincipal(), // Use current user as parent for now
+        approvedContacts: userProfile?.approvedContacts || [],
+        screenTimeLimit: userProfile?.screenTimeLimit || BigInt(120),
+        contentFilterLevel: userProfile?.contentFilterLevel || 'moderate',
+        avatarUrl: selectedAvatar,
+        theme: selectedTheme,
+        mascotPreference: userProfile?.mascotPreference || 'friendly',
+        accessibilitySettings: userProfile?.accessibilitySettings || {
+          readAloudEnabled: false,
+          highContrastMode: false,
+          largeText: false,
+        },
+        avatarConfig: userProfile?.avatarConfig,
+      };
+
+      await saveProfile.mutateAsync(profileToSave);
       toast.success('Profile updated successfully! ✨');
     } catch (error) {
       toast.error('Failed to update profile');
       console.error(error);
     }
   };
+
+  if (profileLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="text-4xl mb-4">⏳</div>
+          <p className="text-lg text-gray-700">Loading your profile...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -78,7 +118,7 @@ export default function ProfileCustomization() {
                 </AvatarFallback>
               </Avatar>
               <h2 className="text-2xl font-bold">{name || 'Your Name'}</h2>
-              <p className="text-gray-500">Age: {userProfile?.age.toString() || 'N/A'}</p>
+              <p className="text-gray-500">Age: {age}</p>
             </div>
             <div className={`h-24 bg-gradient-to-r ${themes.find(t => t.id === selectedTheme)?.color} rounded-lg border-4 border-white shadow-lg`}></div>
           </CardContent>
@@ -113,13 +153,16 @@ export default function ProfileCustomization() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Age</Label>
+                    <Label htmlFor="age">Age</Label>
                     <Input
-                      value={userProfile?.age.toString() || ''}
-                      disabled
+                      id="age"
+                      type="number"
+                      min="1"
+                      max="18"
+                      value={age}
+                      onChange={(e) => setAge(parseInt(e.target.value) || 10)}
                       className="text-lg h-12"
                     />
-                    <p className="text-sm text-gray-500">Age cannot be changed</p>
                   </div>
                   <Button onClick={handleSaveProfile} disabled={saveProfile.isPending} className="w-full text-lg h-12 font-bold">
                     {saveProfile.isPending ? 'Saving...' : 'Save Changes'}

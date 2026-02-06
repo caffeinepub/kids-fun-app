@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
 import { useInternetIdentity } from './useInternetIdentity';
-import type { UserApprovalInfo, ApprovalStatus } from '../backend';
+import type { UserApprovalInfo, ApprovalStatus, UserProfile as BackendUserProfile } from '../backend';
 import { Principal } from '@icp-sdk/core/principal';
 
 // Local type definitions for features not yet in backend interface
@@ -90,6 +90,15 @@ export interface UserProfile {
   approvedContacts: Principal[];
   screenTimeLimit: bigint;
   contentFilterLevel: string;
+  avatarUrl: string;
+  theme: string;
+  mascotPreference: string;
+  accessibilitySettings: {
+    readAloudEnabled: boolean;
+    highContrastMode: boolean;
+    largeText: boolean;
+  };
+  avatarConfig?: AvatarConfig;
 }
 
 export interface GameState {
@@ -303,9 +312,13 @@ export function useGetCallerUserProfile() {
     queryKey: ['currentUserProfile'],
     queryFn: async () => {
       if (!actor) return null;
-      // Backend method not available yet, using localStorage
-      const stored = localStorage.getItem('userProfile');
-      return stored ? JSON.parse(stored) : null;
+      try {
+        const result = await actor.getCallerUserProfile();
+        return result || null;
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+        return null;
+      }
     },
     enabled: !!actor && !actorFetching,
     retry: false,
@@ -319,11 +332,13 @@ export function useGetCallerUserProfile() {
 }
 
 export function useSaveCallerUserProfile() {
+  const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (profile: UserProfile) => {
-      localStorage.setItem('userProfile', JSON.stringify(profile));
+      if (!actor) throw new Error('Actor not available');
+      await actor.saveCallerUserProfile(profile);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
