@@ -1,17 +1,32 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "New project",
-  "architectural_notes": [
-    "Make focused changes only; do not impact other features or existing CRUD behavior while addressing the reported issue."
-  ],
+  "summary": "Art Gallery app project. Current focus: resolve artwork upload failure showing “Failed to upload artwork. Please try again.”",
+  "architectural_notes": [],
   "known_issues": [
-    "Profile Customization: after entering all profile information, the app shows 'Profile not loaded' instead of loading/saving the profile."
+    "Artwork upload fails after user completes upload form, showing error: “Failed to upload artwork. Please try again.”"
   ],
   "isFixRequest": true,
-  "existing_features": [],
+  "existing_features": [
+    {
+      "id": "feature-fix-the-art-gallery-upload-flow-so-that-pressing-upload-artwork-does-not-end-in-the-generic-error-toast-failed-to-upload-artwork-please-try-again-when-the-root-cause-is-missing-authentication-if-the-user-is-not-signed-in-prevent-submission-and-show-a-clear-english-message-instructing-the-user-to-sign-in-before-uploading",
+      "title": "Fix the Art Gallery upload flow so that pressing “Upload Artwork” does not end in the generic error toast “Failed to upload artwork. Please try again.” when the root cause is missing authentication. If the user is not signed in, prevent submission and show a clear English message instructing the user to sign in before uploading.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-improve-error-reporting-in-the-art-gallery-upload-submission-so-that-real-submission-failures-show-a-useful-english-error-message-use-the-thrown-error-message-when-available-e-g-from-the-mutation-and-keep-the-generic-fallback-only-for-unknown-errors",
+      "title": "Improve error reporting in the Art Gallery upload submission so that real submission failures show a useful English error message. Use the thrown error message when available (e.g., from the mutation) and keep the generic fallback only for unknown errors.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    }
+  ],
   "new_feature_requests": [],
-  "projectName": "Untitled request",
+  "projectName": "Art Gallery",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

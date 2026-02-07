@@ -17,9 +17,12 @@ import {
   Search,
   X,
   Youtube,
+  Shield,
 } from 'lucide-react';
 import { ModulePage } from '../App';
 import { useState, useMemo } from 'react';
+import { useIsCallerAdmin } from '../hooks/useQueries';
+import { useInternetIdentity } from '../hooks/useInternetIdentity';
 
 interface DashboardProps {
   onNavigate: (page: ModulePage) => void;
@@ -31,12 +34,17 @@ interface ModuleCard {
   description: string;
   icon: React.ReactNode;
   color: string;
+  adminOnly?: boolean;
 }
 
 export default function Dashboard({ onNavigate }: DashboardProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const { identity } = useInternetIdentity();
+  const { data: isAdmin, isLoading: isAdminLoading } = useIsCallerAdmin();
 
-  const modules: ModuleCard[] = [
+  const isAuthenticated = !!identity;
+
+  const allModules: ModuleCard[] = [
     {
       id: 'games',
       title: 'Games Hub 🎮',
@@ -198,7 +206,32 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       icon: <span className="text-3xl">🖼️</span>,
       color: 'from-pink-500 to-purple-500',
     },
+    {
+      id: 'admin-dashboard',
+      title: 'Admin Dashboard 🛡️',
+      description: 'Manage users and content',
+      icon: <Shield className="w-8 h-8" />,
+      color: 'from-red-600 to-orange-600',
+      adminOnly: true,
+    },
   ];
+
+  // Filter modules based on admin status - wait for admin check to complete
+  const modules = useMemo(() => {
+    // If we're still checking admin status and user is authenticated, don't filter yet
+    if (isAuthenticated && isAdminLoading) {
+      // Return all non-admin modules while loading
+      return allModules.filter(module => !module.adminOnly);
+    }
+
+    return allModules.filter(module => {
+      // Show admin-only modules only if user is authenticated and is admin
+      if (module.adminOnly) {
+        return isAuthenticated && isAdmin === true;
+      }
+      return true;
+    });
+  }, [isAuthenticated, isAdmin, isAdminLoading]);
 
   const filteredModules = useMemo(() => {
     if (!searchQuery.trim()) return modules;

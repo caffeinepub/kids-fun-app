@@ -1,10 +1,53 @@
 {
   "kind": "build_request",
-  "title": "Untitled request",
+  "title": "Fix Art Gallery upload failure toast and ensure upload works when user is authenticated",
   "priority": "normal",
-  "requirements": [],
-  "constraints": [],
-  "nonGoals": [],
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Fix the Art Gallery upload flow so that pressing “Upload Artwork” does not end in the generic error toast “Failed to upload artwork. Please try again.” when the root cause is missing authentication. If the user is not signed in, prevent submission and show a clear English message instructing the user to sign in before uploading.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "**Art Gallery**-When the user presses upload finishes filling in then it said this (Failed to upload artwork. Please try again.)Please fix this error."
+        ]
+      },
+      "acceptanceCriteria": [
+        "When the user is not logged in and attempts to upload, the app does not attempt to submit and instead shows an English message such as “Please sign in to upload artwork.”",
+        "The Upload Artwork button is disabled (or the UI otherwise blocks submission) when the user is not logged in.",
+        "No generic “Failed to upload artwork. Please try again.” toast is shown for the unauthenticated case."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Improve error reporting in the Art Gallery upload submission so that real submission failures show a useful English error message. Use the thrown error message when available (e.g., from the mutation) and keep the generic fallback only for unknown errors.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "(Failed to upload artwork. Please try again.)"
+        ]
+      },
+      "acceptanceCriteria": [
+        "If submission fails for a known reason (e.g., an Error with a message), the toast displays that message in English.",
+        "If submission fails for an unknown reason, the toast falls back to “Failed to upload artwork. Please try again.”",
+        "A successful upload shows the existing success toast and the form resets (title cleared, category reset, public checkbox reset, preview cleared)."
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not edit files under frontend/src/components/ui (compose them only).",
+    "Do not modify the immutable authentication/actor hooks located in frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, or frontend/src/hooks/useActor.ts."
+  ],
+  "nonGoals": [
+    "Do not redesign the Art Gallery UI beyond what is necessary to prevent the upload error and improve error messaging.",
+    "Do not add new backend persistence for artwork as part of this fix."
+  ],
   "imageRequirements": {
     "required": [],
     "edits": []

@@ -6,8 +6,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Upload, Heart, Eye, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useGetCallerArtwork, useGetPublicArtwork, useSubmitArtwork } from '../hooks/useQueries';
+import { useInternetIdentity } from '../hooks/useInternetIdentity';
 
 export default function ArtGalleryPage() {
+  const { identity } = useInternetIdentity();
+  const isAuthenticated = !!identity;
+
   const { data: myArtwork = [], isLoading: myArtworkLoading } = useGetCallerArtwork();
   const { data: publicArtwork = [], isLoading: publicArtworkLoading } = useGetPublicArtwork();
   const submitArtwork = useSubmitArtwork();
@@ -69,6 +73,14 @@ export default function ArtGalleryPage() {
   };
 
   const handleSubmit = async () => {
+    // Check authentication first
+    if (!isAuthenticated) {
+      toast.error('Please sign in to upload artwork', {
+        description: 'You need to be logged in to share your creativity.',
+      });
+      return;
+    }
+
     if (!artTitle.trim()) {
       toast.error('Please enter a title for your artwork');
       return;
@@ -103,9 +115,11 @@ export default function ArtGalleryPage() {
             setArtCategory('Drawing');
             setIsPublic(false);
             clearSelection();
-          } catch (error) {
+          } catch (error: any) {
             console.error('Artwork submission error:', error);
-            toast.error('Failed to upload artwork. Please try again.');
+            // Show specific error message if available
+            const errorMessage = error?.message || 'Failed to upload artwork. Please try again.';
+            toast.error(errorMessage);
           }
         } else {
           toast.error('Failed to process image file');
@@ -117,9 +131,10 @@ export default function ArtGalleryPage() {
       };
       
       reader.readAsDataURL(selectedFile);
-    } catch (error) {
+    } catch (error: any) {
       console.error('File processing error:', error);
-      toast.error('Failed to process image file');
+      const errorMessage = error?.message || 'Failed to process image file';
+      toast.error(errorMessage);
     }
   };
 
@@ -241,6 +256,17 @@ export default function ArtGalleryPage() {
               <CardDescription>Share your creativity with others!</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              {!isAuthenticated && (
+                <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-4 text-center">
+                  <p className="text-yellow-800 font-semibold">
+                    ⚠️ Please sign in to upload artwork
+                  </p>
+                  <p className="text-sm text-yellow-700 mt-1">
+                    You need to be logged in to share your creativity with others.
+                  </p>
+                </div>
+              )}
+
               <div
                 className="border-4 border-dashed border-primary rounded-lg p-12 text-center bg-gradient-to-br from-purple-50 to-pink-50 cursor-pointer hover:bg-purple-100 transition-colors"
                 onClick={() => fileInputRef.current?.click()}
@@ -320,7 +346,7 @@ export default function ArtGalleryPage() {
 
                 <Button 
                   onClick={handleSubmit} 
-                  disabled={submitArtwork.isPending || !selectedFile || !artTitle.trim()} 
+                  disabled={!isAuthenticated || submitArtwork.isPending || !selectedFile || !artTitle.trim()} 
                   className="w-full text-lg h-12"
                 >
                   {submitArtwork.isPending ? 'Uploading...' : 'Upload Artwork'}

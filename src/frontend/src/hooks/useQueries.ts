@@ -855,9 +855,12 @@ export function useIsCallerAdmin() {
     queryKey: ['isAdmin'],
     queryFn: async () => {
       if (!actor) return false;
-      // Backend method not available yet, using localStorage
-      const stored = localStorage.getItem('isAdmin');
-      return stored === 'true';
+      try {
+        return await actor.isCallerAdmin();
+      } catch (error) {
+        console.error('Error checking admin status:', error);
+        return false;
+      }
     },
     enabled: !!actor && !isFetching,
   });

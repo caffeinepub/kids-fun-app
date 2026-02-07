@@ -1,6 +1,39 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Untitled request",
-  "requirements": []
+  "title": "Art Gallery upload auth gating and improved error toasts",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Block Art Gallery upload submission when the user is not authenticated and show a clear sign-in message instead of a generic failure toast.",
+      "acceptanceCriteria": [
+        "When the user is not logged in and attempts to upload, the app does not attempt to submit and instead shows an English message such as “Please sign in to upload artwork.”",
+        "The Upload Artwork button is disabled (or the UI otherwise blocks submission) when the user is not logged in.",
+        "No generic “Failed to upload artwork. Please try again.” toast is shown for the unauthenticated case."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/ArtGalleryPage.tsx",
+          "operation": "modify",
+          "description": "Use the existing Internet Identity state (via useInternetIdentity) to detect whether the user is signed in; if not authenticated, block handleSubmit before any file processing/mutation call and show a clear English toast message instructing the user to sign in. Also update the Upload Artwork button disabled state (and/or equivalent submission guard) to prevent submission while unauthenticated."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Show useful English error messages for real Art Gallery upload failures while keeping a generic fallback for unknown errors, and ensure the success path still resets the form.",
+      "acceptanceCriteria": [
+        "If submission fails for a known reason (e.g., an Error with a message), the toast displays that message in English.",
+        "If submission fails for an unknown reason, the toast falls back to “Failed to upload artwork. Please try again.”",
+        "A successful upload shows the existing success toast and the form resets (title cleared, category reset, public checkbox reset, preview cleared)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/ArtGalleryPage.tsx",
+          "operation": "modify",
+          "description": "Improve upload submission error handling by extracting and displaying the thrown error message when available (including errors coming from submitArtwork.mutateAsync), while retaining the existing generic fallback only for unknown/unparseable errors. Ensure the existing success toast remains and the form reset logic continues to run on success (title, category, public checkbox, and preview/selection cleared)."
+        }
+      ]
+    }
+  ]
 }
