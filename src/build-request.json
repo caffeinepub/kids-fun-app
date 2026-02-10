@@ -1,55 +1,51 @@
 {
   "kind": "build_request",
-  "title": "Fix Art Gallery upload failure toast and ensure upload works when user is authenticated",
+  "title": "Kids YouTube Videos Hub: Play embeddable videos on-site, otherwise redirect to YouTube",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Fix the Art Gallery upload flow so that pressing “Upload Artwork” does not end in the generic error toast “Failed to upload artwork. Please try again.” when the root cause is missing authentication. If the user is not signed in, prevent submission and show a clear English message instructing the user to sign in before uploading.",
+      "text": "Update `frontend/src/pages/VideoHubPage.tsx` so that selecting a channel plays videos directly on the website when the channel is marked as allowed to embed, and otherwise prompts the user to watch on YouTube for channels marked as embed-blocked.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-1"
         ],
         "quotes": [
-          "**Art Gallery**-When the user presses upload finishes filling in then it said this (Failed to upload artwork. Please try again.)Please fix this error."
+          "Make focused changes. No other CRUD or features to be changed. **Kids YouTube Videos Hub**- Show video on my website that are not having any copyrights. Rest can be shown via youtube channel."
         ]
       },
       "acceptanceCriteria": [
-        "When the user is not logged in and attempts to upload, the app does not attempt to submit and instead shows an English message such as “Please sign in to upload artwork.”",
-        "The Upload Artwork button is disabled (or the UI otherwise blocks submission) when the user is not logged in.",
-        "No generic “Failed to upload artwork. Please try again.” toast is shown for the unauthenticated case."
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "text": "Improve error reporting in the Art Gallery upload submission so that real submission failures show a useful English error message. Use the thrown error message when available (e.g., from the mutation) and keep the generic fallback only for unknown errors.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-4"
-        ],
-        "quotes": [
-          "(Failed to upload artwork. Please try again.)"
-        ]
-      },
-      "acceptanceCriteria": [
-        "If submission fails for a known reason (e.g., an Error with a message), the toast displays that message in English.",
-        "If submission fails for an unknown reason, the toast falls back to “Failed to upload artwork. Please try again.”",
-        "A successful upload shows the existing success toast and the form resets (title cleared, category reset, public checkbox reset, preview cleared)."
+        "For a channel where `embedBlocked` is `true`, the channel detail view does not render an embedded player and instead shows the existing CTA to open the `channelUrl` on YouTube.",
+        "For a channel where `embedBlocked` is not `true`, the channel detail view renders an on-site embedded player using that channel’s existing `embedUrl` (e.g., an `<iframe>` within the existing `aspect-video` container).",
+        "The embedded player includes appropriate iframe attributes for video playback (e.g., `allow` for autoplay/encrypted-media/fullscreen as needed) and uses the existing `youtube-nocookie.com` embed URLs already present in the channel data.",
+        "A visible \"Watch on YouTube\" button/link remains available in the channel detail view regardless of embed status, using the existing `channelUrl` and opening in a new tab.",
+        "No other pages, navigation, CRUD flows, or backend code are changed."
       ]
     }
   ],
   "constraints": [
-    "Do not edit files under frontend/src/components/ui (compose them only).",
-    "Do not modify the immutable authentication/actor hooks located in frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, or frontend/src/hooks/useActor.ts."
+    "Make focused changes only for the Kids YouTube Videos Hub; do not change any other CRUD or features.",
+    "Do not edit any files under `frontend/src/components/ui` or other immutable frontend paths listed in SYSTEM_CONTEXT.",
+    "Backend must remain single-actor; no backend changes are required for this request."
   ],
   "nonGoals": [
-    "Do not redesign the Art Gallery UI beyond what is necessary to prevent the upload error and improve error messaging.",
-    "Do not add new backend persistence for artwork as part of this fix."
+    "Do not implement automatic copyright detection or any API-based copyright checks.",
+    "Do not add video upload/hosting features or store video metadata in the backend.",
+    "Do not change the Art Gallery, Admin Dashboard, or any unrelated modules."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

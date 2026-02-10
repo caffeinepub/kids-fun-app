@@ -110,6 +110,16 @@ export const VirtualPetHub = IDL.Record({
   'homeStyle' : IDL.Text,
   'decorations' : IDL.Vec(IDL.Text),
 });
+export const ActivityType = IDL.Variant({
+  'user_created' : IDL.Null,
+  'game_played' : IDL.Record({ 'gameId' : IDL.Text, 'gameName' : IDL.Text }),
+});
+export const ActivityEvent = IDL.Record({
+  'id' : IDL.Nat,
+  'activityType' : ActivityType,
+  'userId' : IDL.Principal,
+  'timestamp' : Time,
+});
 export const ScaryHubGameEntry = IDL.Record({
   'id' : IDL.Text,
   'lastPlayed' : IDL.Int,
@@ -172,6 +182,11 @@ export const idlService = IDL.Service({
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getCallerVirtualPet' : IDL.Func([], [IDL.Opt(VirtualPetHub)], ['query']),
+  'getRecentActivityEvents' : IDL.Func(
+      [IDL.Nat],
+      [IDL.Vec(ActivityEvent)],
+      ['query'],
+    ),
   'getScaryHubGames' : IDL.Func([], [IDL.Vec(ScaryHubGameEntry)], ['query']),
   'getStoryProject' : IDL.Func([IDL.Text], [IDL.Opt(StoryProject)], ['query']),
   'getUserProfile' : IDL.Func(
@@ -192,6 +207,7 @@ export const idlService = IDL.Service({
   'listApprovals' : IDL.Func([], [IDL.Vec(UserApprovalInfo)], ['query']),
   'markChannelAsFavorite' : IDL.Func([IDL.Text], [], []),
   'publishStoryProject' : IDL.Func([IDL.Text], [], []),
+  'recordGamePlay' : IDL.Func([IDL.Text, IDL.Text], [], []),
   'requestApproval' : IDL.Func([], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'saveCallerVirtualPet' : IDL.Func([VirtualPetHub], [], []),
@@ -310,6 +326,16 @@ export const idlFactory = ({ IDL }) => {
     'homeStyle' : IDL.Text,
     'decorations' : IDL.Vec(IDL.Text),
   });
+  const ActivityType = IDL.Variant({
+    'user_created' : IDL.Null,
+    'game_played' : IDL.Record({ 'gameId' : IDL.Text, 'gameName' : IDL.Text }),
+  });
+  const ActivityEvent = IDL.Record({
+    'id' : IDL.Nat,
+    'activityType' : ActivityType,
+    'userId' : IDL.Principal,
+    'timestamp' : Time,
+  });
   const ScaryHubGameEntry = IDL.Record({
     'id' : IDL.Text,
     'lastPlayed' : IDL.Int,
@@ -372,6 +398,11 @@ export const idlFactory = ({ IDL }) => {
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getCallerVirtualPet' : IDL.Func([], [IDL.Opt(VirtualPetHub)], ['query']),
+    'getRecentActivityEvents' : IDL.Func(
+        [IDL.Nat],
+        [IDL.Vec(ActivityEvent)],
+        ['query'],
+      ),
     'getScaryHubGames' : IDL.Func([], [IDL.Vec(ScaryHubGameEntry)], ['query']),
     'getStoryProject' : IDL.Func(
         [IDL.Text],
@@ -400,6 +431,7 @@ export const idlFactory = ({ IDL }) => {
     'listApprovals' : IDL.Func([], [IDL.Vec(UserApprovalInfo)], ['query']),
     'markChannelAsFavorite' : IDL.Func([IDL.Text], [], []),
     'publishStoryProject' : IDL.Func([IDL.Text], [], []),
+    'recordGamePlay' : IDL.Func([IDL.Text, IDL.Text], [], []),
     'requestApproval' : IDL.Func([], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'saveCallerVirtualPet' : IDL.Func([VirtualPetHub], [], []),

@@ -1,260 +1,243 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Heart, 
-  Sparkles, 
-  Home, 
-  Shirt, 
-  Gift, 
-  Star,
-  TrendingUp,
-  Smile,
-  Laugh,
-  PartyPopper,
-  Crown
-} from 'lucide-react';
-import { useGetVirtualPetHub, useSaveVirtualPetHub, useGetUserRewards } from '../hooks/useQueries';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { useGetVirtualPetHub, useSaveVirtualPetHub, useGetUserRewards, useGetUserTrophies } from '../hooks/useQueries';
+import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { toast } from 'sonner';
-import { triggerAchievementCelebration } from '../components/AchievementCelebration';
-import { showEmotionFeedback } from '../components/EmotionFeedback';
-import { ModulePage } from '../App';
+import { Heart, Sparkles, Home, ShoppingBag, Trophy, Star, Gift, Zap } from 'lucide-react';
 
-interface VirtualPetHubPageProps {
-  onNavigate: (page: ModulePage) => void;
-}
-
-export default function VirtualPetHubPage({ onNavigate }: VirtualPetHubPageProps) {
-  const { data: petHub, isLoading } = useGetVirtualPetHub();
-  const { data: userRewards } = useGetUserRewards();
-  const savePetHubMutation = useSaveVirtualPetHub();
+export default function VirtualPetHubPage() {
+  const { identity } = useInternetIdentity();
+  const { data: petHub, isLoading: petLoading } = useGetVirtualPetHub();
+  const { data: rewards } = useGetUserRewards();
+  const { data: trophies = 70 } = useGetUserTrophies();
+  const savePetHub = useSaveVirtualPetHub();
 
   const [petName, setPetName] = useState('');
-  const [selectedAccessories, setSelectedAccessories] = useState<string[]>([]);
-  const [selectedDecorations, setSelectedDecorations] = useState<string[]>([]);
-  const [homeStyle, setHomeStyle] = useState('Cozy');
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [selectedAccessory, setSelectedAccessory] = useState<string | null>(null);
+  const [selectedDecoration, setSelectedDecoration] = useState<string | null>(null);
+  const [selectedHomeStyle, setSelectedHomeStyle] = useState('cozy');
+  const [showNameDialog, setShowNameDialog] = useState(false);
 
   useEffect(() => {
-    if (petHub && !isInitialized) {
+    if (petHub) {
       setPetName(petHub.petName);
-      setSelectedAccessories(petHub.accessories);
-      setSelectedDecorations(petHub.decorations);
-      setHomeStyle(petHub.homeStyle);
-      setIsInitialized(true);
+      setSelectedHomeStyle(petHub.homeStyle || 'cozy');
+    } else if (identity && !petLoading) {
+      setShowNameDialog(true);
     }
-  }, [petHub, isInitialized]);
+  }, [petHub, identity, petLoading]);
 
-  const totalPoints = userRewards?.points || 0;
-  const happinessLevel = petHub?.happinessLevel ? Number(petHub.happinessLevel) : 50;
-  const growthStage = petHub?.growthStage ? Number(petHub.growthStage) : 1;
-
-  const availableAccessories = [
-    { id: 'hat-party', name: 'Party Hat', icon: '🎩', unlockPoints: 0 },
-    { id: 'collar-gold', name: 'Gold Collar', icon: '⭐', unlockPoints: 500 },
-    { id: 'bow-pink', name: 'Pink Bow', icon: '🎀', unlockPoints: 300 },
-    { id: 'sunglasses', name: 'Cool Sunglasses', icon: '😎', unlockPoints: 700 },
-    { id: 'crown', name: 'Royal Crown', icon: '👑', unlockPoints: 1000 },
-    { id: 'scarf', name: 'Cozy Scarf', icon: '🧣', unlockPoints: 400 },
+  const accessories = [
+    { id: 'hat_party', name: 'Party Hat', emoji: '🎩', cost: 50 },
+    { id: 'hat_crown', name: 'Crown', emoji: '👑', cost: 100 },
+    { id: 'glasses_cool', name: 'Cool Glasses', emoji: '😎', cost: 75 },
+    { id: 'bow_tie', name: 'Bow Tie', emoji: '🎀', cost: 60 },
+    { id: 'scarf', name: 'Scarf', emoji: '🧣', cost: 80 },
+    { id: 'necklace', name: 'Necklace', emoji: '📿', cost: 90 },
   ];
 
-  const availableDecorations = [
-    { id: 'ball', name: 'Play Ball', icon: '⚽', unlockPoints: 0 },
-    { id: 'plant', name: 'House Plant', icon: '🌱', unlockPoints: 200 },
-    { id: 'cushion', name: 'Soft Cushion', icon: '🛋️', unlockPoints: 300 },
-    { id: 'toy-box', name: 'Toy Box', icon: '🎁', unlockPoints: 500 },
-    { id: 'lamp', name: 'Fancy Lamp', icon: '💡', unlockPoints: 600 },
-    { id: 'rug', name: 'Colorful Rug', icon: '🎨', unlockPoints: 400 },
+  const decorations = [
+    { id: 'plant', name: 'Plant', emoji: '🪴', cost: 40 },
+    { id: 'lamp', name: 'Lamp', emoji: '💡', cost: 50 },
+    { id: 'rug', name: 'Rug', emoji: '🧶', cost: 60 },
+    { id: 'painting', name: 'Painting', emoji: '🖼️', cost: 70 },
+    { id: 'bookshelf', name: 'Bookshelf', emoji: '📚', cost: 80 },
+    { id: 'toy_box', name: 'Toy Box', emoji: '🧸', cost: 90 },
   ];
 
   const homeStyles = [
-    { id: 'Cozy', name: 'Cozy Home', color: 'from-orange-400 to-red-400' },
-    { id: 'Modern', name: 'Modern Space', color: 'from-blue-400 to-purple-400' },
-    { id: 'Garden', name: 'Garden Paradise', color: 'from-green-400 to-teal-400' },
-    { id: 'Castle', name: 'Royal Castle', color: 'from-purple-400 to-pink-400' },
+    { id: 'cozy', name: 'Cozy Cottage', emoji: '🏡', description: 'Warm and comfortable' },
+    { id: 'modern', name: 'Modern Loft', emoji: '🏢', description: 'Sleek and stylish' },
+    { id: 'garden', name: 'Garden Paradise', emoji: '🌳', description: 'Nature-inspired' },
+    { id: 'castle', name: 'Royal Castle', emoji: '🏰', description: 'Fit for royalty' },
   ];
 
-  const getMoodIcon = () => {
-    if (happinessLevel >= 80) return <PartyPopper className="w-12 h-12 text-yellow-500" />;
-    if (happinessLevel >= 60) return <Laugh className="w-12 h-12 text-green-500" />;
-    if (happinessLevel >= 40) return <Smile className="w-12 h-12 text-blue-500" />;
-    return <Heart className="w-12 h-12 text-pink-500" />;
-  };
-
-  const getMoodText = () => {
-    if (happinessLevel >= 80) return 'Joyful';
-    if (happinessLevel >= 60) return 'Excited';
-    if (happinessLevel >= 40) return 'Content';
-    return 'Happy';
-  };
-
-  const getPetImage = () => {
-    if (happinessLevel >= 80) return '/assets/generated/virtual-pet-joyful.dim_200x200.png';
-    if (happinessLevel >= 60) return '/assets/generated/virtual-pet-excited.dim_200x200.png';
-    if (happinessLevel >= 40) return '/assets/generated/virtual-pet-content.dim_200x200.png';
-    return '/assets/generated/virtual-pet-happy.dim_200x200.png';
-  };
-
-  const handleInitializePet = async () => {
+  const handleCreatePet = async () => {
     if (!petName.trim()) {
       toast.error('Please enter a name for your pet!');
       return;
     }
 
+    if (!identity) {
+      toast.error('Please log in first!');
+      return;
+    }
+
     try {
-      await savePetHubMutation.mutateAsync({
+      await savePetHub.mutateAsync({
+        userId: identity.getPrincipal(),
         petName: petName.trim(),
-        happinessLevel: 50,
-        growthStage: 1,
+        happinessLevel: BigInt(50),
+        growthStage: BigInt(1),
         accessories: [],
         decorations: [],
-        homeStyle: 'Cozy',
+        homeStyle: 'cozy',
+        warnedAboutExtremeChanges: false,
+        trophies: BigInt(trophies),
       });
+
       toast.success(`Welcome ${petName}! 🎉`);
-      showEmotionFeedback('Your pet is so happy to meet you!');
-      triggerAchievementCelebration('Pet Created!', 'confetti');
+      setShowNameDialog(false);
     } catch (error) {
       console.error('Error creating pet:', error);
       toast.error('Failed to create pet. Please try again.');
     }
   };
 
-  const handleToggleAccessory = (accessoryId: string) => {
-    const accessory = availableAccessories.find(a => a.id === accessoryId);
-    if (!accessory) return;
+  const handleFeedPet = async () => {
+    if (!petHub || !identity) return;
 
-    if (totalPoints < accessory.unlockPoints) {
-      toast.error(`You need ${accessory.unlockPoints} points to unlock this accessory!`);
-      return;
-    }
-
-    const newAccessories = selectedAccessories.includes(accessoryId)
-      ? selectedAccessories.filter(id => id !== accessoryId)
-      : [...selectedAccessories, accessoryId];
-
-    setSelectedAccessories(newAccessories);
-    toast.success(
-      selectedAccessories.includes(accessoryId)
-        ? `Removed ${accessory.name}`
-        : `Added ${accessory.name}!`
-    );
-  };
-
-  const handleToggleDecoration = (decorationId: string) => {
-    const decoration = availableDecorations.find(d => d.id === decorationId);
-    if (!decoration) return;
-
-    if (totalPoints < decoration.unlockPoints) {
-      toast.error(`You need ${decoration.unlockPoints} points to unlock this decoration!`);
-      return;
-    }
-
-    const newDecorations = selectedDecorations.includes(decorationId)
-      ? selectedDecorations.filter(id => id !== decorationId)
-      : [...selectedDecorations, decorationId];
-
-    setSelectedDecorations(newDecorations);
-    toast.success(
-      selectedDecorations.includes(decorationId)
-        ? `Removed ${decoration.name}`
-        : `Added ${decoration.name}!`
-    );
-  };
-
-  const handleSaveChanges = async () => {
-    if (!petHub) return;
+    const newHappiness = Math.min(Number(petHub.happinessLevel) + 10, 100);
+    const newGrowth = newHappiness === 100 ? Number(petHub.growthStage) + 1 : Number(petHub.growthStage);
 
     try {
-      await savePetHubMutation.mutateAsync({
-        petName,
-        happinessLevel: Number(petHub.happinessLevel),
-        growthStage: Number(petHub.growthStage),
-        accessories: selectedAccessories,
-        decorations: selectedDecorations,
-        homeStyle,
+      await savePetHub.mutateAsync({
+        ...petHub,
+        happinessLevel: BigInt(newHappiness),
+        growthStage: BigInt(newGrowth),
       });
-      toast.success('Pet customization saved! 🎉');
-      showEmotionFeedback('Your pet loves the new look!');
+
+      toast.success('Your pet is happy! 😊');
     } catch (error) {
-      console.error('Error saving pet:', error);
-      toast.error('Failed to save changes. Please try again.');
+      console.error('Error feeding pet:', error);
+      toast.error('Failed to feed pet');
     }
   };
 
-  const handleFeedPet = () => {
-    showEmotionFeedback('Yummy! Your pet is so happy!');
-    toast.success('Your pet enjoyed the treat! 🍖');
+  const handlePlayWithPet = async () => {
+    if (!petHub || !identity) return;
+
+    const newHappiness = Math.min(Number(petHub.happinessLevel) + 15, 100);
+    const newGrowth = newHappiness === 100 ? Number(petHub.growthStage) + 1 : Number(petHub.growthStage);
+
+    try {
+      await savePetHub.mutateAsync({
+        ...petHub,
+        happinessLevel: BigInt(newHappiness),
+        growthStage: BigInt(newGrowth),
+      });
+
+      toast.success('Your pet loves playing with you! 🎮');
+    } catch (error) {
+      console.error('Error playing with pet:', error);
+      toast.error('Failed to play with pet');
+    }
   };
 
-  const handlePlayWithPet = () => {
-    showEmotionFeedback('Playtime is the best!');
-    toast.success('Your pet had so much fun! 🎾');
-    triggerAchievementCelebration('Play Time!', 'confetti');
+  const handleBuyAccessory = async (accessoryId: string, cost: number) => {
+    if (!petHub || !identity) return;
+
+    if (trophies < cost) {
+      toast.error(`Not enough trophies! You need ${cost} trophies.`);
+      return;
+    }
+
+    if (petHub.accessories.includes(accessoryId)) {
+      toast.error('You already own this accessory!');
+      return;
+    }
+
+    try {
+      await savePetHub.mutateAsync({
+        ...petHub,
+        accessories: [...petHub.accessories, accessoryId],
+      });
+
+      toast.success('Accessory purchased! 🎉');
+    } catch (error) {
+      console.error('Error buying accessory:', error);
+      toast.error('Failed to purchase accessory');
+    }
   };
 
-  if (isLoading) {
+  const handleBuyDecoration = async (decorationId: string, cost: number) => {
+    if (!petHub || !identity) return;
+
+    if (trophies < cost) {
+      toast.error(`Not enough trophies! You need ${cost} trophies.`);
+      return;
+    }
+
+    if (petHub.decorations.includes(decorationId)) {
+      toast.error('You already own this decoration!');
+      return;
+    }
+
+    try {
+      await savePetHub.mutateAsync({
+        ...petHub,
+        decorations: [...petHub.decorations, decorationId],
+      });
+
+      toast.success('Decoration purchased! 🎉');
+    } catch (error) {
+      console.error('Error buying decoration:', error);
+      toast.error('Failed to purchase decoration');
+    }
+  };
+
+  const handleChangeHomeStyle = async (styleId: string) => {
+    if (!petHub || !identity) return;
+
+    try {
+      await savePetHub.mutateAsync({
+        ...petHub,
+        homeStyle: styleId,
+      });
+
+      setSelectedHomeStyle(styleId);
+      toast.success('Home style updated! 🏡');
+    } catch (error) {
+      console.error('Error changing home style:', error);
+      toast.error('Failed to change home style');
+    }
+  };
+
+  const getGrowthStageName = (stage: number) => {
+    if (stage <= 1) return 'Baby';
+    if (stage <= 3) return 'Child';
+    if (stage <= 5) return 'Teen';
+    if (stage <= 7) return 'Adult';
+    return 'Elder';
+  };
+
+  const getPetEmoji = (stage: number) => {
+    if (stage <= 1) return '🥚';
+    if (stage <= 3) return '🐣';
+    if (stage <= 5) return '🐥';
+    if (stage <= 7) return '🐤';
+    return '🦜';
+  };
+
+  if (petLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-center">
-          <Sparkles className="w-16 h-16 mx-auto mb-4 animate-spin text-purple-600" />
-          <p className="text-xl font-bold text-black">Loading your pet...</p>
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+          <p className="text-lg text-gray-600">Loading your pet...</p>
         </div>
       </div>
     );
   }
 
-  if (!petHub) {
+  if (!identity) {
     return (
-      <div className="max-w-2xl mx-auto space-y-6">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            Create Your Virtual Pet! 🐾
-          </h1>
-          <p className="text-lg text-black">Give your new friend a name to get started!</p>
-        </div>
-
-        <Card className="border-4 bg-gradient-to-br from-purple-50 to-pink-50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-black">
-              <Sparkles className="w-6 h-6 text-purple-600" />
-              Welcome to Virtual Pet Hub
-            </CardTitle>
-            <CardDescription className="text-black">
-              Your pet will grow and learn as you earn points from games, spin rewards, and activities!
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Card className="max-w-md border-4 border-purple-400 shadow-lg">
+          <CardHeader className="text-center">
+            <CardTitle className="text-3xl">🐾 Virtual Pet Hub</CardTitle>
+            <CardDescription className="text-lg">
+              Please log in to create and care for your virtual pet!
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="text-center">
-              <div className="text-9xl mb-4">🐶</div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="petName" className="text-lg font-bold text-black">
-                Pet Name
-              </Label>
-              <Input
-                id="petName"
-                placeholder="Enter a name for your pet..."
-                value={petName}
-                onChange={(e) => setPetName(e.target.value)}
-                className="text-lg text-black"
-              />
-            </div>
-
-            <Button
-              size="lg"
-              onClick={handleInitializePet}
-              disabled={savePetHubMutation.isPending}
-              className="w-full text-xl py-6"
-            >
-              {savePetHubMutation.isPending ? 'Creating...' : 'Create My Pet! 🎉'}
-            </Button>
-          </CardContent>
         </Card>
       </div>
     );
@@ -262,320 +245,251 @@ export default function VirtualPetHubPage({ onNavigate }: VirtualPetHubPageProps
 
   return (
     <div className="space-y-6">
+      <Dialog open={showNameDialog} onOpenChange={setShowNameDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-2xl">Create Your Virtual Pet! 🐾</DialogTitle>
+            <DialogDescription>
+              Choose a name for your new companion
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="petName">Pet Name</Label>
+              <Input
+                id="petName"
+                placeholder="Enter a name..."
+                value={petName}
+                onChange={(e) => setPetName(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleCreatePet()}
+              />
+            </div>
+            <Button onClick={handleCreatePet} className="w-full" size="lg">
+              Create Pet 🎉
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <div className="text-center">
         <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-          Virtual Pet Hub 🐾
+          🐾 Virtual Pet Hub
         </h1>
-        <p className="text-lg text-black">Take care of {petName} and watch them grow!</p>
+        <p className="text-lg text-gray-700">Take care of your virtual companion!</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          <Card className="border-4 bg-gradient-to-br from-purple-50 to-pink-50">
+      {petHub && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Pet Display */}
+          <Card className="lg:col-span-2 border-4 border-purple-400 shadow-lg">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-black">
-                <Heart className="w-6 h-6 text-pink-600" />
-                {petName}
-              </CardTitle>
-              <CardDescription className="text-black">Growth Stage {growthStage} • {getMoodText()}</CardDescription>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-2xl flex items-center gap-2">
+                  {getPetEmoji(Number(petHub.growthStage))} {petHub.petName}
+                </CardTitle>
+                <Badge variant="secondary" className="text-lg">
+                  {getGrowthStageName(Number(petHub.growthStage))}
+                </Badge>
+              </div>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="relative">
-                <div 
-                  className={`rounded-3xl p-8 bg-gradient-to-br ${homeStyles.find(s => s.id === homeStyle)?.color || 'from-orange-400 to-red-400'}`}
-                  style={{
-                    backgroundImage: 'url(/assets/generated/pet-home-background.dim_400x300.png)',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                  }}
-                >
-                  <div className="text-center space-y-4">
-                    <div className="relative inline-block">
-                      <img 
-                        src={getPetImage()} 
-                        alt={petName}
-                        className="w-48 h-48 mx-auto animate-bounce"
-                      />
-                      {selectedAccessories.map((accId) => {
-                        const acc = availableAccessories.find(a => a.id === accId);
+              {/* Pet Stats */}
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="flex items-center gap-2">
+                      <Heart className="w-5 h-5 text-red-500" />
+                      Happiness
+                    </Label>
+                    <span className="font-bold">{Number(petHub.happinessLevel)}%</span>
+                  </div>
+                  <Progress value={Number(petHub.happinessLevel)} className="h-3" />
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="flex items-center gap-2">
+                      <Star className="w-5 h-5 text-yellow-500" />
+                      Growth Stage
+                    </Label>
+                    <span className="font-bold">Level {Number(petHub.growthStage)}</span>
+                  </div>
+                  <Progress value={(Number(petHub.growthStage) / 10) * 100} className="h-3" />
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="flex items-center gap-2">
+                      <Trophy className="w-5 h-5 text-amber-500" />
+                      Trophies
+                    </Label>
+                    <span className="font-bold">{trophies}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Pet Visual */}
+              <div className="relative bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg p-8 min-h-[300px] flex items-center justify-center border-4 border-purple-300">
+                <div className="text-center space-y-4">
+                  <div className="text-9xl animate-bounce">
+                    {getPetEmoji(Number(petHub.growthStage))}
+                  </div>
+                  {petHub.accessories.length > 0 && (
+                    <div className="flex gap-2 justify-center flex-wrap">
+                      {petHub.accessories.map((accId) => {
+                        const acc = accessories.find((a) => a.id === accId);
                         return acc ? (
-                          <div key={accId} className="absolute top-0 right-0 text-4xl">
-                            {acc.icon}
-                          </div>
+                          <span key={accId} className="text-4xl">
+                            {acc.emoji}
+                          </span>
                         ) : null;
                       })}
                     </div>
-                    
-                    <div className="flex justify-center gap-4 flex-wrap">
-                      {selectedDecorations.map((decId) => {
-                        const dec = availableDecorations.find(d => d.id === decId);
-                        return dec ? (
-                          <div key={decId} className="text-3xl">
-                            {dec.icon}
-                          </div>
-                        ) : null;
-                      })}
-                    </div>
-                  </div>
+                  )}
                 </div>
               </div>
 
-              <div className="flex gap-4">
-                <Button onClick={handleFeedPet} className="flex-1" variant="outline">
-                  🍖 Feed
+              {/* Care Actions */}
+              <div className="grid grid-cols-2 gap-4">
+                <Button
+                  onClick={handleFeedPet}
+                  size="lg"
+                  className="gap-2"
+                  disabled={savePetHub.isPending}
+                >
+                  <Gift className="w-5 h-5" />
+                  Feed Pet
                 </Button>
-                <Button onClick={handlePlayWithPet} className="flex-1" variant="outline">
-                  🎾 Play
-                </Button>
-                <Button onClick={() => onNavigate('games')} className="flex-1">
-                  🎮 Play Games
+                <Button
+                  onClick={handlePlayWithPet}
+                  size="lg"
+                  className="gap-2"
+                  disabled={savePetHub.isPending}
+                >
+                  <Zap className="w-5 h-5" />
+                  Play
                 </Button>
               </div>
             </CardContent>
           </Card>
 
-          <Tabs defaultValue="accessories" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="accessories" className="text-black">
-                <Shirt className="w-4 h-4 mr-2" />
-                Accessories
-              </TabsTrigger>
-              <TabsTrigger value="decorations" className="text-black">
-                <Gift className="w-4 h-4 mr-2" />
-                Decorations
-              </TabsTrigger>
-              <TabsTrigger value="home" className="text-black">
-                <Home className="w-4 h-4 mr-2" />
-                Home Style
-              </TabsTrigger>
-            </TabsList>
+          {/* Customization Panel */}
+          <Card className="border-4 border-pink-400 shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ShoppingBag className="w-6 h-6" />
+                Customize
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue="accessories">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="accessories">Accessories</TabsTrigger>
+                  <TabsTrigger value="decorations">Decor</TabsTrigger>
+                  <TabsTrigger value="home">Home</TabsTrigger>
+                </TabsList>
 
-            <TabsContent value="accessories" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-black">Dress Up Your Pet</CardTitle>
-                  <CardDescription className="text-black">Unlock accessories by earning points!</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {availableAccessories.map((accessory) => {
-                      const isUnlocked = totalPoints >= accessory.unlockPoints;
-                      const isSelected = selectedAccessories.includes(accessory.id);
-
+                <TabsContent value="accessories" className="space-y-2">
+                  <ScrollArea className="h-[400px]">
+                    {accessories.map((accessory) => {
+                      const owned = petHub.accessories.includes(accessory.id);
                       return (
-                        <Card
-                          key={accessory.id}
-                          className={`cursor-pointer transition-all ${
-                            isSelected ? 'border-4 border-purple-500 bg-purple-50' : 'border-2'
-                          } ${!isUnlocked ? 'opacity-50' : 'hover:scale-105'}`}
-                          onClick={() => isUnlocked && handleToggleAccessory(accessory.id)}
-                        >
-                          <CardContent className="p-4 text-center space-y-2">
-                            <div className="text-4xl">{accessory.icon}</div>
-                            <p className="font-bold text-sm text-black">{accessory.name}</p>
-                            {!isUnlocked && (
-                              <Badge variant="secondary" className="text-xs">
-                                {accessory.unlockPoints} pts
-                              </Badge>
-                            )}
-                            {isSelected && (
-                              <Badge className="bg-green-500">Equipped</Badge>
-                            )}
+                        <Card key={accessory.id} className="mb-2">
+                          <CardContent className="p-3">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <span className="text-2xl">{accessory.emoji}</span>
+                                <div>
+                                  <p className="font-semibold">{accessory.name}</p>
+                                  <p className="text-sm text-gray-600">
+                                    {accessory.cost} 🏆
+                                  </p>
+                                </div>
+                              </div>
+                              <Button
+                                size="sm"
+                                onClick={() => handleBuyAccessory(accessory.id, accessory.cost)}
+                                disabled={owned || savePetHub.isPending}
+                              >
+                                {owned ? 'Owned' : 'Buy'}
+                              </Button>
+                            </div>
                           </CardContent>
                         </Card>
                       );
                     })}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
+                  </ScrollArea>
+                </TabsContent>
 
-            <TabsContent value="decorations" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-black">Decorate Pet's Home</CardTitle>
-                  <CardDescription className="text-black">Make your pet's space cozy and fun!</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {availableDecorations.map((decoration) => {
-                      const isUnlocked = totalPoints >= decoration.unlockPoints;
-                      const isSelected = selectedDecorations.includes(decoration.id);
-
+                <TabsContent value="decorations" className="space-y-2">
+                  <ScrollArea className="h-[400px]">
+                    {decorations.map((decoration) => {
+                      const owned = petHub.decorations.includes(decoration.id);
                       return (
-                        <Card
-                          key={decoration.id}
-                          className={`cursor-pointer transition-all ${
-                            isSelected ? 'border-4 border-green-500 bg-green-50' : 'border-2'
-                          } ${!isUnlocked ? 'opacity-50' : 'hover:scale-105'}`}
-                          onClick={() => isUnlocked && handleToggleDecoration(decoration.id)}
-                        >
-                          <CardContent className="p-4 text-center space-y-2">
-                            <div className="text-4xl">{decoration.icon}</div>
-                            <p className="font-bold text-sm text-black">{decoration.name}</p>
-                            {!isUnlocked && (
-                              <Badge variant="secondary" className="text-xs">
-                                {decoration.unlockPoints} pts
-                              </Badge>
-                            )}
-                            {isSelected && (
-                              <Badge className="bg-green-500">Placed</Badge>
-                            )}
+                        <Card key={decoration.id} className="mb-2">
+                          <CardContent className="p-3">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <span className="text-2xl">{decoration.emoji}</span>
+                                <div>
+                                  <p className="font-semibold">{decoration.name}</p>
+                                  <p className="text-sm text-gray-600">
+                                    {decoration.cost} 🏆
+                                  </p>
+                                </div>
+                              </div>
+                              <Button
+                                size="sm"
+                                onClick={() => handleBuyDecoration(decoration.id, decoration.cost)}
+                                disabled={owned || savePetHub.isPending}
+                              >
+                                {owned ? 'Owned' : 'Buy'}
+                              </Button>
+                            </div>
                           </CardContent>
                         </Card>
                       );
                     })}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
+                  </ScrollArea>
+                </TabsContent>
 
-            <TabsContent value="home" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-black">Choose Home Style</CardTitle>
-                  <CardDescription className="text-black">Pick a theme for your pet's home!</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 gap-4">
-                    {homeStyles.map((style) => (
-                      <Card
-                        key={style.id}
-                        className={`cursor-pointer transition-all hover:scale-105 ${
-                          homeStyle === style.id ? 'border-4 border-blue-500' : 'border-2'
-                        }`}
-                        onClick={() => setHomeStyle(style.id)}
-                      >
-                        <CardContent className="p-6 text-center space-y-3">
-                          <div className={`h-24 rounded-lg bg-gradient-to-br ${style.color}`}></div>
-                          <p className="font-bold text-black">{style.name}</p>
-                          {homeStyle === style.id && (
-                            <Badge className="bg-blue-500">Selected</Badge>
-                          )}
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-
-          <Button
-            size="lg"
-            onClick={handleSaveChanges}
-            disabled={savePetHubMutation.isPending}
-            className="w-full text-xl py-6"
-          >
-            {savePetHubMutation.isPending ? 'Saving...' : 'Save Changes 💾'}
-          </Button>
-        </div>
-
-        <div className="space-y-6">
-          <Card className="border-4 bg-gradient-to-br from-pink-50 to-red-50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-black">
-                <Heart className="w-6 h-6 text-pink-600" />
-                Happiness
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="text-center">
-                {getMoodIcon()}
-                <p className="text-2xl font-bold mt-2 text-black">{getMoodText()}</p>
-              </div>
-              <Progress value={happinessLevel} className="h-4" />
-              <p className="text-center text-sm text-black">
-                {happinessLevel}% Happy
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-4 bg-gradient-to-br from-blue-50 to-purple-50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-black">
-                <TrendingUp className="w-6 h-6 text-blue-600" />
-                Growth Progress
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="text-center">
-                <Crown className="w-12 h-12 mx-auto text-yellow-500" />
-                <p className="text-2xl font-bold mt-2 text-black">Stage {growthStage}</p>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm text-black">
-                  <span>Progress to Stage {growthStage + 1}</span>
-                  <span>{Math.floor((totalPoints % 1000) / 10)}%</span>
-                </div>
-                <Progress value={(totalPoints % 1000) / 10} className="h-3" />
-                <p className="text-xs text-black text-center">
-                  {totalPoints} / {growthStage * 1000} points
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-4 bg-gradient-to-br from-yellow-50 to-orange-50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-black">
-                <Star className="w-6 h-6 text-yellow-600" />
-                Quick Stats
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-black">Total Points:</span>
-                <span className="font-bold text-black">{totalPoints}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-black">Accessories:</span>
-                <span className="font-bold text-black">{selectedAccessories.length}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-black">Decorations:</span>
-                <span className="font-bold text-black">{selectedDecorations.length}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-black">Home Style:</span>
-                <span className="font-bold text-black">{homeStyle}</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-4 bg-gradient-to-br from-green-50 to-teal-50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-black">
-                <Sparkles className="w-6 h-6 text-green-600" />
-                Earn More Points
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => onNavigate('games')}
-              >
-                🎮 Play Games
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => onNavigate('spin-wheel')}
-              >
-                🎡 Spin the Wheel
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => onNavigate('learn-hub')}
-              >
-                📚 Learn Hub
-              </Button>
+                <TabsContent value="home" className="space-y-2">
+                  <ScrollArea className="h-[400px]">
+                    {homeStyles.map((style) => {
+                      const selected = petHub.homeStyle === style.id;
+                      return (
+                        <Card key={style.id} className="mb-2">
+                          <CardContent className="p-3">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <span className="text-2xl">{style.emoji}</span>
+                                <div>
+                                  <p className="font-semibold">{style.name}</p>
+                                  <p className="text-sm text-gray-600">
+                                    {style.description}
+                                  </p>
+                                </div>
+                              </div>
+                              <Button
+                                size="sm"
+                                onClick={() => handleChangeHomeStyle(style.id)}
+                                disabled={selected || savePetHub.isPending}
+                                variant={selected ? 'secondary' : 'default'}
+                              >
+                                {selected ? 'Active' : 'Select'}
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </ScrollArea>
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
         </div>
-      </div>
+      )}
     </div>
   );
 }

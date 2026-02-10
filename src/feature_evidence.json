@@ -2,10 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-fix-the-art-gallery-upload-flow-so-that-pressing-upload-artwork-does-not-end-in-the-generic-error-toast-failed-to-upload-artwork-please-try-again-when-the-root-cause-is-missing-authentication-if-the-user-is-not-signed-in-prevent-submission-and-show-a-clear-english-message-instructing-the-user-to-sign-in-before-uploading",
-      "featureTitle": "Fix the Art Gallery upload flow so that pressing “Upload Artwork” does not end in the generic error toast “Failed to upload artwork. Please try again.” when the root cause is missing authentication. If the user is not signed in, prevent submission and show a clear English message instructing the user to sign in before uploading.",
+      "featureId": "feature-update-frontend-src-pages-videohubpage-tsx-so-that-selecting-a-channel-plays-videos-directly-on-the-website-when-the-channel-is-marked-as-allowed-to-embed-and-otherwise-prompts-the-user-to-watch-on-youtube-for-channels-marked-as-embed-blocked",
+      "featureTitle": "Update `frontend/src/pages/VideoHubPage.tsx` so that selecting a channel plays videos directly on the website when the channel is marked as allowed to embed, and otherwise prompts the user to watch on YouTube for channels marked as embed-blocked.",
       "files": [
-        "frontend/src/pages/ArtGalleryPage.tsx"
+        "frontend/src/pages/VideoHubPage.tsx"
       ],
       "components": [
         "authorization@3.0.0",
@@ -21,29 +21,6 @@
       ],
       "testIds": [
         "REQ-1"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-improve-error-reporting-in-the-art-gallery-upload-submission-so-that-real-submission-failures-show-a-useful-english-error-message-use-the-thrown-error-message-when-available-e-g-from-the-mutation-and-keep-the-generic-fallback-only-for-unknown-errors",
-      "featureTitle": "Improve error reporting in the Art Gallery upload submission so that real submission failures show a useful English error message. Use the thrown error message when available (e.g., from the mutation) and keep the generic fallback only for unknown errors.",
-      "files": [
-        "frontend/src/pages/ArtGalleryPage.tsx"
-      ],
-      "components": [
-        "authorization@3.0.0",
-        "blob-storage@4.0.0",
-        "user-approval@3.0.0",
-        "camera@1.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "http-outcalls@3.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-2"
       ],
       "confidence": "high"
     }

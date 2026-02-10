@@ -139,7 +139,7 @@ export default function StickerCreatorPage() {
         try {
           await createStickerMutation.mutateAsync({
             name: stickerName,
-            imageData: uint8Array,
+            image: uint8Array,
           });
           toast.success('🎨 Sticker created successfully!', {
             description: 'Your sticker is ready to use!',

@@ -1,32 +1,35 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Art Gallery app project. Current focus: resolve artwork upload failure showing “Failed to upload artwork. Please try again.”",
+  "summary": "Project to implement focused, isolated changes in two areas: Art Gallery upload routing (private vs public) with BigInt-safe saving and no changes to existing items; and a Kids YouTube Videos Hub that plays non-copyright videos on-site while redirecting restricted videos to YouTube.",
   "architectural_notes": [],
-  "known_issues": [
-    "Artwork upload fails after user completes upload form, showing error: “Failed to upload artwork. Please try again.”"
-  ],
+  "known_issues": [],
   "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-fix-the-art-gallery-upload-flow-so-that-pressing-upload-artwork-does-not-end-in-the-generic-error-toast-failed-to-upload-artwork-please-try-again-when-the-root-cause-is-missing-authentication-if-the-user-is-not-signed-in-prevent-submission-and-show-a-clear-english-message-instructing-the-user-to-sign-in-before-uploading",
-      "title": "Fix the Art Gallery upload flow so that pressing “Upload Artwork” does not end in the generic error toast “Failed to upload artwork. Please try again.” when the root cause is missing authentication. If the user is not signed in, prevent submission and show a clear English message instructing the user to sign in before uploading.",
+      "id": "feature-update-frontend-src-pages-videohubpage-tsx-so-that-selecting-a-channel-plays-videos-directly-on-the-website-when-the-channel-is-marked-as-allowed-to-embed-and-otherwise-prompts-the-user-to-watch-on-youtube-for-channels-marked-as-embed-blocked",
+      "title": "Update `frontend/src/pages/VideoHubPage.tsx` so that selecting a channel plays videos directly on the website when the channel is marked as allowed to embed, and otherwise prompts the user to watch on YouTube for channels marked as embed-blocked.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
-    },
-    {
-      "id": "feature-improve-error-reporting-in-the-art-gallery-upload-submission-so-that-real-submission-failures-show-a-useful-english-error-message-use-the-thrown-error-message-when-available-e-g-from-the-mutation-and-keep-the-generic-fallback-only-for-unknown-errors",
-      "title": "Improve error reporting in the Art Gallery upload submission so that real submission failures show a useful English error message. Use the thrown error message when available (e.g., from the mutation) and keep the generic fallback only for unknown errors.",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "version": 1
     }
   ],
-  "new_feature_requests": [],
-  "projectName": "Art Gallery",
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Art Gallery Fix: On Upload Artwork, save to My Art (private) when Share Publicly is unchecked, otherwise save to Public Gallery; convert any BigInt to string before saving; do not modify anything outside Art Gallery; keep existing gallery items untouched.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Kids YouTube Videos Hub: Play videos on the website only when they are not copyright-restricted; otherwise show/play them via YouTube (e.g., link/embed to YouTube channel); make focused changes only without impacting other CRUD/features.",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "projectName": "Kids YouTube Videos Hub: Play embeddable videos on-site, otherwise redirect to YouTube",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

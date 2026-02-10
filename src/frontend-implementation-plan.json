@@ -1,37 +1,23 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Art Gallery upload auth gating and improved error toasts",
+  "title": "Kids YouTube Videos Hub: embed allowed channels, redirect embed-blocked channels",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Block Art Gallery upload submission when the user is not authenticated and show a clear sign-in message instead of a generic failure toast.",
+      "summary": "Update the Video Hub channel detail view to embed videos on-site when embedding is allowed, and otherwise show only the YouTube CTA while always keeping a Watch on YouTube link available.",
       "acceptanceCriteria": [
-        "When the user is not logged in and attempts to upload, the app does not attempt to submit and instead shows an English message such as “Please sign in to upload artwork.”",
-        "The Upload Artwork button is disabled (or the UI otherwise blocks submission) when the user is not logged in.",
-        "No generic “Failed to upload artwork. Please try again.” toast is shown for the unauthenticated case."
+        "For a channel where `embedBlocked` is `true`, the channel detail view does not render an embedded player and instead shows the existing CTA to open the `channelUrl` on YouTube.",
+        "For a channel where `embedBlocked` is not `true`, the channel detail view renders an on-site embedded player using that channel’s existing `embedUrl` (e.g., an `<iframe>` within the existing `aspect-video` container).",
+        "The embedded player includes appropriate iframe attributes for video playback (e.g., `allow` for autoplay/encrypted-media/fullscreen as needed) and uses the existing `youtube-nocookie.com` embed URLs already present in the channel data.",
+        "A visible \"Watch on YouTube\" button/link remains available in the channel detail view regardless of embed status, using the existing `channelUrl` and opening in a new tab.",
+        "No other pages, navigation, CRUD flows, or backend code are changed."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/ArtGalleryPage.tsx",
+          "path": "frontend/src/pages/VideoHubPage.tsx",
           "operation": "modify",
-          "description": "Use the existing Internet Identity state (via useInternetIdentity) to detect whether the user is signed in; if not authenticated, block handleSubmit before any file processing/mutation call and show a clear English toast message instructing the user to sign in. Also update the Upload Artwork button disabled state (and/or equivalent submission guard) to prevent submission while unauthenticated."
-        }
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "summary": "Show useful English error messages for real Art Gallery upload failures while keeping a generic fallback for unknown errors, and ensure the success path still resets the form.",
-      "acceptanceCriteria": [
-        "If submission fails for a known reason (e.g., an Error with a message), the toast displays that message in English.",
-        "If submission fails for an unknown reason, the toast falls back to “Failed to upload artwork. Please try again.”",
-        "A successful upload shows the existing success toast and the form resets (title cleared, category reset, public checkbox reset, preview cleared)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/ArtGalleryPage.tsx",
-          "operation": "modify",
-          "description": "Improve upload submission error handling by extracting and displaying the thrown error message when available (including errors coming from submitArtwork.mutateAsync), while retaining the existing generic fallback only for unknown/unparseable errors. Ensure the existing success toast remains and the form reset logic continues to run on success (title, category, public checkbox, and preview/selection cleared)."
+          "description": "In the selected-channel detail view, conditionally render an on-site embedded YouTube player (<iframe>) inside the existing `aspect-video` container when `selectedChannel.embedBlocked` is not `true`, using the existing `selectedChannel.embedUrl` (which already uses `youtube-nocookie.com`). When `embedBlocked` is `true`, do not render the iframe and instead keep the current prompt/CTA messaging. Ensure a visible \"Watch on YouTube\" link/button remains present for both states, uses `selectedChannel.channelUrl`, and opens in a new tab with safe link attributes. Add appropriate iframe attributes for playback (e.g., `allow`, `allowFullScreen`, `title`, and related safety attributes) without changing any other pages or UI component files."
         }
       ]
     }

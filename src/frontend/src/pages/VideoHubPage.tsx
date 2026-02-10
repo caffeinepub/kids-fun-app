@@ -194,6 +194,8 @@ export default function VideoHubPage({ onNavigate }: VideoHubPageProps) {
   };
 
   if (selectedChannel && selectedCategory) {
+    const canEmbed = !selectedChannel.embedBlocked;
+
     return (
       <div className="space-y-6">
         {/* Back Button */}
@@ -226,34 +228,49 @@ export default function VideoHubPage({ onNavigate }: VideoHubPageProps) {
         <Card className="border-4 border-neon-purple shadow-neon-lg bg-gradient-to-br from-white to-purple-50">
           <CardContent className="p-6">
             <div className="space-y-4">
-              {/* Channel Preview with Attribution */}
-              <div className="aspect-video w-full rounded-lg overflow-hidden shadow-neon-md bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center relative">
-                <div className="text-center p-8 space-y-4 z-10">
-                  <div className="text-6xl mb-4">{selectedChannel.icon}</div>
-                  <Youtube className="w-16 h-16 text-red-500 mx-auto" />
-                  <h3 className="text-2xl font-bold text-purple-900">
-                    {selectedChannel.name}
-                  </h3>
-                  <p className="text-lg text-purple-700 max-w-md mx-auto">
-                    {selectedChannel.embedBlocked 
-                      ? "This channel's videos are available on YouTube. Click below to watch!"
-                      : "Watch amazing videos from this channel on YouTube!"}
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-                    <a
-                      href={selectedChannel.channelUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-block"
-                    >
-                      <Button className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-neon-lg hover:shadow-neon-xl transition-all text-lg px-8 py-4">
-                        <Youtube className="w-6 h-6 mr-2" />
-                        Watch on YouTube
-                        <ExternalLink className="w-5 h-5 ml-2" />
-                      </Button>
-                    </a>
+              {/* Channel Preview - Conditional Embed or CTA */}
+              <div className="aspect-video w-full rounded-lg overflow-hidden shadow-neon-md bg-gradient-to-br from-purple-100 to-pink-100 relative">
+                {canEmbed ? (
+                  // Embedded Player
+                  <iframe
+                    src={selectedChannel.embedUrl}
+                    title={`${selectedChannel.name} videos`}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    referrerPolicy="strict-origin-when-cross-origin"
+                  />
+                ) : (
+                  // CTA for embed-blocked channels
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center p-8 space-y-4 z-10">
+                      <div className="text-6xl mb-4">{selectedChannel.icon}</div>
+                      <Youtube className="w-16 h-16 text-red-500 mx-auto" />
+                      <h3 className="text-2xl font-bold text-purple-900">
+                        {selectedChannel.name}
+                      </h3>
+                      <p className="text-lg text-purple-700 max-w-md mx-auto">
+                        This channel's videos are available on YouTube. Click below to watch!
+                      </p>
+                    </div>
                   </div>
-                </div>
+                )}
+              </div>
+
+              {/* Watch on YouTube Button - Always visible */}
+              <div className="flex justify-center">
+                <a
+                  href={selectedChannel.channelUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block"
+                >
+                  <Button className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-neon-lg hover:shadow-neon-xl transition-all text-lg px-8 py-4">
+                    <Youtube className="w-6 h-6 mr-2" />
+                    Watch on YouTube
+                    <ExternalLink className="w-5 h-5 ml-2" />
+                  </Button>
+                </a>
               </div>
 
               {/* Attribution Notice */}
@@ -280,7 +297,9 @@ export default function VideoHubPage({ onNavigate }: VideoHubPageProps) {
                       Safe Viewing Experience
                     </p>
                     <p className="text-xs text-green-800">
-                      When you visit YouTube, you'll see videos from this trusted educational channel. Parental supervision is recommended.
+                      {canEmbed 
+                        ? "Watch videos directly here, or visit YouTube for the full channel experience. Parental supervision is recommended."
+                        : "When you visit YouTube, you'll see videos from this trusted educational channel. Parental supervision is recommended."}
                     </p>
                   </div>
                 </div>

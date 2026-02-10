@@ -11,6 +11,9 @@ import Runtime "mo:core/Runtime";
 import Nat "mo:core/Nat";
 import Text "mo:core/Text";
 import Set "mo:core/Set";
+import List "mo:core/List";
+
+
 
 actor {
   include MixinStorage();
@@ -646,6 +649,18 @@ actor {
     views : Nat;
   };
 
+  public type ActivityType = {
+    #user_created;
+    #game_played : { gameId : Text; gameName : Text };
+  };
+
+  public type ActivityEvent = {
+    id : Nat;
+    userId : Principal;
+    activityType : ActivityType;
+    timestamp : Time.Time;
+  };
+
   let userProfiles = Map.empty<Principal, UserProfile>();
   let adminUserStatuses = Map.empty<Principal, AdminUserStatus>();
   let adminFeatureRestrictions = Map.empty<Principal, [AdminFeatureRestriction]>();
@@ -691,6 +706,9 @@ actor {
   let scaryHubGames = Map.empty<Text, ScaryHubGameEntry>();
   let videoChannels = Map.empty<Text, VideoChannel>();
   let userFavoriteChannels = Map.empty<Principal, Set.Set<Text>>();
+
+  let activityLog = List.empty<ActivityEvent>();
+  var nextActivityId = 0;
 
   public shared ({ caller }) func initializeAccessControl() : async () {
     AccessControl.initialize(accessControlState, caller);
@@ -748,7 +766,25 @@ actor {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can save profiles");
     };
+
+    // Only record user_created activity if this is the first time creating a profile
+    let isNewProfile = switch (userProfiles.get(caller)) {
+      case (null) { true };
+      case (?_) { false };
+    };
+
     userProfiles.add(caller, profile);
+
+    if (isNewProfile) {
+      let activity : ActivityEvent = {
+        id = nextActivityId;
+        userId = caller;
+        activityType = #user_created;
+        timestamp = Time.now();
+      };
+      activityLog.add(activity);
+      nextActivityId += 1;
+    };
   };
 
   // Story Builder Functions with proper authorization
@@ -1129,4 +1165,36 @@ actor {
       case (null) { [] };
     };
   };
+
+  // Record game_played activity event for user
+  public shared ({ caller }) func recordGamePlay(gameId : Text, gameName : Text) : async () {
+    if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
+      Runtime.trap("Unauthorized: Only users can record game play activities");
+    };
+
+    let activity : ActivityEvent = {
+      id = nextActivityId;
+      userId = caller;
+      activityType = #game_played({ gameId; gameName });
+      timestamp = Time.now();
+    };
+
+    nextActivityId += 1;
+    activityLog.add(activity);
+  };
+
+  // Admin-only: fetch the most recent activity events
+  public query ({ caller }) func getRecentActivityEvents(limit : Nat) : async [ActivityEvent] {
+    if (not AccessControl.hasPermission(accessControlState, caller, #admin)) {
+      Runtime.trap("Unauthorized: Only admins can fetch activity events");
+    };
+
+    let activityArray = activityLog.toArray();
+    let total = activityArray.size();
+    if (total == 0) { return [] };
+
+    let startIndex = if (limit >= total) { 0 } else { total - limit };
+    Array.tabulate<ActivityEvent>(Nat.min(limit, total), func(i) { activityArray[startIndex + i] });
+  };
 };
+

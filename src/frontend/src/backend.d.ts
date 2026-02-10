@@ -42,6 +42,16 @@ export interface ScaryHubGameEntry {
     highScore: bigint;
     category: string;
 }
+export type ActivityType = {
+    __kind__: "user_created";
+    user_created: null;
+} | {
+    __kind__: "game_played";
+    game_played: {
+        gameId: string;
+        gameName: string;
+    };
+};
 export interface Character {
     name: string;
     position: {
@@ -61,6 +71,12 @@ export interface Prop {
         x: bigint;
         y: bigint;
     };
+}
+export interface ActivityEvent {
+    id: bigint;
+    activityType: ActivityType;
+    userId: Principal;
+    timestamp: Time;
 }
 export interface VideoChannel {
     categoryId: string;
@@ -142,6 +158,7 @@ export interface backendInterface {
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getCallerVirtualPet(): Promise<VirtualPetHub | null>;
+    getRecentActivityEvents(limit: bigint): Promise<Array<ActivityEvent>>;
     getScaryHubGames(): Promise<Array<ScaryHubGameEntry>>;
     getStoryProject(storyId: string): Promise<StoryProject | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
@@ -154,6 +171,7 @@ export interface backendInterface {
     listApprovals(): Promise<Array<UserApprovalInfo>>;
     markChannelAsFavorite(channelId: string): Promise<void>;
     publishStoryProject(storyId: string): Promise<void>;
+    recordGamePlay(gameId: string, gameName: string): Promise<void>;
     requestApproval(): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     saveCallerVirtualPet(pet: VirtualPetHub): Promise<void>;

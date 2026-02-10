@@ -1,12 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Fix the Art Gallery “Upload Artwork” flow so unauthenticated users are clearly blocked from submitting, and real upload errors show useful messages instead of a generic failure toast.
+**Goal:** Update the Kids YouTube Videos Hub channel detail experience to embed videos on-site only for channels that allow embedding, while directing users to YouTube for embed-blocked channels.
 
 **Planned changes:**
-- Add an authentication check to the Art Gallery upload submission so unauthenticated users cannot submit.
-- Update the UI to disable (or otherwise block) the Upload Artwork action when the user is not signed in, and show a clear English prompt to sign in.
-- Improve upload error handling to display the thrown/known error message when available, with a generic fallback only for unknown errors.
-- Keep existing success behavior: on successful upload, show the success toast and reset the form fields (title, category, public checkbox, preview).
+- Update `frontend/src/pages/VideoHubPage.tsx` so channels with `embedBlocked: true` do not render an embedded player and instead show the existing CTA to open the `channelUrl` on YouTube.
+- Update `frontend/src/pages/VideoHubPage.tsx` so channels without `embedBlocked: true` render the on-site embedded player using the existing `embedUrl` (via an `<iframe>` in the existing `aspect-video` container) with appropriate playback attributes.
+- Ensure a visible “Watch on YouTube” link/button remains available for all channels, opening `channelUrl` in a new tab.
 
-**User-visible outcome:** Users who aren’t signed in are prompted to sign in before uploading and cannot submit; signed-in users can upload successfully, and any upload failures display clearer English error messages.
+**User-visible outcome:** When viewing a channel, users can watch videos directly on the site if embedding is allowed; otherwise they are prompted to watch on YouTube, with a “Watch on YouTube” option always available.

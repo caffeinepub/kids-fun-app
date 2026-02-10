@@ -1,46 +1,71 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-06T07:36:45.899Z",
-  "summary": "ArtGalleryPage upload flow was updated to gate submission on authentication and to reset the form on success. However, the diff does not show the Upload button being disabled when unauthenticated, and the improved error-message fallback logic is truncated so it cannot be fully verified. Some additional toasts (e.g., “Image selected!”) appear to be newly added but were not requested.",
+  "generatedAt": "2026-02-10T08:14:04.948Z",
+  "summary": "The diff shows edits to `VideoHubPage.tsx`, but the provided truncation does not include the channel detail rendering logic needed to verify the embed-vs-redirect behavior. Additionally, two unrelated files (`frontend-file-summaries.txt`, `project_state.json`) were modified even though the request required focused changes only for the Kids YouTube Videos Hub page and no unrelated module/metadata updates.",
   "missing_requirements": [
     {
       "id": "REQ-1",
-      "requirement": "The Upload Artwork button is disabled (or the UI otherwise blocks submission) when the user is not logged in.",
-      "reason": "The diff shows blocking submission inside handleSubmit() with an early return when unauthenticated, but does not show any UI-level disabling of the Upload Artwork button (e.g., <Button disabled={!isAuthenticated} ...>). Because the file is truncated, this may exist later, but there is no evidence of it in the provided excerpt.",
+      "requirement": "When `embedBlocked` is true, the channel detail view must not render an embedded player and must show the existing CTA to open `channelUrl` on YouTube.",
+      "reason": "The diff snippet only shows data/interface changes and channel entries with `embedBlocked`, but does not include the channel detail view rendering logic where the iframe would be conditionally omitted and the CTA shown.",
       "evidence": [
-        "frontend/src/pages/ArtGalleryPage.tsx"
+        "frontend/src/pages/VideoHubPage.tsx (truncated)"
       ]
     },
     {
-      "id": "REQ-2",
-      "requirement": "If submission fails for an unknown reason, the toast falls back to “Failed to upload artwork. Please try again.” and if it fails for a known reason, it uses the thrown error message when available.",
-      "reason": "The catch block where the error message is determined is truncated (shows `const errorMessage = error?.message || 'F...`). This prevents confirming the exact fallback string and that the toast displays the computed message.",
+      "id": "REQ-1",
+      "requirement": "When `embedBlocked` is not true, the channel detail view must render an on-site embedded player using the channel’s existing `embedUrl` inside the existing `aspect-video` container.",
+      "reason": "The diff snippet does not show any `<iframe>` or `aspect-video` container rendering, so it cannot be confirmed that embedding is implemented for allowed channels.",
       "evidence": [
-        "frontend/src/pages/ArtGalleryPage.tsx"
+        "frontend/src/pages/VideoHubPage.tsx (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-1",
+      "requirement": "Embedded player iframe must include appropriate attributes (e.g., `allow` autoplay/encrypted-media/fullscreen as needed) and use the existing `youtube-nocookie.com` embed URLs already present in channel data.",
+      "reason": "While `embedUrl` values shown use `youtube-nocookie.com`, the iframe itself and its attributes are not visible in the truncated diff.",
+      "evidence": [
+        "frontend/src/pages/VideoHubPage.tsx (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-1",
+      "requirement": "A visible \"Watch on YouTube\" button/link must remain available in the channel detail view regardless of embed status, using `channelUrl` and opening in a new tab.",
+      "reason": "The truncated diff does not show the channel detail view UI, so presence of a persistent \"Watch on YouTube\" link/button and `target=_blank` behavior cannot be verified.",
+      "evidence": [
+        "frontend/src/pages/VideoHubPage.tsx (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-1",
+      "requirement": "No other pages, navigation, CRUD flows, or backend code are changed (focused change limited to `VideoHubPage.tsx`).",
+      "reason": "The diff includes modifications to additional files that are not part of the requested `VideoHubPage.tsx` update.",
+      "evidence": [
+        "frontend-file-summaries.txt",
+        "project_state.json"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Success toast shown when an image is selected (\"Image selected! 🎨\").",
-      "reason": "BuildRequest focuses on upload/auth gating and error reporting; it does not request new toasts during file selection.",
+      "description": "Updated/added large descriptive content in `frontend-file-summaries.txt` unrelated to the Kids YouTube Videos Hub request.",
+      "reason": "The BuildRequest only asks to update `frontend/src/pages/VideoHubPage.tsx` with embed-blocked behavior; it does not request changes to repository summary/metadata files.",
       "evidence": [
-        "frontend/src/pages/ArtGalleryPage.tsx"
+        "frontend-file-summaries.txt"
       ]
     },
     {
-      "description": "Extra descriptive text added to the unauthenticated upload error toast (description: \"You need to be logged in to share your creativity.\").",
-      "reason": "REQ-1 requires a clear English message instructing the user to sign in; adding a secondary description is not requested (though it may be acceptable).",
+      "description": "Modified `project_state.json` including entries referencing Art Gallery and other feature requests/status tracking.",
+      "reason": "The BuildRequest does not request updating project tracking/state files; it also explicitly says not to change unrelated modules like Art Gallery/Admin Dashboard.",
       "evidence": [
-        "frontend/src/pages/ArtGalleryPage.tsx"
+        "project_state.json"
       ]
     }
   ],
-  "confidence": 0.58,
+  "confidence": 0.68,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/src/pages/ArtGalleryPage.tsx",
+    "frontend/src/pages/VideoHubPage.tsx",
     "project_state.json"
   ]
 }

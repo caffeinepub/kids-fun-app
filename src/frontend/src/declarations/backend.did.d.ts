@@ -15,6 +15,14 @@ export interface AccessibilitySettings {
   'largeText' : boolean,
   'readAloudEnabled' : boolean,
 }
+export interface ActivityEvent {
+  'id' : bigint,
+  'activityType' : ActivityType,
+  'userId' : Principal,
+  'timestamp' : Time,
+}
+export type ActivityType = { 'user_created' : null } |
+  { 'game_played' : { 'gameId' : string, 'gameName' : string } };
 export type ApprovalStatus = { 'pending' : null } |
   { 'approved' : null } |
   { 'rejected' : null };
@@ -158,6 +166,7 @@ export interface _SERVICE {
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getCallerVirtualPet' : ActorMethod<[], [] | [VirtualPetHub]>,
+  'getRecentActivityEvents' : ActorMethod<[bigint], Array<ActivityEvent>>,
   'getScaryHubGames' : ActorMethod<[], Array<ScaryHubGameEntry>>,
   'getStoryProject' : ActorMethod<[string], [] | [StoryProject]>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
@@ -170,6 +179,7 @@ export interface _SERVICE {
   'listApprovals' : ActorMethod<[], Array<UserApprovalInfo>>,
   'markChannelAsFavorite' : ActorMethod<[string], undefined>,
   'publishStoryProject' : ActorMethod<[string], undefined>,
+  'recordGamePlay' : ActorMethod<[string, string], undefined>,
   'requestApproval' : ActorMethod<[], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'saveCallerVirtualPet' : ActorMethod<[VirtualPetHub], undefined>,
