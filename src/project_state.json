@@ -1,16 +1,26 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Project to implement focused, isolated changes in two areas: Art Gallery upload routing (private vs public) with BigInt-safe saving and no changes to existing items; and a Kids YouTube Videos Hub that plays non-copyright videos on-site while redirecting restricted videos to YouTube.",
-  "architectural_notes": [],
+  "summary": "3D avatar creator app with enhanced 3D look and additional customization options.",
+  "architectural_notes": [
+    "Avatar Creator changes must be isolated to avoid impacting other features/CRUD."
+  ],
   "known_issues": [],
-  "isFixRequest": true,
+  "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-update-frontend-src-pages-videohubpage-tsx-so-that-selecting-a-channel-plays-videos-directly-on-the-website-when-the-channel-is-marked-as-allowed-to-embed-and-otherwise-prompts-the-user-to-watch-on-youtube-for-channels-marked-as-embed-blocked",
-      "title": "Update `frontend/src/pages/VideoHubPage.tsx` so that selecting a channel plays videos directly on the website when the channel is marked as allowed to embed, and otherwise prompts the user to watch on YouTube for channels marked as embed-blocked.",
+      "id": "feature-enhance-the-avatar-creator-preview-to-look-more-3d-by-improving-depth-shading-and-lighting-of-the-avatar-parts-in-the-existing-preview-component-without-changing-any-other-modules-or-backend-crud-flows",
+      "title": "Enhance the Avatar Creator preview to look more 3D by improving depth, shading, and lighting of the avatar parts in the existing preview component without changing any other modules or backend CRUD flows.",
       "reqIds": [
         "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-more-avatar-creator-customization-options-by-expanding-the-selectable-variants-for-existing-categories-head-hair-body-pants-headwear-shoes-while-keeping-the-saved-avatarconfig-schema-exactly-the-same",
+      "title": "Add more Avatar Creator customization options by expanding the selectable variants for existing categories (head, hair, body, pants, headwear, shoes) while keeping the saved AvatarConfig schema exactly the same.",
+      "reqIds": [
+        "REQ-2"
       ],
       "version": 1
     }
@@ -18,18 +28,13 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Art Gallery Fix: On Upload Artwork, save to My Art (private) when Share Publicly is unchecked, otherwise save to Public Gallery; convert any BigInt to string before saving; do not modify anything outside Art Gallery; keep existing gallery items untouched.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Kids YouTube Videos Hub: Play videos on the website only when they are not copyright-restricted; otherwise show/play them via YouTube (e.g., link/embed to YouTube channel); make focused changes only without impacting other CRUD/features.",
+      "summary": "Enhance Avatar Creator to look more 3D and add more customization options (focused changes; do not impact other features/CRUD).",
       "reqIds": [],
       "status": "pending"
     }
   ],
-  "projectName": "Kids YouTube Videos Hub: Play embeddable videos on-site, otherwise redirect to YouTube",
+  "gameProjectType": "3d",
+  "projectName": "Improve Avatar Creator 3D look and add more customization options (focused changes only)",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

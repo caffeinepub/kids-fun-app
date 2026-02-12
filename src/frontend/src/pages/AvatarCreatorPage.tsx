@@ -1,40 +1,99 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Save, Shuffle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSaveAvatarConfig, useGetCallerUserProfile } from '../hooks/useQueries';
+import AvatarPreview3D from '../components/avatar3d/AvatarPreview3D';
+import { getDefaultAvatarConfig } from '../utils/avatarConfig';
+import type { AvatarConfig } from '../hooks/useQueries';
 
 export default function AvatarCreatorPage() {
-  const { data: userProfile } = useGetCallerUserProfile();
+  const { data: userProfile, isLoading: profileLoading } = useGetCallerUserProfile();
   const saveAvatar = useSaveAvatarConfig();
 
-  const [avatarConfig, setAvatarConfig] = useState({
-    body: 'body1',
-    head: 'head1',
-    hair: 'hair1',
-    pants: 'pants1',
-    headwear: 'none',
-    shoes: 'shoes1',
-  });
+  const [avatarConfig, setAvatarConfig] = useState<AvatarConfig>(getDefaultAvatarConfig());
+
+  // Initialize from user profile when available
+  useEffect(() => {
+    if (userProfile?.avatarConfig && !profileLoading) {
+      setAvatarConfig(userProfile.avatarConfig);
+    }
+  }, [userProfile, profileLoading]);
 
   const avatarParts = {
-    body: ['body1', 'body2', 'body3', 'body4'],
-    head: ['head1', 'head2', 'head3', 'head4'],
-    hair: ['hair1', 'hair2', 'hair3', 'hair4', 'hair5', 'hair6'],
-    pants: ['pants1', 'pants2', 'pants3', 'pants4'],
-    headwear: ['none', 'hat1', 'hat2', 'crown', 'cap'],
-    shoes: ['shoes1', 'shoes2', 'shoes3', 'shoes4'],
+    body: ['body1', 'body2', 'body3', 'body4', 'body5', 'body6', 'body7', 'body8'],
+    head: ['head1', 'head2', 'head3', 'head4', 'head5', 'head6', 'head7', 'head8'],
+    hair: ['hair1', 'hair2', 'hair3', 'hair4', 'hair5', 'hair6', 'hair7', 'hair8', 'hair9', 'hair10'],
+    pants: ['pants1', 'pants2', 'pants3', 'pants4', 'pants5', 'pants6', 'pants7', 'pants8'],
+    headwear: ['none', 'hat1', 'hat2', 'crown', 'cap', 'beanie', 'hat3', 'hat4'],
+    shoes: ['shoes1', 'shoes2', 'shoes3', 'shoes4', 'shoes5', 'shoes6', 'shoes7', 'shoes8'],
   };
 
   const partEmojis: Record<string, Record<string, string>> = {
-    body: { body1: '👕', body2: '👔', body3: '🎽', body4: '🦺' },
-    head: { head1: '😊', head2: '😄', head3: '😎', head4: '🤓' },
-    hair: { hair1: '💇', hair2: '💇‍♂️', hair3: '🦱', hair4: '🦰', hair5: '🦳', hair6: '🦲' },
-    pants: { pants1: '👖', pants2: '🩳', pants3: '👗', pants4: '🩱' },
-    headwear: { none: '❌', hat1: '🎩', hat2: '👒', crown: '👑', cap: '🧢' },
-    shoes: { shoes1: '👟', shoes2: '👞', shoes3: '👠', shoes4: '🥾' },
+    body: { 
+      body1: '👕', 
+      body2: '👔', 
+      body3: '🎽', 
+      body4: '🦺',
+      body5: '🧥',
+      body6: '👗',
+      body7: '🎽',
+      body8: '👚',
+    },
+    head: { 
+      head1: '😊', 
+      head2: '😄', 
+      head3: '😎', 
+      head4: '🤓',
+      head5: '😁',
+      head6: '🙂',
+      head7: '😌',
+      head8: '🤗',
+    },
+    hair: { 
+      hair1: '💇', 
+      hair2: '💇‍♂️', 
+      hair3: '🦱', 
+      hair4: '🦰', 
+      hair5: '🦳', 
+      hair6: '🦲',
+      hair7: '💛',
+      hair8: '🔥',
+      hair9: '🎀',
+      hair10: '💗',
+    },
+    pants: { 
+      pants1: '👖', 
+      pants2: '🩳', 
+      pants3: '👗', 
+      pants4: '🩱',
+      pants5: '👔',
+      pants6: '🧡',
+      pants7: '💚',
+      pants8: '❤️',
+    },
+    headwear: { 
+      none: '❌', 
+      hat1: '🎩', 
+      hat2: '👒', 
+      crown: '👑', 
+      cap: '🧢',
+      beanie: '🎿',
+      hat3: '💜',
+      hat4: '🧡',
+    },
+    shoes: { 
+      shoes1: '👟', 
+      shoes2: '👞', 
+      shoes3: '👠', 
+      shoes4: '🥾',
+      shoes5: '🖤',
+      shoes6: '💙',
+      shoes7: '💛',
+      shoes8: '💚',
+    },
   };
 
   const updatePart = (category: keyof typeof avatarConfig, value: string) => {
@@ -70,28 +129,17 @@ export default function AvatarCreatorPage() {
         <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 via-pink-600 to-yellow-600 bg-clip-text text-transparent">
           Avatar Creator 🎭
         </h1>
-        <p className="text-xl text-gray-700">Create your unique character!</p>
+        <p className="text-xl text-gray-700">Create your unique 3D character!</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-1 border-4">
           <CardHeader className="text-center">
             <CardTitle>Your Avatar</CardTitle>
-            <CardDescription>Preview your creation</CardDescription>
+            <CardDescription>Preview your 3D creation</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg p-8 border-4 border-primary">
-              <div className="text-center space-y-2">
-                {avatarConfig.headwear !== 'none' && (
-                  <div className="text-6xl">{partEmojis.headwear[avatarConfig.headwear]}</div>
-                )}
-                <div className="text-6xl">{partEmojis.hair[avatarConfig.hair]}</div>
-                <div className="text-7xl">{partEmojis.head[avatarConfig.head]}</div>
-                <div className="text-6xl">{partEmojis.body[avatarConfig.body]}</div>
-                <div className="text-6xl">{partEmojis.pants[avatarConfig.pants]}</div>
-                <div className="text-5xl">{partEmojis.shoes[avatarConfig.shoes]}</div>
-              </div>
-            </div>
+            <AvatarPreview3D avatarConfig={avatarConfig} />
             <div className="flex gap-2 mt-4">
               <Button onClick={randomize} variant="outline" className="flex-1">
                 <Shuffle className="w-4 h-4 mr-2" />

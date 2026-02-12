@@ -1,11 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Update the Kids YouTube Videos Hub channel detail experience to embed videos on-site only for channels that allow embedding, while directing users to YouTube for embed-blocked channels.
+**Goal:** Make the Avatar Creator preview look more 3D and expand the available customization options without changing any backend schema or impacting other app areas.
 
 **Planned changes:**
-- Update `frontend/src/pages/VideoHubPage.tsx` so channels with `embedBlocked: true` do not render an embedded player and instead show the existing CTA to open the `channelUrl` on YouTube.
-- Update `frontend/src/pages/VideoHubPage.tsx` so channels without `embedBlocked: true` render the on-site embedded player using the existing `embedUrl` (via an `<iframe>` in the existing `aspect-video` container) with appropriate playback attributes.
-- Ensure a visible “Watch on YouTube” link/button remains available for all channels, opening `channelUrl` in a new tab.
+- Improve perceived 3D depth in `frontend/src/components/avatar3d/AvatarPreview3D.tsx` via presentational tweaks (layering, shading/lighting, silhouette) while keeping the existing avatarConfig-driven rendering and interactions.
+- Adjust existing avatar-related CSS in `frontend/src/index.css` to strengthen highlights/shadows and depth effects for the preview.
+- Add more selectable variants within existing Avatar Creator categories (head, hair, body, pants, headwear, shoes) in `frontend/src/pages/AvatarCreatorPage.tsx` without introducing any new AvatarConfig fields.
+- Extend `frontend/src/components/avatar3d/avatarVariants.ts` with mappings for all newly added option IDs so every new selection renders in the preview and works with Randomize.
 
-**User-visible outcome:** When viewing a channel, users can watch videos directly on the site if embedding is allowed; otherwise they are prompted to watch on YouTube, with a “Watch on YouTube” option always available.
+**User-visible outcome:** The Avatar Creator preview looks noticeably more 3D (with better depth and lighting), and users can choose from more options in the existing customization tabs; randomize, save, and reload continue to work as before.

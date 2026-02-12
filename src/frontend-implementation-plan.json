@@ -1,23 +1,49 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Kids YouTube Videos Hub: embed allowed channels, redirect embed-blocked channels",
+  "title": "Avatar Creator: stronger 3D preview styling + expanded variants (focused changes only)",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Update the Video Hub channel detail view to embed videos on-site when embedding is allowed, and otherwise show only the YouTube CTA while always keeping a Watch on YouTube link available.",
+      "summary": "Improve the existing AvatarPreview3D depth, shading, and lighting via focused presentational/CSS changes while preserving interactions and not touching other modules.",
       "acceptanceCriteria": [
-        "For a channel where `embedBlocked` is `true`, the channel detail view does not render an embedded player and instead shows the existing CTA to open the `channelUrl` on YouTube.",
-        "For a channel where `embedBlocked` is not `true`, the channel detail view renders an on-site embedded player using that channel’s existing `embedUrl` (e.g., an `<iframe>` within the existing `aspect-video` container).",
-        "The embedded player includes appropriate iframe attributes for video playback (e.g., `allow` for autoplay/encrypted-media/fullscreen as needed) and uses the existing `youtube-nocookie.com` embed URLs already present in the channel data.",
-        "A visible \"Watch on YouTube\" button/link remains available in the channel detail view regardless of embed status, using the existing `channelUrl` and opening in a new tab.",
-        "No other pages, navigation, CRUD flows, or backend code are changed."
+        "Avatar preview in `frontend/src/components/avatar3d/AvatarPreview3D.tsx` looks noticeably more 3D (e.g., clearer depth layering between head/hair/headwear/body/arms/legs/shoes, stronger highlights/shadows, improved silhouette) while still using the existing avatarConfig-driven rendering.",
+        "3D improvements are implemented by adjusting existing styles in `frontend/src/index.css` (e.g., avatar 3D classes) and/or small presentational changes in `AvatarPreview3D.tsx`, without introducing new app modules or altering non-avatar pages.",
+        "Existing interaction behavior remains intact: drag to rotate still works; Reset View still resets rotation to the front-facing view.",
+        "No changes are made to Internet Identity/auth hooks or any files under `frontend/src/components/ui` (read-only sources)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/VideoHubPage.tsx",
+          "path": "frontend/src/index.css",
           "operation": "modify",
-          "description": "In the selected-channel detail view, conditionally render an on-site embedded YouTube player (<iframe>) inside the existing `aspect-video` container when `selectedChannel.embedBlocked` is not `true`, using the existing `selectedChannel.embedUrl` (which already uses `youtube-nocookie.com`). When `embedBlocked` is `true`, do not render the iframe and instead keep the current prompt/CTA messaging. Ensure a visible \"Watch on YouTube\" link/button remains present for both states, uses `selectedChannel.channelUrl`, and opens in a new tab with safe link attributes. Add appropriate iframe attributes for playback (e.g., `allow`, `allowFullScreen`, `title`, and related safety attributes) without changing any other pages or UI component files."
+          "description": "Enhance the existing avatar 3D utility classes to increase perceived depth: add stronger directional lighting cues (highlights/shadows), per-part depth separation (e.g., translateZ layering), and improved silhouette via shadows/gradients while keeping the current Avatar Creator scope focused."
+        },
+        {
+          "path": "frontend/src/components/avatar3d/AvatarPreview3D.tsx",
+          "operation": "modify",
+          "description": "Make small, presentational-only adjustments to the avatar part rendering (e.g., add lightweight overlay elements or class hooks for highlights/shadows and depth ordering) so the improved CSS lighting/depth applies cleanly; preserve existing drag-to-rotate and Reset View behavior and keep avatarConfig-driven rendering intact."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Expand selectable variant IDs for existing Avatar Creator categories and ensure avatarVariants mappings cover all new IDs without changing AvatarConfig schema.",
+      "acceptanceCriteria": [
+        "`frontend/src/pages/AvatarCreatorPage.tsx` offers additional selectable options within the existing tabs (no new AvatarConfig fields are introduced).",
+        "`frontend/src/components/avatar3d/avatarVariants.ts` includes corresponding variant mappings for all newly added option IDs so the 3D preview renders correctly for every selectable option.",
+        "Randomize in `AvatarCreatorPage.tsx` can select from the newly added options and does not error.",
+        "Saving and reloading the avatar continues to work using the existing `AvatarConfig` type (body/head/hair/pants/headwear/shoes as Text/string values) without any backend schema changes."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/AvatarCreatorPage.tsx",
+          "operation": "modify",
+          "description": "Add more selectable option IDs within the existing category arrays (head, hair, body, pants, headwear, shoes) and extend the existing emoji mapping so every new option displays in the current tabs; ensure Randomize draws from the expanded arrays without errors and do not add any new AvatarConfig fields."
+        },
+        {
+          "path": "frontend/src/components/avatar3d/avatarVariants.ts",
+          "operation": "modify",
+          "description": "Extend the existing variant maps for head/hair/body/pants/headwear/shoes to include styles for every newly added option ID from AvatarCreatorPage, ensuring the 3D preview renders correctly for all selectable options while keeping the AvatarConfig schema unchanged."
         }
       ]
     }

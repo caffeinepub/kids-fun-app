@@ -2,10 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-frontend-src-pages-videohubpage-tsx-so-that-selecting-a-channel-plays-videos-directly-on-the-website-when-the-channel-is-marked-as-allowed-to-embed-and-otherwise-prompts-the-user-to-watch-on-youtube-for-channels-marked-as-embed-blocked",
-      "featureTitle": "Update `frontend/src/pages/VideoHubPage.tsx` so that selecting a channel plays videos directly on the website when the channel is marked as allowed to embed, and otherwise prompts the user to watch on YouTube for channels marked as embed-blocked.",
+      "featureId": "feature-enhance-the-avatar-creator-preview-to-look-more-3d-by-improving-depth-shading-and-lighting-of-the-avatar-parts-in-the-existing-preview-component-without-changing-any-other-modules-or-backend-crud-flows",
+      "featureTitle": "Enhance the Avatar Creator preview to look more 3D by improving depth, shading, and lighting of the avatar parts in the existing preview component without changing any other modules or backend CRUD flows.",
       "files": [
-        "frontend/src/pages/VideoHubPage.tsx"
+        "frontend/src/components/avatar3d/AvatarPreview3D.tsx",
+        "frontend/src/index.css"
       ],
       "components": [
         "authorization@3.0.0",
@@ -21,6 +22,30 @@
       ],
       "testIds": [
         "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-more-avatar-creator-customization-options-by-expanding-the-selectable-variants-for-existing-categories-head-hair-body-pants-headwear-shoes-while-keeping-the-saved-avatarconfig-schema-exactly-the-same",
+      "featureTitle": "Add more Avatar Creator customization options by expanding the selectable variants for existing categories (head, hair, body, pants, headwear, shoes) while keeping the saved AvatarConfig schema exactly the same.",
+      "files": [
+        "frontend/src/components/avatar3d/avatarVariants.ts",
+        "frontend/src/pages/AvatarCreatorPage.tsx"
+      ],
+      "components": [
+        "authorization@3.0.0",
+        "blob-storage@4.0.0",
+        "user-approval@3.0.0",
+        "camera@1.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "http-outcalls@3.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
       ],
       "confidence": "high"
     }

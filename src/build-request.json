@@ -1,51 +1,60 @@
 {
   "kind": "build_request",
-  "title": "Kids YouTube Videos Hub: Play embeddable videos on-site, otherwise redirect to YouTube",
+  "title": "Improve Avatar Creator 3D look and add more customization options (focused changes only)",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Update `frontend/src/pages/VideoHubPage.tsx` so that selecting a channel plays videos directly on the website when the channel is marked as allowed to embed, and otherwise prompts the user to watch on YouTube for channels marked as embed-blocked.",
+      "text": "Enhance the Avatar Creator preview to look more 3D by improving depth, shading, and lighting of the avatar parts in the existing preview component without changing any other modules or backend CRUD flows.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "recent-messages-8"
         ],
         "quotes": [
-          "Make focused changes. No other CRUD or features to be changed. **Kids YouTube Videos Hub**- Show video on my website that are not having any copyrights. Rest can be shown via youtube channel."
+          "Make focused changes only. Ensure no other features or CRUD is impacted.**Avatar Creator**-Please make it more 3d and add more optons."
         ]
       },
       "acceptanceCriteria": [
-        "For a channel where `embedBlocked` is `true`, the channel detail view does not render an embedded player and instead shows the existing CTA to open the `channelUrl` on YouTube.",
-        "For a channel where `embedBlocked` is not `true`, the channel detail view renders an on-site embedded player using that channel’s existing `embedUrl` (e.g., an `<iframe>` within the existing `aspect-video` container).",
-        "The embedded player includes appropriate iframe attributes for video playback (e.g., `allow` for autoplay/encrypted-media/fullscreen as needed) and uses the existing `youtube-nocookie.com` embed URLs already present in the channel data.",
-        "A visible \"Watch on YouTube\" button/link remains available in the channel detail view regardless of embed status, using the existing `channelUrl` and opening in a new tab.",
-        "No other pages, navigation, CRUD flows, or backend code are changed."
+        "Avatar preview in `frontend/src/components/avatar3d/AvatarPreview3D.tsx` looks noticeably more 3D (e.g., clearer depth layering between head/hair/headwear/body/arms/legs/shoes, stronger highlights/shadows, improved silhouette) while still using the existing avatarConfig-driven rendering.",
+        "3D improvements are implemented by adjusting existing styles in `frontend/src/index.css` (e.g., avatar 3D classes) and/or small presentational changes in `AvatarPreview3D.tsx`, without introducing new app modules or altering non-avatar pages.",
+        "Existing interaction behavior remains intact: drag to rotate still works; Reset View still resets rotation to the front-facing view.",
+        "No changes are made to Internet Identity/auth hooks or any files under `frontend/src/components/ui` (read-only sources)."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Add more Avatar Creator customization options by expanding the selectable variants for existing categories (head, hair, body, pants, headwear, shoes) while keeping the saved AvatarConfig schema exactly the same.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "recent-messages-8"
+        ],
+        "quotes": [
+          "**Avatar Creator**-Please make it more 3d and add more optons."
+        ]
+      },
+      "acceptanceCriteria": [
+        "`frontend/src/pages/AvatarCreatorPage.tsx` offers additional selectable options within the existing tabs (no new AvatarConfig fields are introduced).",
+        "`frontend/src/components/avatar3d/avatarVariants.ts` includes corresponding variant mappings for all newly added option IDs so the 3D preview renders correctly for every selectable option.",
+        "Randomize in `AvatarCreatorPage.tsx` can select from the newly added options and does not error.",
+        "Saving and reloading the avatar continues to work using the existing `AvatarConfig` type (body/head/hair/pants/headwear/shoes as Text/string values) without any backend schema changes."
       ]
     }
   ],
   "constraints": [
-    "Make focused changes only for the Kids YouTube Videos Hub; do not change any other CRUD or features.",
-    "Do not edit any files under `frontend/src/components/ui` or other immutable frontend paths listed in SYSTEM_CONTEXT.",
-    "Backend must remain single-actor; no backend changes are required for this request."
+    "Make focused changes only to the Avatar Creator; do not modify or break any other features or CRUD flows.",
+    "Do not change the backend `AvatarConfig` schema or any other backend types/APIs; new options must be represented as additional string values within existing fields.",
+    "Respect single-actor backend architecture; only update backend if strictly necessary (expected: no backend changes).",
+    "Do not edit any immutable frontend paths listed in SYSTEM_CONTEXT (compose existing UI components instead of modifying them)."
   ],
   "nonGoals": [
-    "Do not implement automatic copyright detection or any API-based copyright checks.",
-    "Do not add video upload/hosting features or store video metadata in the backend.",
-    "Do not change the Art Gallery, Admin Dashboard, or any unrelated modules."
+    "Adding new AvatarConfig fields (e.g., eye color sliders, skin tone fields) that require backend type/schema changes.",
+    "Reworking routing/navigation or changing other pages/modules outside the Avatar Creator.",
+    "Introducing external 3D asset downloads or a new asset pipeline."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }
