@@ -1,26 +1,20 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "3D avatar creator app with enhanced 3D look and additional customization options.",
+  "summary": "Project to apply a focused UI theme color update (background, cards, headings, buttons) without impacting existing features or CRUD.",
   "architectural_notes": [
-    "Avatar Creator changes must be isolated to avoid impacting other features/CRUD."
+    "Make focused UI styling changes only; do not impact existing features or CRUD behavior."
   ],
-  "known_issues": [],
+  "known_issues": [
+    "Previous attempt to implement the requested color/theme update failed (AI tool reported it couldn't implement)."
+  ],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-enhance-the-avatar-creator-preview-to-look-more-3d-by-improving-depth-shading-and-lighting-of-the-avatar-parts-in-the-existing-preview-component-without-changing-any-other-modules-or-backend-crud-flows",
-      "title": "Enhance the Avatar Creator preview to look more 3D by improving depth, shading, and lighting of the avatar parts in the existing preview component without changing any other modules or backend CRUD flows.",
+      "id": "feature-update-the-global-light-theme-color-tokens-so-the-app-uses-main-background-d6f0ff-cards-sections-ffffff-primary-headings-2b2b2b-and-primary-buttons-ffe066-with-dark-text-without-changing-any-app-behavior-or-crud-flows",
+      "title": "Update the global light theme color tokens so the app uses: main background #D6F0FF, cards/sections #FFFFFF, primary headings #2B2B2B, and primary buttons #FFE066 with dark text, without changing any app behavior or CRUD flows.",
       "reqIds": [
         "REQ-1"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-more-avatar-creator-customization-options-by-expanding-the-selectable-variants-for-existing-categories-head-hair-body-pants-headwear-shoes-while-keeping-the-saved-avatarconfig-schema-exactly-the-same",
-      "title": "Add more Avatar Creator customization options by expanding the selectable variants for existing categories (head, hair, body, pants, headwear, shoes) while keeping the saved AvatarConfig schema exactly the same.",
-      "reqIds": [
-        "REQ-2"
       ],
       "version": 1
     }
@@ -28,13 +22,20 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Enhance Avatar Creator to look more 3D and add more customization options (focused changes; do not impact other features/CRUD).",
+      "summary": "Update UI theme colors: background #D6F0FF, sections/cards #FFFFFF, primary headings #2B2B2B, buttons #FFE066 with dark text (no other feature/CRUD impact)",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Keep changes focused to styling only: do not refactor components, routes, queries, or state management; only adjust the minimum CSS/theme variables and any minimal, directly-related hardcoded color classes that prevent the new theme colors from applying.",
+      "reqIds": [
+        "REQ-2"
+      ],
       "status": "pending"
     }
   ],
-  "gameProjectType": "3d",
-  "projectName": "Improve Avatar Creator 3D look and add more customization options (focused changes only)",
+  "projectName": "Apply focused UI color theme update (background, cards, headings, buttons)",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

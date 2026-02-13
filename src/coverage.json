@@ -1,40 +1,34 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-12T05:29:04.634Z",
+  "generatedAt": "2026-02-12T14:00:32.928Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
     "total": 2,
-    "implemented": 2,
+    "implemented": 1,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Enhance the Avatar Creator preview to look more 3D by improving depth, shading, and lighting of the avatar parts in the existing preview component without changing any other modules or backend CRUD flows.",
+        "summary": "Update the global light theme color tokens so the app uses: main background #D6F0FF, cards/sections #FFFFFF, primary headings #2B2B2B, and primary buttons #FFE066 with dark text, without changing any app behavior or CRUD flows.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/index.css",
-          "frontend/src/components/avatar3d/AvatarPreview3D.tsx"
+          "frontend/src/index.css"
         ],
         "matchedFiles": [
-          "frontend/src/index.css",
-          "frontend/src/components/avatar3d/AvatarPreview3D.tsx"
+          "frontend/src/index.css"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Add more Avatar Creator customization options by expanding the selectable variants for existing categories (head, hair, body, pants, headwear, shoes) while keeping the saved AvatarConfig schema exactly the same.",
-        "status": "implemented",
+        "summary": "Keep changes focused to styling only: do not refactor components, routes, queries, or state management; only adjust the minimum CSS/theme variables and any minimal, directly-related hardcoded color classes that prevent the new theme colors from applying.",
+        "status": "missing",
         "plannedFiles": [
-          "frontend/src/pages/AvatarCreatorPage.tsx",
-          "frontend/src/components/avatar3d/avatarVariants.ts"
+          "frontend/src/components/Footer.tsx"
         ],
-        "matchedFiles": [
-          "frontend/src/pages/AvatarCreatorPage.tsx",
-          "frontend/src/components/avatar3d/avatarVariants.ts"
-        ]
+        "matchedFiles": []
       }
     ]
   },
@@ -43,10 +37,7 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/avatar3d/AvatarPreview3D.tsx",
-    "frontend/src/components/avatar3d/avatarVariants.ts",
     "frontend/src/index.css",
-    "frontend/src/pages/AvatarCreatorPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

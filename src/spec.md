@@ -1,12 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Make the Avatar Creator preview look more 3D and expand the available customization options without changing any backend schema or impacting other app areas.
+**Goal:** Apply a focused light-theme color update for background, cards/sections, headings, and primary buttons without changing any app behavior or CRUD flows.
 
 **Planned changes:**
-- Improve perceived 3D depth in `frontend/src/components/avatar3d/AvatarPreview3D.tsx` via presentational tweaks (layering, shading/lighting, silhouette) while keeping the existing avatarConfig-driven rendering and interactions.
-- Adjust existing avatar-related CSS in `frontend/src/index.css` to strengthen highlights/shadows and depth effects for the preview.
-- Add more selectable variants within existing Avatar Creator categories (head, hair, body, pants, headwear, shoes) in `frontend/src/pages/AvatarCreatorPage.tsx` without introducing any new AvatarConfig fields.
-- Extend `frontend/src/components/avatar3d/avatarVariants.ts` with mappings for all newly added option IDs so every new selection renders in the preview and works with Randomize.
+- Update global light theme color tokens/variables so the main background is #D6F0FF and card/section surfaces are #FFFFFF.
+- Set primary heading text color defaults to #2B2B2B in light mode.
+- Update primary button styling to use #FFE066 with a dark, readable text color.
+- Make minimal, directly-related adjustments to any hardcoded color classes that prevent the new theme tokens from applying (styling-only changes).
 
-**User-visible outcome:** The Avatar Creator preview looks noticeably more 3D (with better depth and lighting), and users can choose from more options in the existing customization tabs; randomize, save, and reload continue to work as before.
+**User-visible outcome:** In light mode, the app displays a light-blue page background, white cards/sections, dark primary headings, and yellow primary buttons with readable dark text, with all existing functionality unchanged.

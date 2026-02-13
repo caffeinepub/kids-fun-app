@@ -1,49 +1,38 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Avatar Creator: stronger 3D preview styling + expanded variants (focused changes only)",
+  "title": "Focused light theme color token update (background, cards, headings, buttons)",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Improve the existing AvatarPreview3D depth, shading, and lighting via focused presentational/CSS changes while preserving interactions and not touching other modules.",
+      "summary": "Update global light theme tokens so background, card surfaces, headings, and primary buttons match the provided hex colors without changing app behavior.",
       "acceptanceCriteria": [
-        "Avatar preview in `frontend/src/components/avatar3d/AvatarPreview3D.tsx` looks noticeably more 3D (e.g., clearer depth layering between head/hair/headwear/body/arms/legs/shoes, stronger highlights/shadows, improved silhouette) while still using the existing avatarConfig-driven rendering.",
-        "3D improvements are implemented by adjusting existing styles in `frontend/src/index.css` (e.g., avatar 3D classes) and/or small presentational changes in `AvatarPreview3D.tsx`, without introducing new app modules or altering non-avatar pages.",
-        "Existing interaction behavior remains intact: drag to rotate still works; Reset View still resets rotation to the front-facing view.",
-        "No changes are made to Internet Identity/auth hooks or any files under `frontend/src/components/ui` (read-only sources)."
+        "In light mode, the page background renders as hex #D6F0FF (or visually indistinguishable from it) wherever the app uses the global background token (e.g., Tailwind class bg-background).",
+        "In light mode, card/section surfaces render as #FFFFFF wherever the app uses the card token (e.g., bg-card).",
+        "Primary heading text (e.g., h1/h2/h3 or the app’s main page titles) renders as #2B2B2B by default unless a specific component intentionally overrides it.",
+        "Primary buttons render with background #FFE066 and a dark, readable text color (e.g., #2B2B2B or equivalently dark).",
+        "No backend canister methods, data types, or CRUD behaviors are modified."
       ],
       "file_operations": [
         {
           "path": "frontend/src/index.css",
           "operation": "modify",
-          "description": "Enhance the existing avatar 3D utility classes to increase perceived depth: add stronger directional lighting cues (highlights/shadows), per-part depth separation (e.g., translateZ layering), and improved silhouette via shadows/gradients while keeping the current Avatar Creator scope focused."
-        },
-        {
-          "path": "frontend/src/components/avatar3d/AvatarPreview3D.tsx",
-          "operation": "modify",
-          "description": "Make small, presentational-only adjustments to the avatar part rendering (e.g., add lightweight overlay elements or class hooks for highlights/shadows and depth ordering) so the improved CSS lighting/depth applies cleanly; preserve existing drag-to-rotate and Reset View behavior and keep avatarConfig-driven rendering intact."
+          "description": "Adjust the light-mode CSS custom properties used by Tailwind tokens (bg-background/bg-card/text-foreground/bg-primary/text-primary-foreground) so they visually match: background #D6F0FF, card #FFFFFF, default primary text/headings #2B2B2B, and primary button background #FFE066 with dark text. Keep dark-mode variables unchanged unless strictly necessary for contrast."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Expand selectable variant IDs for existing Avatar Creator categories and ensure avatarVariants mappings cover all new IDs without changing AvatarConfig schema.",
+      "summary": "Keep the change strictly styling-scoped by modifying only theme variables and minimal hardcoded color classes that block the new tokens from applying.",
       "acceptanceCriteria": [
-        "`frontend/src/pages/AvatarCreatorPage.tsx` offers additional selectable options within the existing tabs (no new AvatarConfig fields are introduced).",
-        "`frontend/src/components/avatar3d/avatarVariants.ts` includes corresponding variant mappings for all newly added option IDs so the 3D preview renders correctly for every selectable option.",
-        "Randomize in `AvatarCreatorPage.tsx` can select from the newly added options and does not error.",
-        "Saving and reloading the avatar continues to work using the existing `AvatarConfig` type (body/head/hair/pants/headwear/shoes as Text/string values) without any backend schema changes."
+        "Only styling/theme-related files (e.g., frontend/src/index.css and other CSS/theme configuration as strictly needed) are changed; no feature logic changes are introduced.",
+        "All existing pages and modules remain functional and visually coherent after the color update (no unreadable text on buttons or backgrounds)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/AvatarCreatorPage.tsx",
+          "path": "frontend/src/components/Footer.tsx",
           "operation": "modify",
-          "description": "Add more selectable option IDs within the existing category arrays (head, hair, body, pants, headwear, shoes) and extend the existing emoji mapping so every new option displays in the current tabs; ensure Randomize draws from the expanded arrays without errors and do not add any new AvatarConfig fields."
-        },
-        {
-          "path": "frontend/src/components/avatar3d/avatarVariants.ts",
-          "operation": "modify",
-          "description": "Extend the existing variant maps for head/hair/body/pants/headwear/shoes to include styles for every newly added option ID from AvatarCreatorPage, ensuring the 3D preview renders correctly for all selectable options while keeping the AvatarConfig schema unchanged."
+          "description": "Replace hardcoded light-surface and text utility classes (e.g., bg-white/80, text-gray-600) with theme token-based classes (e.g., bg-card/opacity and text-foreground or text-muted-foreground equivalents) so the new global background/card/foreground tokens apply consistently, without changing component structure or behavior."
         }
       ]
     }

@@ -13,8 +13,6 @@ import Text "mo:core/Text";
 import Set "mo:core/Set";
 import List "mo:core/List";
 
-
-
 actor {
   include MixinStorage();
 
@@ -959,6 +957,9 @@ actor {
   };
 
   public query ({ caller }) func getScaryHubGames() : async [ScaryHubGameEntry] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can access games");
+    };
     scaryHubGames.values().toArray();
   };
 
@@ -1197,4 +1198,3 @@ actor {
     Array.tabulate<ActivityEvent>(Nat.min(limit, total), func(i) { activityArray[startIndex + i] });
   };
 };
-

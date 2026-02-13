@@ -1,60 +1,68 @@
 {
   "kind": "build_request",
-  "title": "Improve Avatar Creator 3D look and add more customization options (focused changes only)",
+  "title": "Apply focused UI color theme update (background, cards, headings, buttons)",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Enhance the Avatar Creator preview to look more 3D by improving depth, shading, and lighting of the avatar parts in the existing preview component without changing any other modules or backend CRUD flows.",
+      "text": "Update the global light theme color tokens so the app uses: main background #D6F0FF, cards/sections #FFFFFF, primary headings #2B2B2B, and primary buttons #FFE066 with dark text, without changing any app behavior or CRUD flows.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "recent-messages-8"
+          "msg-1"
         ],
         "quotes": [
-          "Make focused changes only. Ensure no other features or CRUD is impacted.**Avatar Creator**-Please make it more 3d and add more optons."
+          "Please make my background : #D6F0FF (light blue)\n\nSections/cards: #FFFFFF\n\nPrimary headings: #2B2B2B\n\nButtons: #FFE066 (yellow) with dark text"
         ]
       },
       "acceptanceCriteria": [
-        "Avatar preview in `frontend/src/components/avatar3d/AvatarPreview3D.tsx` looks noticeably more 3D (e.g., clearer depth layering between head/hair/headwear/body/arms/legs/shoes, stronger highlights/shadows, improved silhouette) while still using the existing avatarConfig-driven rendering.",
-        "3D improvements are implemented by adjusting existing styles in `frontend/src/index.css` (e.g., avatar 3D classes) and/or small presentational changes in `AvatarPreview3D.tsx`, without introducing new app modules or altering non-avatar pages.",
-        "Existing interaction behavior remains intact: drag to rotate still works; Reset View still resets rotation to the front-facing view.",
-        "No changes are made to Internet Identity/auth hooks or any files under `frontend/src/components/ui` (read-only sources)."
+        "In light mode, the page background renders as hex #D6F0FF (or visually indistinguishable from it) wherever the app uses the global background token (e.g., Tailwind class bg-background).",
+        "In light mode, card/section surfaces render as #FFFFFF wherever the app uses the card token (e.g., bg-card).",
+        "Primary heading text (e.g., h1/h2/h3 or the app’s main page titles) renders as #2B2B2B by default unless a specific component intentionally overrides it.",
+        "Primary buttons render with background #FFE066 and a dark, readable text color (e.g., #2B2B2B or equivalently dark).",
+        "No backend canister methods, data types, or CRUD behaviors are modified."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Add more Avatar Creator customization options by expanding the selectable variants for existing categories (head, hair, body, pants, headwear, shoes) while keeping the saved AvatarConfig schema exactly the same.",
+      "text": "Keep changes focused to styling only: do not refactor components, routes, queries, or state management; only adjust the minimum CSS/theme variables and any minimal, directly-related hardcoded color classes that prevent the new theme colors from applying.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "recent-messages-8"
+          "msg-1"
         ],
         "quotes": [
-          "**Avatar Creator**-Please make it more 3d and add more optons."
+          "Make focused changes only. Ensure no other features or CRUD is impacted."
         ]
       },
       "acceptanceCriteria": [
-        "`frontend/src/pages/AvatarCreatorPage.tsx` offers additional selectable options within the existing tabs (no new AvatarConfig fields are introduced).",
-        "`frontend/src/components/avatar3d/avatarVariants.ts` includes corresponding variant mappings for all newly added option IDs so the 3D preview renders correctly for every selectable option.",
-        "Randomize in `AvatarCreatorPage.tsx` can select from the newly added options and does not error.",
-        "Saving and reloading the avatar continues to work using the existing `AvatarConfig` type (body/head/hair/pants/headwear/shoes as Text/string values) without any backend schema changes."
+        "Only styling/theme-related files (e.g., frontend/src/index.css and other CSS/theme configuration as strictly needed) are changed; no feature logic changes are introduced.",
+        "All existing pages and modules remain functional and visually coherent after the color update (no unreadable text on buttons or backgrounds)."
       ]
     }
   ],
   "constraints": [
-    "Make focused changes only to the Avatar Creator; do not modify or break any other features or CRUD flows.",
-    "Do not change the backend `AvatarConfig` schema or any other backend types/APIs; new options must be represented as additional string values within existing fields.",
-    "Respect single-actor backend architecture; only update backend if strictly necessary (expected: no backend changes).",
-    "Do not edit any immutable frontend paths listed in SYSTEM_CONTEXT (compose existing UI components instead of modifying them)."
+    "Make focused styling changes only; do not impact any other features or any CRUD behavior.",
+    "Do not modify backend logic or storage.",
+    "Do not edit any files under frontend/src/components/ui (read-only); compose existing components instead if needed."
   ],
   "nonGoals": [
-    "Adding new AvatarConfig fields (e.g., eye color sliders, skin tone fields) that require backend type/schema changes.",
-    "Reworking routing/navigation or changing other pages/modules outside the Avatar Creator.",
-    "Introducing external 3D asset downloads or a new asset pipeline."
+    "Adding new features, pages, or UI components.",
+    "Changing dark mode theme behavior unless required to keep text/button contrast acceptable in light mode.",
+    "Any backend schema/state migrations."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }
