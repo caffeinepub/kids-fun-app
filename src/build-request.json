@@ -1,90 +1,41 @@
 {
   "kind": "build_request",
-  "title": "Gate full app behind login with pre-login feature preview + limited trial games",
+  "title": "Keep changes strictly scoped to login/trial gating without impacting existing CRUD/features",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Add an unauthenticated (pre-login) experience that allows users to (a) view a feature preview and (b) play a limited set of trial games, while preventing access to the rest of the app until they log in.",
-      "target": "frontend",
+      "text": "Confine any code changes in this iteration to the login flow, pre-login experience, and trial gameplay access gating only; do not modify any other feature behavior or any existing CRUD logic/data flows outside authentication/trial gating.",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-4"
         ],
         "quotes": [
-          "Before login users should not be able to use the website only if they login they should be able to. Before login there should be able to see the features and play some games as a trial."
+          "Make focused changes only. Ensure no other features or CRUD is impacted.****"
         ]
       },
       "acceptanceCriteria": [
-        "When the user is not authenticated (no Internet Identity), the app renders a pre-login experience instead of the full Dashboard/modules.",
-        "The pre-login experience includes a clear login call-to-action using Internet Identity.",
-        "The pre-login experience includes a feature preview section (reusing the existing feature grid content).",
-        "The pre-login experience includes a way to access trial games without logging in.",
-        "No other existing module behavior or CRUD flows are changed when the user is authenticated."
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "text": "Implement navigation/access gating so unauthenticated users cannot access any non-trial pages/modules (including pages accessible via internal navigation state), and are redirected back to the pre-login experience with an English message prompting them to log in.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "Make focused changes only. Ensure no other features or CRUD is impacted. Before login users should not be able to use the website only if they login they should be able to."
-        ]
-      },
-      "acceptanceCriteria": [
-        "If an unauthenticated user attempts to navigate to a restricted module page (anything outside the pre-login experience and the allowed trial games), the UI prevents access and returns them to the pre-login experience.",
-        "Restricted content is not rendered for unauthenticated users (no partial/flash render of restricted pages).",
-        "After successful login, the user can access the full app normally.",
-        "After logout, the user is returned to the pre-login experience and restricted pages are no longer accessible."
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Limit the Games Hub and game launching behavior for unauthenticated users to a defined trial set of games; all other games must be visibly locked and attempting to open them must prompt the user to log in (English text).",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "...play some games as a trial."
-        ]
-      },
-      "acceptanceCriteria": [
-        "When unauthenticated, the Games Hub shows which games are available as trial and which are locked.",
-        "Clicking a locked game while unauthenticated does not open the game and instead displays an English login prompt.",
-        "Trial games remain fully playable without authentication.",
-        "When authenticated, the Games Hub returns to showing/launching games as it does today (no loss of functionality)."
+        "No backend data models, stable storage layout, or CRUD methods are changed except where strictly required for authentication/trial gating.",
+        "Authenticated users can still access and use all existing modules/pages with the same create/read/update/delete behavior as before.",
+        "Unauthenticated users remain restricted to the pre-login experience and the defined trial game allowlist; attempts to access other pages continue to redirect/block with English messaging.",
+        "No new pages/modules/features are introduced as part of this change set."
       ]
     }
   ],
   "constraints": [
-    "Make focused changes only; do not introduce unrelated features.",
-    "Ensure no other existing features or CRUD flows are impacted for authenticated users.",
-    "Do not edit any frontend immutable paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui.",
-    "Backend must remain single-actor; avoid backend changes unless strictly required for the login/trial gating behavior."
+    "Make focused changes only; do not impact any other features or CRUD behavior.",
+    "Use English for all user-facing text.",
+    "Backend must remain single-actor (backend/main.mo); create backend/migration.mo only if state schema changes are required.",
+    "Do not edit files under frontend/src/components/ui or any paths listed as immutable in SYSTEM_CONTEXT."
   ],
   "nonGoals": [
-    "Adding new backend authorization rules for every method (frontend gating only unless a specific security gap is identified during implementation).",
-    "Changing the data model, existing CRUD logic, or existing module functionality beyond access gating.",
-    "Adding new games or modifying game logic/content."
+    "Adding new games, modules, or CRUD endpoints.",
+    "Refactoring unrelated UI components or redesigning unrelated pages.",
+    "Changing authentication provider (Internet Identity only)."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

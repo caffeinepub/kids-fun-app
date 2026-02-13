@@ -1,14 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Gate the full app behind Internet Identity login while providing a pre-login experience that previews features and allows a limited set of trial games.
+**Goal:** Keep this iteration strictly limited to the login flow, pre-login experience, and trial gameplay access gating, without affecting any existing CRUD behavior or other feature modules.
 
 **Planned changes:**
-- Add an unauthenticated pre-login screen shown whenever the user is not authenticated, including a clear Internet Identity login call-to-action.
-- Include a feature preview section in the pre-login screen by reusing the existing feature grid content.
-- Allow unauthenticated users to access and play a limited set of trial games from the pre-login experience.
-- Add frontend navigation/access gating so unauthenticated users cannot access restricted modules/pages (no restricted content rendered), and are redirected back to the pre-login screen with an English prompt to log in.
-- Update Games Hub/game launching behavior for unauthenticated users: show trial vs locked games, block locked game launches, and display an English login prompt; keep authenticated behavior unchanged.
-- Ensure logout returns the user to the pre-login experience and re-applies restrictions.
+- Restrict code changes to authentication/login flow, pre-login screens, and trial game allowlist gating/redirect behavior only.
+- Ensure authenticated users continue to access all existing modules/pages with unchanged create/read/update/delete behavior.
+- Ensure unauthenticated users are limited to the pre-login experience and the defined trial allowlist, with English messaging when blocked/redirected.
+- Avoid introducing any new pages/modules/features as part of this change set.
 
-**User-visible outcome:** Logged-out users see a pre-login page where they can preview features and play a small trial set of games, but attempting to access anything else (including locked games) prompts them in English to log in; after logging in, the full app works as it does today.
+**User-visible outcome:** Logged-in users can use the app as before with no CRUD/feature changes; logged-out users can only see the pre-login experience and access the allowed trial gameplay, and are blocked/redirected from all other areas with clear English messages.

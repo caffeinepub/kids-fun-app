@@ -956,10 +956,9 @@ actor {
     virtualPetHubMap.add(caller, pet);
   };
 
+  // Allow guests to browse games for trial gameplay (pre-login experience)
   public query ({ caller }) func getScaryHubGames() : async [ScaryHubGameEntry] {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can access games");
-    };
+    // No authorization check - guests can browse games for trial gameplay
     scaryHubGames.values().toArray();
   };
 
@@ -1085,13 +1084,15 @@ actor {
     };
   };
 
-  // Public: Get all video channels (browsing is public for kids)
+  // Public: Get all video channels (browsing is public for kids, including guests)
   public query ({ caller }) func getVideoChannels() : async [VideoChannel] {
+    // No authorization check - guests can browse video channels
     videoChannels.values().toArray();
   };
 
-  // Public: Get specific video channel details
+  // Public: Get specific video channel details (browsing is public for kids, including guests)
   public query ({ caller }) func getVideoChannel(channelId : Text) : async ?VideoChannel {
+    // No authorization check - guests can view video channel details
     videoChannels.get(channelId);
   };
 

@@ -1,54 +1,24 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Add login-gated access with a pre-login trial mode: unauthenticated users can view feature previews and play limited trial games, but cannot use the full website until logging in.",
+  "summary": "New project",
   "architectural_notes": [
-    "Implement route/feature access control based on authentication state, with explicit allowlist for pre-login preview/trial areas.",
-    "Keep changes focused to avoid impacting existing CRUD/features outside auth gating."
+    "Make focused changes only; ensure no other features or CRUD flows are impacted."
   ],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-add-an-unauthenticated-pre-login-experience-that-allows-users-to-a-view-a-feature-preview-and-b-play-a-limited-set-of-trial-games-while-preventing-access-to-the-rest-of-the-app-until-they-log-in",
-      "title": "Add an unauthenticated (pre-login) experience that allows users to (a) view a feature preview and (b) play a limited set of trial games, while preventing access to the rest of the app until they log in.",
+      "id": "feature-confine-any-code-changes-in-this-iteration-to-the-login-flow-pre-login-experience-and-trial-gameplay-access-gating-only-do-not-modify-any-other-feature-behavior-or-any-existing-crud-logic-data-flows-outside-authentication-trial-gating",
+      "title": "Confine any code changes in this iteration to the login flow, pre-login experience, and trial gameplay access gating only; do not modify any other feature behavior or any existing CRUD logic/data flows outside authentication/trial gating.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
-    },
-    {
-      "id": "feature-implement-navigation-access-gating-so-unauthenticated-users-cannot-access-any-non-trial-pages-modules-including-pages-accessible-via-internal-navigation-state-and-are-redirected-back-to-the-pre-login-experience-with-an-english-message-prompting-them-to-log-in",
-      "title": "Implement navigation/access gating so unauthenticated users cannot access any non-trial pages/modules (including pages accessible via internal navigation state), and are redirected back to the pre-login experience with an English message prompting them to log in.",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-limit-the-games-hub-and-game-launching-behavior-for-unauthenticated-users-to-a-defined-trial-set-of-games-all-other-games-must-be-visibly-locked-and-attempting-to-open-them-must-prompt-the-user-to-log-in-english-text",
-      "title": "Limit the Games Hub and game launching behavior for unauthenticated users to a defined trial set of games; all other games must be visibly locked and attempting to open them must prompt the user to log in (English text).",
-      "reqIds": [
-        "REQ-3"
-      ],
-      "version": 1
     }
   ],
-  "new_feature_requests": [
-    {
-      "id": "AR-1",
-      "summary": "Gate full website functionality behind login; unauthenticated users cannot use the site beyond allowed preview/trial areas",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Provide pre-login experience: allow viewing features and playing some games as a trial before authentication",
-      "reqIds": [],
-      "status": "pending"
-    }
-  ],
-  "projectName": "Gate full app behind login with pre-login feature preview + limited trial games",
+  "new_feature_requests": [],
+  "projectName": "Keep changes strictly scoped to login/trial gating without impacting existing CRUD/features",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

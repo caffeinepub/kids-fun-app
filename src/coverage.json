@@ -1,67 +1,38 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-13T05:07:55.747Z",
+  "generatedAt": "2026-02-13T05:40:30.204Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 3,
+    "total": 1,
+    "implemented": 1,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Add an unauthenticated (pre-login) experience that allows users to (a) view a feature preview and (b) play a limited set of trial games, while preventing access to the rest of the app until they log in.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/PreLoginExperiencePage.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/components/Header.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/PreLoginExperiencePage.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/components/Header.tsx"
-        ]
-      },
-      {
-        "id": "REQ-2",
-        "summary": "Implement navigation/access gating so unauthenticated users cannot access any non-trial pages/modules (including pages accessible via internal navigation state), and are redirected back to the pre-login experience with an English message prompting them to log in.",
+        "summary": "Confine any code changes in this iteration to the login flow, pre-login experience, and trial gameplay access gating only; do not modify any other feature behavior or any existing CRUD logic/data flows outside authentication/trial gating.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/App.tsx",
-          "frontend/src/pages/PreLoginExperiencePage.tsx"
+          "frontend/src/pages/GamesHub.tsx"
         ],
         "matchedFiles": [
           "frontend/src/App.tsx",
-          "frontend/src/pages/PreLoginExperiencePage.tsx"
-        ]
-      },
-      {
-        "id": "REQ-3",
-        "summary": "Limit the Games Hub and game launching behavior for unauthenticated users to a defined trial set of games; all other games must be visibly locked and attempting to open them must prompt the user to log in (English text).",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/GamesHub.tsx",
-          "frontend/src/App.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/GamesHub.tsx",
-          "frontend/src/App.tsx"
+          "frontend/src/pages/GamesHub.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
     "frontend/src/App.tsx",
-    "frontend/src/components/Header.tsx",
     "frontend/src/pages/GamesHub.tsx",
-    "frontend/src/pages/PreLoginExperiencePage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

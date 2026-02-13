@@ -1,77 +1,26 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Pre-login preview + trial games with authenticated-only app access",
+  "title": "Strictly scoped login + trial gameplay access gating adjustments (frontend-only)",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Create a pre-login experience that previews features and allows playing a limited set of trial games while gating the rest of the app behind Internet Identity login.",
+      "summary": "Keep all changes confined to authentication, pre-login experience, and trial-game allowlist gating without affecting existing modules or CRUD behavior.",
       "acceptanceCriteria": [
-        "When the user is not authenticated (no Internet Identity), the app renders a pre-login experience instead of the full Dashboard/modules.",
-        "The pre-login experience includes a clear login call-to-action using Internet Identity.",
-        "The pre-login experience includes a feature preview section (reusing the existing feature grid content).",
-        "The pre-login experience includes a way to access trial games without logging in.",
-        "No other existing module behavior or CRUD flows are changed when the user is authenticated."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/PreLoginExperiencePage.tsx",
-          "operation": "create",
-          "description": "Add a dedicated pre-login screen that (1) shows a clear Internet Identity login CTA using the authorization component’s frontend auth flow (via useInternetIdentity), (2) reuses the existing HomepageFeatures feature grid for the feature preview, and (3) includes a prominent action to enter the trial games area (navigate to Games Hub). Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Wire the new pre-login page into the existing state-based navigation by extending ModulePage with a 'pre-login' page and rendering it when the user is unauthenticated. Ensure authenticated users continue to see the full app with no behavioral changes."
-        },
-        {
-          "path": "frontend/src/components/Header.tsx",
-          "operation": "modify",
-          "description": "Adjust header navigation behavior for the new pre-login experience: when logged out, clicking the brand/logo routes to the pre-login screen; on logout, route to the pre-login screen (and keep existing query cache clearing per the authorization component guidance). Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "summary": "Implement strict client-side access gating so unauthenticated users cannot render restricted pages and are redirected to pre-login with an English login prompt message.",
-      "acceptanceCriteria": [
-        "If an unauthenticated user attempts to navigate to a restricted module page (anything outside the pre-login experience and the allowed trial games), the UI prevents access and returns them to the pre-login experience.",
-        "Restricted content is not rendered for unauthenticated users (no partial/flash render of restricted pages).",
-        "After successful login, the user can access the full app normally.",
-        "After logout, the user is returned to the pre-login experience and restricted pages are no longer accessible."
+        "Authenticated users can still access and use all existing modules/pages with the same create/read/update/delete behavior as before.",
+        "Unauthenticated users remain restricted to the pre-login experience and the defined trial game allowlist; attempts to access other pages continue to redirect/block with English messaging.",
+        "No new pages/modules/features are introduced as part of this change set."
       ],
       "file_operations": [
         {
           "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Add a centralized access-gating layer before page rendering: define the allowed unauthenticated pages (pre-login + Games Hub + specific trial game pages), block all other pages when identity is missing, and immediately route to 'pre-login' while setting an English message (e.g., 'Please log in to access this section.'). Ensure gating happens prior to rendering any restricted page to avoid flash/partial render. Verify the component's usage instructions before implementing."
+          "description": "Tighten and centralize client-side access gating by exporting a single source of truth for the trial-game allowlist and unauthenticated page allowlist, and ensure redirect/block messaging remains English-only. Keep changes strictly limited to login/pre-login/trial gating. Use the selected \"authorization\" component’s frontend guidance to ensure unauthenticated users cannot access application data and that logout clears cached app data; verify the component's usage instructions before implementing."
         },
-        {
-          "path": "frontend/src/pages/PreLoginExperiencePage.tsx",
-          "operation": "modify",
-          "description": "Add UI to display the access-gate redirect message (English) when present, alongside the login CTA and trial-games entry points. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Restrict the Games Hub to a defined trial set for unauthenticated users, visually lock other games, and prompt login when locked games are clicked.",
-      "acceptanceCriteria": [
-        "When unauthenticated, the Games Hub shows which games are available as trial and which are locked.",
-        "Clicking a locked game while unauthenticated does not open the game and instead displays an English login prompt.",
-        "Trial games remain fully playable without authentication.",
-        "When authenticated, the Games Hub returns to showing/launching games as it does today (no loss of functionality)."
-      ],
-      "file_operations": [
         {
           "path": "frontend/src/pages/GamesHub.tsx",
           "operation": "modify",
-          "description": "Introduce a defined trial allowlist (specific game ModulePage ids) and update the Games Hub UI to label trial vs locked games when unauthenticated. Prevent navigation for locked games and show an English login prompt (e.g., via existing toast/sonner) on click; allow trial game navigation as normal. When authenticated, preserve current full catalog behavior. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Ensure game launching is gated consistently: allow trial game pages to render unauthenticated, block all other game pages and redirect to pre-login with the English login prompt message. Also pass authentication state (or equivalent) into GamesHub so it can render trial/locked states without changing authenticated behavior."
+          "description": "Remove duplicated trial-game allowlist logic and consume the centralized trial allowlist exported from App-level gating so unauthenticated users can only launch allowlisted trial games, with consistent English lock/toast messaging. Keep changes strictly limited to trial gating behavior and do not alter game logic. Verify the component's usage instructions before implementing."
         }
       ]
     }

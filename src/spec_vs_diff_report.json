@@ -1,69 +1,78 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-13T05:07:55.743Z",
-  "summary": "REQ-1/2/3 appear to be implemented via a new PreLoginExperience page, auth-based gating in App.tsx, header behavior changes, and GamesHub trial/locked behavior. However, the diff summary also indicates multiple substantial, unrelated feature additions/changes (CSS redesign, query hook overhauls, game logic changes, new game layout/upgrades, events notifications, video generator changes), which violate the “focused changes only / do not introduce unrelated features” constraint.",
-  "missing_requirements": [],
+  "generatedAt": "2026-02-13T05:40:30.200Z",
+  "summary": "Diff evidence suggests changes extend beyond login flow and trial access gating, including substantial backend type/model definitions and frontend feature work (hooks, CSS, multiple pages/components and game functionality) that were not requested and conflict with the strict scoping requirement.",
+  "missing_requirements": [
+    {
+      "id": "REQ-1",
+      "requirement": "Confine any code changes in this iteration to the login flow, pre-login experience, and trial gameplay access gating only; do not modify any other feature behavior or any existing CRUD logic/data flows outside authentication/trial gating.",
+      "reason": "The diff summary indicates updates/additions affecting broad backend data models and multiple frontend features (hooks, CSS, various pages/components, game implementations) beyond login/trial gating, so the scope-confinement requirement is not met.",
+      "evidence": [
+        "backend/main.mo",
+        "frontend/src/App.tsx",
+        "frontend/src/pages/GamesHub.tsx",
+        "frontend-file-summaries.txt"
+      ]
+    }
+  ],
   "hallucinated_features": [
     {
-      "description": "Global UI/CSS redesign (new OKLCH color system, backgrounds, neon effects, 3D avatar styling).",
-      "reason": "Not requested; BuildRequest is only about login/trial gating and explicitly asks for focused changes only.",
+      "description": "Large expansion/definition of many backend domain types/models (e.g., UserProfile, GameProgress, Event, ChatMessage, Joke, Feedback, Reward, ParentalControl, etc.) unrelated to authentication/trial gating.",
+      "reason": "BuildRequest asked to keep changes strictly scoped to login/trial gating and avoid modifying backend data models/storage/CRUD except if strictly required for gating; these model definitions appear unrelated to gating in the provided diff excerpt.",
       "evidence": [
-        "frontend-file-summaries.txt (frontend/src/index.css)"
+        "backend/main.mo"
       ]
     },
     {
-      "description": "Major expansion/changes to React Query hooks and localStorage-based implementations for many modules (art gallery, certificates, craft projects, events, jokes, music remixes, stickers, spin wheel, seasonal events, invention stories), plus polling and various type-conversion behaviors.",
-      "reason": "Not requested; non-goal is to avoid changing data model/CRUD/module functionality beyond access gating.",
+      "description": "Global CSS/theme redesign (new colors, neon glow effects, enhanced 3D avatar styling).",
+      "reason": "UI redesign and global styling changes are outside the requested login/trial gating scope.",
       "evidence": [
-        "frontend-file-summaries.txt (frontend/src/hooks/useQueries.ts)"
+        "frontend-file-summaries.txt"
       ]
     },
     {
-      "description": "Added/modified reusable GameLayout with trophy/pet upgrade functionality and upgrade dialogs.",
-      "reason": "Not requested; introduces new gameplay/meta systems beyond gating.",
+      "description": "Extensive React Query hook additions/changes for many modules (events, jokes, music remixes, stickers, spin wheel, art gallery, certificates, craft projects, etc.), including localStorage-based implementations and polling.",
+      "reason": "Not requested; appears to modify/add data flows and functionality across many app areas beyond authentication/trial gating.",
       "evidence": [
-        "frontend-file-summaries.txt (frontend/src/components/GameLayout.tsx)"
+        "frontend-file-summaries.txt"
       ]
     },
     {
-      "description": "Significant rework/optimization of BalloonPop game (spawning, scoring rules, animation loop, performance refactor).",
-      "reason": "Not requested; non-goal explicitly says not to modify game logic/content.",
+      "description": "Reusable GameLayout with trophy counter, upgrade dialog, and pet upgrade/trophy management features.",
+      "reason": "Not requested and represents new/expanded gameplay UI/features beyond gating.",
       "evidence": [
-        "frontend-file-summaries.txt (frontend/src/pages/games/BalloonPop.tsx)"
+        "frontend-file-summaries.txt"
       ]
     },
     {
-      "description": "Added/changed gameplay features in multiple games (MemoryMatch progressive difficulty, WordWizard/NumberRunner detailed mechanics).",
-      "reason": "Not requested; non-goal explicitly says not to modify game logic/content.",
+      "description": "New/expanded game implementations and optimizations (e.g., BalloonPop fully optimized gameplay, other games with progressive difficulty/state-based navigation).",
+      "reason": "BuildRequest explicitly lists as non-goals adding new games/modules/features; these descriptions indicate game feature work beyond gating.",
       "evidence": [
-        "frontend-file-summaries.txt (frontend/src/pages/games/MemoryMatch.tsx)",
-        "frontend-file-summaries.txt (frontend/src/pages/games/WordWizard.tsx)",
-        "frontend-file-summaries.txt (frontend/src/pages/games/NumberRunner.tsx)"
+        "frontend-file-summaries.txt"
       ]
     },
     {
-      "description": "Events page changes: automatic event-day notification system and localStorage-based event management without backend calls.",
-      "reason": "Not requested; alters module behavior beyond gating.",
+      "description": "Events page event-day notification system and localStorage-based event management without backend calls.",
+      "reason": "Unrelated feature change outside login/trial gating scope.",
       "evidence": [
-        "frontend-file-summaries.txt (frontend/src/pages/EventsPage.tsx)"
+        "frontend-file-summaries.txt"
       ]
     },
     {
-      "description": "Video Generator page: fully functional Generate button with canvas-based 2D animated video previews.",
-      "reason": "Not requested; introduces/changes module functionality beyond gating.",
+      "description": "Video generator page implementation with canvas-based animated previews and functional Generate button.",
+      "reason": "Unrelated feature work outside login/trial gating scope.",
       "evidence": [
-        "frontend-file-summaries.txt (frontend/src/pages/VideoGeneratorPage.tsx)"
+        "frontend-file-summaries.txt"
       ]
     }
   ],
   "confidence": 0.74,
   "changed_files": [
+    "backend/main.mo",
     "frontend-file-summaries.txt",
     "frontend/src/App.tsx",
-    "frontend/src/components/Header.tsx",
     "frontend/src/pages/GamesHub.tsx",
-    "frontend/src/pages/PreLoginExperiencePage.tsx",
     "project_state.json"
   ]
 }
