@@ -2,10 +2,12 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-global-light-theme-color-tokens-so-the-app-uses-main-background-d6f0ff-cards-sections-ffffff-primary-headings-2b2b2b-and-primary-buttons-ffe066-with-dark-text-without-changing-any-app-behavior-or-crud-flows",
-      "featureTitle": "Update the global light theme color tokens so the app uses: main background #D6F0FF, cards/sections #FFFFFF, primary headings #2B2B2B, and primary buttons #FFE066 with dark text, without changing any app behavior or CRUD flows.",
+      "featureId": "feature-add-an-unauthenticated-pre-login-experience-that-allows-users-to-a-view-a-feature-preview-and-b-play-a-limited-set-of-trial-games-while-preventing-access-to-the-rest-of-the-app-until-they-log-in",
+      "featureTitle": "Add an unauthenticated (pre-login) experience that allows users to (a) view a feature preview and (b) play a limited set of trial games, while preventing access to the rest of the app until they log in.",
       "files": [
-        "frontend/src/index.css"
+        "frontend/src/App.tsx",
+        "frontend/src/components/Header.tsx",
+        "frontend/src/pages/PreLoginExperiencePage.tsx"
       ],
       "components": [
         "authorization@3.0.0",
@@ -21,6 +23,54 @@
       ],
       "testIds": [
         "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-navigation-access-gating-so-unauthenticated-users-cannot-access-any-non-trial-pages-modules-including-pages-accessible-via-internal-navigation-state-and-are-redirected-back-to-the-pre-login-experience-with-an-english-message-prompting-them-to-log-in",
+      "featureTitle": "Implement navigation/access gating so unauthenticated users cannot access any non-trial pages/modules (including pages accessible via internal navigation state), and are redirected back to the pre-login experience with an English message prompting them to log in.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/pages/PreLoginExperiencePage.tsx"
+      ],
+      "components": [
+        "authorization@3.0.0",
+        "blob-storage@4.0.0",
+        "user-approval@3.0.0",
+        "camera@1.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "http-outcalls@3.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-limit-the-games-hub-and-game-launching-behavior-for-unauthenticated-users-to-a-defined-trial-set-of-games-all-other-games-must-be-visibly-locked-and-attempting-to-open-them-must-prompt-the-user-to-log-in-english-text",
+      "featureTitle": "Limit the Games Hub and game launching behavior for unauthenticated users to a defined trial set of games; all other games must be visibly locked and attempting to open them must prompt the user to log in (English text).",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/pages/GamesHub.tsx"
+      ],
+      "components": [
+        "authorization@3.0.0",
+        "blob-storage@4.0.0",
+        "user-approval@3.0.0",
+        "camera@1.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "http-outcalls@3.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
       ],
       "confidence": "high"
     }

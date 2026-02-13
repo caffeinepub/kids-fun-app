@@ -1,55 +1,77 @@
 {
   "kind": "build_request",
-  "title": "Apply focused UI color theme update (background, cards, headings, buttons)",
+  "title": "Gate full app behind login with pre-login feature preview + limited trial games",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Update the global light theme color tokens so the app uses: main background #D6F0FF, cards/sections #FFFFFF, primary headings #2B2B2B, and primary buttons #FFE066 with dark text, without changing any app behavior or CRUD flows.",
+      "text": "Add an unauthenticated (pre-login) experience that allows users to (a) view a feature preview and (b) play a limited set of trial games, while preventing access to the rest of the app until they log in.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "Please make my background : #D6F0FF (light blue)\n\nSections/cards: #FFFFFF\n\nPrimary headings: #2B2B2B\n\nButtons: #FFE066 (yellow) with dark text"
+          "Before login users should not be able to use the website only if they login they should be able to. Before login there should be able to see the features and play some games as a trial."
         ]
       },
       "acceptanceCriteria": [
-        "In light mode, the page background renders as hex #D6F0FF (or visually indistinguishable from it) wherever the app uses the global background token (e.g., Tailwind class bg-background).",
-        "In light mode, card/section surfaces render as #FFFFFF wherever the app uses the card token (e.g., bg-card).",
-        "Primary heading text (e.g., h1/h2/h3 or the app’s main page titles) renders as #2B2B2B by default unless a specific component intentionally overrides it.",
-        "Primary buttons render with background #FFE066 and a dark, readable text color (e.g., #2B2B2B or equivalently dark).",
-        "No backend canister methods, data types, or CRUD behaviors are modified."
+        "When the user is not authenticated (no Internet Identity), the app renders a pre-login experience instead of the full Dashboard/modules.",
+        "The pre-login experience includes a clear login call-to-action using Internet Identity.",
+        "The pre-login experience includes a feature preview section (reusing the existing feature grid content).",
+        "The pre-login experience includes a way to access trial games without logging in.",
+        "No other existing module behavior or CRUD flows are changed when the user is authenticated."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Keep changes focused to styling only: do not refactor components, routes, queries, or state management; only adjust the minimum CSS/theme variables and any minimal, directly-related hardcoded color classes that prevent the new theme colors from applying.",
+      "text": "Implement navigation/access gating so unauthenticated users cannot access any non-trial pages/modules (including pages accessible via internal navigation state), and are redirected back to the pre-login experience with an English message prompting them to log in.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "Make focused changes only. Ensure no other features or CRUD is impacted."
+          "Make focused changes only. Ensure no other features or CRUD is impacted. Before login users should not be able to use the website only if they login they should be able to."
         ]
       },
       "acceptanceCriteria": [
-        "Only styling/theme-related files (e.g., frontend/src/index.css and other CSS/theme configuration as strictly needed) are changed; no feature logic changes are introduced.",
-        "All existing pages and modules remain functional and visually coherent after the color update (no unreadable text on buttons or backgrounds)."
+        "If an unauthenticated user attempts to navigate to a restricted module page (anything outside the pre-login experience and the allowed trial games), the UI prevents access and returns them to the pre-login experience.",
+        "Restricted content is not rendered for unauthenticated users (no partial/flash render of restricted pages).",
+        "After successful login, the user can access the full app normally.",
+        "After logout, the user is returned to the pre-login experience and restricted pages are no longer accessible."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Limit the Games Hub and game launching behavior for unauthenticated users to a defined trial set of games; all other games must be visibly locked and attempting to open them must prompt the user to log in (English text).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "...play some games as a trial."
+        ]
+      },
+      "acceptanceCriteria": [
+        "When unauthenticated, the Games Hub shows which games are available as trial and which are locked.",
+        "Clicking a locked game while unauthenticated does not open the game and instead displays an English login prompt.",
+        "Trial games remain fully playable without authentication.",
+        "When authenticated, the Games Hub returns to showing/launching games as it does today (no loss of functionality)."
       ]
     }
   ],
   "constraints": [
-    "Make focused styling changes only; do not impact any other features or any CRUD behavior.",
-    "Do not modify backend logic or storage.",
-    "Do not edit any files under frontend/src/components/ui (read-only); compose existing components instead if needed."
+    "Make focused changes only; do not introduce unrelated features.",
+    "Ensure no other existing features or CRUD flows are impacted for authenticated users.",
+    "Do not edit any frontend immutable paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui.",
+    "Backend must remain single-actor; avoid backend changes unless strictly required for the login/trial gating behavior."
   ],
   "nonGoals": [
-    "Adding new features, pages, or UI components.",
-    "Changing dark mode theme behavior unless required to keep text/button contrast acceptable in light mode.",
-    "Any backend schema/state migrations."
+    "Adding new backend authorization rules for every method (frontend gating only unless a specific security gap is identified during implementation).",
+    "Changing the data model, existing CRUD logic, or existing module functionality beyond access gating.",
+    "Adding new games or modifying game logic/content."
   ],
   "imageRequirements": {
     "required": [],

@@ -1,38 +1,77 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Focused light theme color token update (background, cards, headings, buttons)",
+  "title": "Pre-login preview + trial games with authenticated-only app access",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Update global light theme tokens so background, card surfaces, headings, and primary buttons match the provided hex colors without changing app behavior.",
+      "summary": "Create a pre-login experience that previews features and allows playing a limited set of trial games while gating the rest of the app behind Internet Identity login.",
       "acceptanceCriteria": [
-        "In light mode, the page background renders as hex #D6F0FF (or visually indistinguishable from it) wherever the app uses the global background token (e.g., Tailwind class bg-background).",
-        "In light mode, card/section surfaces render as #FFFFFF wherever the app uses the card token (e.g., bg-card).",
-        "Primary heading text (e.g., h1/h2/h3 or the app’s main page titles) renders as #2B2B2B by default unless a specific component intentionally overrides it.",
-        "Primary buttons render with background #FFE066 and a dark, readable text color (e.g., #2B2B2B or equivalently dark).",
-        "No backend canister methods, data types, or CRUD behaviors are modified."
+        "When the user is not authenticated (no Internet Identity), the app renders a pre-login experience instead of the full Dashboard/modules.",
+        "The pre-login experience includes a clear login call-to-action using Internet Identity.",
+        "The pre-login experience includes a feature preview section (reusing the existing feature grid content).",
+        "The pre-login experience includes a way to access trial games without logging in.",
+        "No other existing module behavior or CRUD flows are changed when the user is authenticated."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/index.css",
+          "path": "frontend/src/pages/PreLoginExperiencePage.tsx",
+          "operation": "create",
+          "description": "Add a dedicated pre-login screen that (1) shows a clear Internet Identity login CTA using the authorization component’s frontend auth flow (via useInternetIdentity), (2) reuses the existing HomepageFeatures feature grid for the feature preview, and (3) includes a prominent action to enter the trial games area (navigate to Games Hub). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Adjust the light-mode CSS custom properties used by Tailwind tokens (bg-background/bg-card/text-foreground/bg-primary/text-primary-foreground) so they visually match: background #D6F0FF, card #FFFFFF, default primary text/headings #2B2B2B, and primary button background #FFE066 with dark text. Keep dark-mode variables unchanged unless strictly necessary for contrast."
+          "description": "Wire the new pre-login page into the existing state-based navigation by extending ModulePage with a 'pre-login' page and rendering it when the user is unauthenticated. Ensure authenticated users continue to see the full app with no behavioral changes."
+        },
+        {
+          "path": "frontend/src/components/Header.tsx",
+          "operation": "modify",
+          "description": "Adjust header navigation behavior for the new pre-login experience: when logged out, clicking the brand/logo routes to the pre-login screen; on logout, route to the pre-login screen (and keep existing query cache clearing per the authorization component guidance). Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Keep the change strictly styling-scoped by modifying only theme variables and minimal hardcoded color classes that block the new tokens from applying.",
+      "summary": "Implement strict client-side access gating so unauthenticated users cannot render restricted pages and are redirected to pre-login with an English login prompt message.",
       "acceptanceCriteria": [
-        "Only styling/theme-related files (e.g., frontend/src/index.css and other CSS/theme configuration as strictly needed) are changed; no feature logic changes are introduced.",
-        "All existing pages and modules remain functional and visually coherent after the color update (no unreadable text on buttons or backgrounds)."
+        "If an unauthenticated user attempts to navigate to a restricted module page (anything outside the pre-login experience and the allowed trial games), the UI prevents access and returns them to the pre-login experience.",
+        "Restricted content is not rendered for unauthenticated users (no partial/flash render of restricted pages).",
+        "After successful login, the user can access the full app normally.",
+        "After logout, the user is returned to the pre-login experience and restricted pages are no longer accessible."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/Footer.tsx",
+          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Replace hardcoded light-surface and text utility classes (e.g., bg-white/80, text-gray-600) with theme token-based classes (e.g., bg-card/opacity and text-foreground or text-muted-foreground equivalents) so the new global background/card/foreground tokens apply consistently, without changing component structure or behavior."
+          "description": "Add a centralized access-gating layer before page rendering: define the allowed unauthenticated pages (pre-login + Games Hub + specific trial game pages), block all other pages when identity is missing, and immediately route to 'pre-login' while setting an English message (e.g., 'Please log in to access this section.'). Ensure gating happens prior to rendering any restricted page to avoid flash/partial render. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/PreLoginExperiencePage.tsx",
+          "operation": "modify",
+          "description": "Add UI to display the access-gate redirect message (English) when present, alongside the login CTA and trial-games entry points. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Restrict the Games Hub to a defined trial set for unauthenticated users, visually lock other games, and prompt login when locked games are clicked.",
+      "acceptanceCriteria": [
+        "When unauthenticated, the Games Hub shows which games are available as trial and which are locked.",
+        "Clicking a locked game while unauthenticated does not open the game and instead displays an English login prompt.",
+        "Trial games remain fully playable without authentication.",
+        "When authenticated, the Games Hub returns to showing/launching games as it does today (no loss of functionality)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/GamesHub.tsx",
+          "operation": "modify",
+          "description": "Introduce a defined trial allowlist (specific game ModulePage ids) and update the Games Hub UI to label trial vs locked games when unauthenticated. Prevent navigation for locked games and show an English login prompt (e.g., via existing toast/sonner) on click; allow trial game navigation as normal. When authenticated, preserve current full catalog behavior. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Ensure game launching is gated consistently: allow trial game pages to render unauthenticated, block all other game pages and redirect to pre-login with the English login prompt message. Also pass authentication state (or equivalent) into GamesHub so it can render trial/locked states without changing authenticated behavior."
         }
       ]
     }
