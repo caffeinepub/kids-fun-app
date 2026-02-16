@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from 'next-themes';
+import { useInternetIdentity } from './hooks/useInternetIdentity';
 import Header from './components/Header';
 import Dashboard from './pages/Dashboard';
 import GamesHub from './pages/GamesHub';
@@ -34,6 +35,7 @@ import AdminDashboardPage from './pages/AdminDashboardPage';
 import ScaryHub from './pages/ScaryHub';
 import FunnyFartHub from './pages/FunnyFartHub';
 import VideoHubPage from './pages/VideoHubPage';
+import PreLoginExperiencePage from './pages/PreLoginExperiencePage';
 
 // Game imports
 import BalloonPop from './pages/games/BalloonPop';
@@ -80,6 +82,7 @@ import SpaceInvaders from './pages/games/SpaceInvaders';
 const queryClient = new QueryClient();
 
 export type ModulePage =
+  | 'pre-login'
   | 'dashboard'
   | 'games'
   | 'profile'
@@ -162,15 +165,76 @@ export type ModulePage =
   | 'game:delayed-controls'
   | 'game:tutorial-is-villain';
 
-function App() {
-  const [currentPage, setCurrentPage] = useState<ModulePage>('dashboard');
+// Trial games that can be played without authentication - centralized source of truth
+export const TRIAL_GAMES: ModulePage[] = [
+  'game:balloon-pop',
+  'game:memory-match',
+  'game:tic-tac-toe',
+  'game:birthday-cake-maker',
+  'game:birthday-cake-decorator',
+];
+
+// Pages that can be accessed without authentication
+const UNAUTHENTICATED_PAGES: ModulePage[] = [
+  'pre-login',
+  'games',
+  ...TRIAL_GAMES,
+];
+
+function AppContent() {
+  const [currentPage, setCurrentPage] = useState<ModulePage>('pre-login');
+  const [redirectMessage, setRedirectMessage] = useState<string>('');
+  const { identity, isInitializing } = useInternetIdentity();
+
+  const isAuthenticated = !!identity;
+
+  // Handle navigation with access gating
+  const handleNavigate = (page: ModulePage) => {
+    // If not authenticated and trying to access restricted page
+    if (!isAuthenticated && !UNAUTHENTICATED_PAGES.includes(page)) {
+      setRedirectMessage('Please log in to access this section.');
+      setCurrentPage('pre-login');
+      return;
+    }
+
+    // Clear redirect message on successful navigation
+    setRedirectMessage('');
+    setCurrentPage(page);
+  };
+
+  // Redirect to pre-login if not authenticated and on restricted page
+  useEffect(() => {
+    if (!isInitializing && !isAuthenticated && !UNAUTHENTICATED_PAGES.includes(currentPage)) {
+      setRedirectMessage('Please log in to access this section.');
+      setCurrentPage('pre-login');
+    }
+  }, [isAuthenticated, isInitializing, currentPage]);
+
+  // Set default page based on authentication status
+  useEffect(() => {
+    if (!isInitializing) {
+      if (isAuthenticated && currentPage === 'pre-login') {
+        setCurrentPage('dashboard');
+      } else if (!isAuthenticated && currentPage === 'dashboard') {
+        setCurrentPage('pre-login');
+      }
+    }
+  }, [isAuthenticated, isInitializing, currentPage]);
 
   const renderPage = () => {
+    // Show pre-login for unauthenticated users
+    if (!isAuthenticated && currentPage === 'pre-login') {
+      return <PreLoginExperiencePage onNavigate={handleNavigate} redirectMessage={redirectMessage} />;
+    }
+
+    // Render authenticated or trial pages
     switch (currentPage) {
+      case 'pre-login':
+        return <PreLoginExperiencePage onNavigate={handleNavigate} redirectMessage={redirectMessage} />;
       case 'dashboard':
-        return <Dashboard onNavigate={setCurrentPage} />;
+        return <Dashboard onNavigate={handleNavigate} />;
       case 'games':
-        return <GamesHub onNavigate={setCurrentPage} />;
+        return <GamesHub onNavigate={handleNavigate} isAuthenticated={isAuthenticated} />;
       case 'profile':
         return <ProfileCustomization />;
       case 'events':
@@ -206,109 +270,109 @@ function App() {
       case 'certificates':
         return <CertificatesPage />;
       case 'creative-fun-hub':
-        return <CreativeFunHub onNavigate={setCurrentPage} />;
+        return <CreativeFunHub onNavigate={handleNavigate} />;
       case 'interactive-shorts':
-        return <InteractiveShortsPage onNavigate={setCurrentPage} />;
+        return <InteractiveShortsPage onNavigate={handleNavigate} />;
       case 'green-screen-fun':
-        return <GreenScreenFunPage onNavigate={setCurrentPage} />;
+        return <GreenScreenFunPage onNavigate={handleNavigate} />;
       case 'karaoke-mode':
-        return <KaraokeModePage onNavigate={setCurrentPage} />;
+        return <KaraokeModePage onNavigate={handleNavigate} />;
       case 'dance-challenge':
-        return <DanceChallengePage onNavigate={setCurrentPage} />;
+        return <DanceChallengePage onNavigate={handleNavigate} />;
       case 'learn-hub':
-        return <LearnHubPage onNavigate={setCurrentPage} />;
+        return <LearnHubPage onNavigate={handleNavigate} />;
       case 'virtual-pet-hub':
         return <VirtualPetHubPage />;
       case 'smart-hub':
-        return <SmartHubPage onNavigate={setCurrentPage} />;
+        return <SmartHubPage onNavigate={handleNavigate} />;
       case 'admin-dashboard':
         return <AdminDashboardPage />;
       case 'scary-hub':
-        return <ScaryHub onNavigate={setCurrentPage} />;
+        return <ScaryHub onNavigate={handleNavigate} />;
       case 'funny-fart-hub':
-        return <FunnyFartHub onNavigate={setCurrentPage} />;
+        return <FunnyFartHub onNavigate={handleNavigate} />;
       case 'video-hub':
-        return <VideoHubPage onNavigate={setCurrentPage} />;
+        return <VideoHubPage onNavigate={handleNavigate} />;
       case 'game:balloon-pop':
-        return <BalloonPop onNavigate={setCurrentPage} />;
+        return <BalloonPop onNavigate={handleNavigate} />;
       case 'game:super-speedy-racer':
-        return <SuperSpeedyRacer onNavigate={setCurrentPage} />;
+        return <SuperSpeedyRacer onNavigate={handleNavigate} />;
       case 'game:ambulance-rescue':
-        return <AmbulanceRescue onNavigate={setCurrentPage} />;
+        return <AmbulanceRescue onNavigate={handleNavigate} />;
       case 'game:eclipse-now-solo':
-        return <EclipseNowSolo onNavigate={setCurrentPage} />;
+        return <EclipseNowSolo onNavigate={handleNavigate} />;
       case 'game:forest-night':
-        return <ForestNight onNavigate={setCurrentPage} />;
+        return <ForestNight onNavigate={handleNavigate} />;
       case 'game:memory-match':
-        return <MemoryMatch onNavigate={setCurrentPage} />;
+        return <MemoryMatch onNavigate={handleNavigate} />;
       case 'game:birthday-cake-maker':
-        return <BirthdayCakeMaker onNavigate={setCurrentPage} />;
+        return <BirthdayCakeMaker onNavigate={handleNavigate} />;
       case 'game:birthday-cake-decorator':
-        return <BirthdayCakeDecorator onNavigate={setCurrentPage} />;
+        return <BirthdayCakeDecorator onNavigate={handleNavigate} />;
       case 'game:famous-places':
-        return <FamousPlaces onNavigate={setCurrentPage} />;
+        return <FamousPlaces onNavigate={handleNavigate} />;
       case 'game:word-wizard':
-        return <WordWizard onNavigate={setCurrentPage} />;
+        return <WordWizard onNavigate={handleNavigate} />;
       case 'game:police-buddy-chase':
-        return <PoliceBuddyChase onNavigate={setCurrentPage} />;
+        return <PoliceBuddyChase onNavigate={handleNavigate} />;
       case 'game:number-runner':
-        return <NumberRunner onNavigate={setCurrentPage} />;
+        return <NumberRunner onNavigate={handleNavigate} />;
       case 'game:bibble-adventure':
-        return <BibbleAdventure onNavigate={setCurrentPage} />;
+        return <BibbleAdventure onNavigate={handleNavigate} />;
       case 'game:shape-shifting-world':
-        return <ShapeShiftingWorld onNavigate={setCurrentPage} />;
+        return <ShapeShiftingWorld onNavigate={handleNavigate} />;
       case 'game:time-control-adventure':
-        return <TimeControlAdventure onNavigate={setCurrentPage} />;
+        return <TimeControlAdventure onNavigate={handleNavigate} />;
       case 'game:theme-park-builder':
-        return <ThemeParkBuilder onNavigate={setCurrentPage} />;
+        return <ThemeParkBuilder onNavigate={handleNavigate} />;
       case 'game:mind-maze-puzzle':
-        return <MindMazePuzzle onNavigate={setCurrentPage} />;
+        return <MindMazePuzzle onNavigate={handleNavigate} />;
       case 'game:space-station-life':
-        return <SpaceStationLife onNavigate={setCurrentPage} />;
+        return <SpaceStationLife onNavigate={handleNavigate} />;
       case 'game:superpower-training':
-        return <SuperpowerTraining onNavigate={setCurrentPage} />;
+        return <SuperpowerTraining onNavigate={handleNavigate} />;
       case 'game:escape-room-universe':
-        return <EscapeRoomUniverse onNavigate={setCurrentPage} />;
+        return <EscapeRoomUniverse onNavigate={handleNavigate} />;
       case 'game:gadget-combat':
-        return <GadgetCombat onNavigate={setCurrentPage} />;
+        return <GadgetCombat onNavigate={handleNavigate} />;
       case 'game:grandma-secret-arcade':
-        return <GrandmaSecretArcade onNavigate={setCurrentPage} />;
+        return <GrandmaSecretArcade onNavigate={handleNavigate} />;
       case 'game:screen-is-enemy':
-        return <ScreenIsEnemy onNavigate={setCurrentPage} />;
+        return <ScreenIsEnemy onNavigate={handleNavigate} />;
       case 'game:control-enemies':
-        return <ControlEnemies onNavigate={setCurrentPage} />;
+        return <ControlEnemies onNavigate={handleNavigate} />;
       case 'game:everything-breaks':
-        return <EverythingBreaks onNavigate={setCurrentPage} />;
+        return <EverythingBreaks onNavigate={handleNavigate} />;
       case 'game:sound-based-world':
-        return <SoundBasedWorld onNavigate={setCurrentPage} />;
+        return <SoundBasedWorld onNavigate={handleNavigate} />;
       case 'game:reverse-progression':
-        return <ReverseProgression onNavigate={setCurrentPage} />;
+        return <ReverseProgression onNavigate={handleNavigate} />;
       case 'game:enemies-platforms':
-        return <EnemiesPlatforms onNavigate={setCurrentPage} />;
+        return <EnemiesPlatforms onNavigate={handleNavigate} />;
       case 'game:pause-mechanic':
-        return <PauseMechanic onNavigate={setCurrentPage} />;
+        return <PauseMechanic onNavigate={handleNavigate} />;
       case 'game:youre-late-always':
-        return <YoureLateAlways onNavigate={setCurrentPage} />;
+        return <YoureLateAlways onNavigate={handleNavigate} />;
       case 'game:lies-and-truths':
-        return <LiesAndTruths onNavigate={setCurrentPage} />;
+        return <LiesAndTruths onNavigate={handleNavigate} />;
       case 'game:tiny-hero-giant-world':
-        return <TinyHeroGiantWorld onNavigate={setCurrentPage} />;
+        return <TinyHeroGiantWorld onNavigate={handleNavigate} />;
       case 'game:tic-tac-toe':
-        return <TicTacToe onNavigate={setCurrentPage} />;
+        return <TicTacToe onNavigate={handleNavigate} />;
       case 'game:monster-maze':
-        return <MonsterMaze onNavigate={setCurrentPage} />;
+        return <MonsterMaze onNavigate={handleNavigate} />;
       case 'game:spider-web-puzzle':
-        return <SpiderWebPuzzle onNavigate={setCurrentPage} />;
+        return <SpiderWebPuzzle onNavigate={handleNavigate} />;
       case 'game:pumpkin-smash':
-        return <PumpkinSmash onNavigate={setCurrentPage} />;
+        return <PumpkinSmash onNavigate={handleNavigate} />;
       case 'game:cronker-kontry':
-        return <CronkerKontry onNavigate={setCurrentPage} />;
+        return <CronkerKontry onNavigate={handleNavigate} />;
       case 'game:pac-man':
-        return <PacMan onNavigate={setCurrentPage} />;
+        return <PacMan onNavigate={handleNavigate} />;
       case 'game:tetris':
-        return <Tetris onNavigate={setCurrentPage} />;
+        return <Tetris onNavigate={handleNavigate} />;
       case 'game:space-invaders':
-        return <SpaceInvaders onNavigate={setCurrentPage} />;
+        return <SpaceInvaders onNavigate={handleNavigate} />;
       case 'game:floor-is-liar':
       case 'game:inventory-is-enemy':
       case 'game:speed-is-health':
@@ -327,7 +391,7 @@ function App() {
                 This game is currently under development and will be available soon!
               </p>
               <button
-                onClick={() => setCurrentPage('games')}
+                onClick={() => handleNavigate('games')}
                 className="px-8 py-4 bg-primary text-primary-foreground rounded-full text-xl font-bold hover:opacity-90 transition-opacity"
               >
                 Back to Games Hub
@@ -336,18 +400,24 @@ function App() {
           </div>
         );
       default:
-        return <Dashboard onNavigate={setCurrentPage} />;
+        return isAuthenticated ? <Dashboard onNavigate={handleNavigate} /> : <PreLoginExperiencePage onNavigate={handleNavigate} redirectMessage={redirectMessage} />;
     }
   };
 
   return (
+    <div className="min-h-screen bg-background">
+      <Header currentPage={currentPage} onNavigate={handleNavigate} isAuthenticated={isAuthenticated} />
+      {renderPage()}
+      <Toaster />
+    </div>
+  );
+}
+
+function App() {
+  return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        <div className="min-h-screen bg-background">
-          <Header currentPage={currentPage} onNavigate={setCurrentPage} />
-          {renderPage()}
-          <Toaster />
-        </div>
+        <AppContent />
       </ThemeProvider>
     </QueryClientProvider>
   );

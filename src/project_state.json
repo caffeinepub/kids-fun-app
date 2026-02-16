@@ -1,24 +1,74 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "New project",
+  "summary": "Project now includes an Art Gallery upload flow (with public vs \"my art\" visibility) and a Virtual Pet Hub featuring a fully 3D pet lifecycle and interactions.",
   "architectural_notes": [
-    "Make focused changes only; ensure no other features or CRUD flows are impacted."
+    "User requests focused changes only; avoid impacting other features/CRUD when implementing updates."
   ],
-  "known_issues": [],
-  "isFixRequest": false,
+  "known_issues": [
+    "Art Gallery upload fails with error: \"Do not know how to serialize a BigInt\"."
+  ],
+  "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-confine-any-code-changes-in-this-iteration-to-the-login-flow-pre-login-experience-and-trial-gameplay-access-gating-only-do-not-modify-any-other-feature-behavior-or-any-existing-crud-logic-data-flows-outside-authentication-trial-gating",
-      "title": "Confine any code changes in this iteration to the login flow, pre-login experience, and trial gameplay access gating only; do not modify any other feature behavior or any existing CRUD logic/data flows outside authentication/trial gating.",
+      "id": "feature-in-virtual-pet-hub-when-the-user-presses-the-feed-pet-button-make-the-pet-display-perform-an-immediate-clearly-visible-reaction-not-just-a-toast-the-reaction-must-be-shown-in-the-pet-visual-area-and-should-last-briefly-e-g-1-2-seconds-before-returning-to-idle",
+      "title": "In Virtual Pet Hub, when the user presses the “Feed Pet” button, make the pet display perform an immediate, clearly visible reaction (not just a toast). The reaction must be shown in the pet visual area and should last briefly (e.g., ~1–2 seconds) before returning to idle.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-in-virtual-pet-hub-when-the-user-presses-the-play-button-make-the-pet-display-perform-an-immediate-clearly-visible-reaction-distinct-from-the-feed-reaction-not-just-a-toast-the-reaction-must-be-shown-in-the-pet-visual-area-and-should-last-briefly-e-g-1-2-seconds-before-returning-to-idle",
+      "title": "In Virtual Pet Hub, when the user presses the “Play” button, make the pet display perform an immediate, clearly visible reaction distinct from the Feed reaction (not just a toast). The reaction must be shown in the pet visual area and should last briefly (e.g., ~1–2 seconds) before returning to idle.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-feed-play-reactions-do-not-block-normal-usage-buttons-must-remain-functional-and-the-page-must-not-crash-if-actions-are-triggered-repeatedly-if-a-user-triggers-an-action-while-an-animation-is-already-playing-either-restart-the-animation-cleanly-or-queue-replace-it-in-a-predictable-way",
+      "title": "Ensure Feed/Play reactions do not block normal usage: buttons must remain functional and the page must not crash if actions are triggered repeatedly. If a user triggers an action while an animation is already playing, either restart the animation cleanly or queue/replace it in a predictable way.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
     }
   ],
-  "new_feature_requests": [],
-  "projectName": "Keep changes strictly scoped to login/trial gating without impacting existing CRUD/features",
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Fix Art Gallery upload error: \"Do not know how to serialize a BigInt\" so users can instantly upload artwork and choose public vs \"my art\" visibility.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Support uploading up to 100MB files in the Art Gallery.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Virtual Pet Hub: pet starts as an egg, user can hatch into a dog or cat, and it slowly ages over time.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Make the Virtual Pet Hub pet 100% 3D.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Virtual Pet Hub: when user presses Feed or Play, the 3D pet should perform visible actions/animations (respond to interaction).",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "3d",
+  "projectName": "Virtual Pet Hub: Make Feed/Play trigger visible pet reactions (simplified)",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

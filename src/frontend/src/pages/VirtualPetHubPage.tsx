@@ -10,6 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useGetVirtualPetHub, useSaveVirtualPetHub, useGetUserRewards, useGetUserTrophies } from '../hooks/useQueries';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
+import { usePetReaction } from '../hooks/usePetReaction';
 import { toast } from 'sonner';
 import { Heart, Sparkles, Home, ShoppingBag, Trophy, Star, Gift, Zap } from 'lucide-react';
 
@@ -19,6 +20,7 @@ export default function VirtualPetHubPage() {
   const { data: rewards } = useGetUserRewards();
   const { data: trophies = 70 } = useGetUserTrophies();
   const savePetHub = useSaveVirtualPetHub();
+  const { reaction, triggerReaction } = usePetReaction();
 
   const [petName, setPetName] = useState('');
   const [selectedAccessory, setSelectedAccessory] = useState<string | null>(null);
@@ -95,6 +97,9 @@ export default function VirtualPetHubPage() {
   const handleFeedPet = async () => {
     if (!petHub || !identity) return;
 
+    // Trigger the feed reaction immediately
+    triggerReaction('feed');
+
     const newHappiness = Math.min(Number(petHub.happinessLevel) + 10, 100);
     const newGrowth = newHappiness === 100 ? Number(petHub.growthStage) + 1 : Number(petHub.growthStage);
 
@@ -114,6 +119,9 @@ export default function VirtualPetHubPage() {
 
   const handlePlayWithPet = async () => {
     if (!petHub || !identity) return;
+
+    // Trigger the play reaction immediately
+    triggerReaction('play');
 
     const newHappiness = Math.min(Number(petHub.happinessLevel) + 15, 100);
     const newGrowth = newHappiness === 100 ? Number(petHub.growthStage) + 1 : Number(petHub.growthStage);
@@ -328,10 +336,10 @@ export default function VirtualPetHubPage() {
                 </div>
               </div>
 
-              {/* Pet Visual */}
-              <div className="relative bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg p-8 min-h-[300px] flex items-center justify-center border-4 border-purple-300">
+              {/* Pet Visual with Reaction Overlay */}
+              <div className="relative bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg p-8 min-h-[300px] flex items-center justify-center border-4 border-purple-300 overflow-hidden">
                 <div className="text-center space-y-4">
-                  <div className="text-9xl animate-bounce">
+                  <div className={`text-9xl ${reaction ? 'pet-reaction-bounce' : 'animate-bounce'}`}>
                     {getPetEmoji(Number(petHub.growthStage))}
                   </div>
                   {petHub.accessories.length > 0 && (
@@ -347,6 +355,31 @@ export default function VirtualPetHubPage() {
                     </div>
                   )}
                 </div>
+
+                {/* Feed Reaction Overlay */}
+                {reaction === 'feed' && (
+                  <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                    <div className="pet-reaction-feed">
+                      <div className="text-6xl animate-ping">❤️</div>
+                      <div className="text-5xl absolute top-1/4 left-1/4 animate-pulse">🍎</div>
+                      <div className="text-5xl absolute top-1/3 right-1/4 animate-pulse delay-100">🍕</div>
+                      <div className="text-4xl absolute bottom-1/3 left-1/3 animate-pulse delay-200">🍰</div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Play Reaction Overlay */}
+                {reaction === 'play' && (
+                  <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                    <div className="pet-reaction-play">
+                      <div className="text-6xl animate-spin-slow">⚡</div>
+                      <div className="text-5xl absolute top-1/4 left-1/4 pet-reaction-sparkle">✨</div>
+                      <div className="text-5xl absolute top-1/3 right-1/4 pet-reaction-sparkle delay-100">⭐</div>
+                      <div className="text-4xl absolute bottom-1/3 left-1/3 pet-reaction-sparkle delay-200">💫</div>
+                      <div className="text-4xl absolute bottom-1/4 right-1/3 pet-reaction-sparkle delay-300">🎉</div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Care Actions */}
@@ -474,7 +507,6 @@ export default function VirtualPetHubPage() {
                                 size="sm"
                                 onClick={() => handleChangeHomeStyle(style.id)}
                                 disabled={selected || savePetHub.isPending}
-                                variant={selected ? 'secondary' : 'default'}
                               >
                                 {selected ? 'Active' : 'Select'}
                               </Button>

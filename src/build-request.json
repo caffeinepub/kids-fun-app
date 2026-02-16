@@ -1,41 +1,86 @@
 {
   "kind": "build_request",
-  "title": "Keep changes strictly scoped to login/trial gating without impacting existing CRUD/features",
+  "title": "Virtual Pet Hub: Make Feed/Play trigger visible pet reactions (simplified)",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Confine any code changes in this iteration to the login flow, pre-login experience, and trial gameplay access gating only; do not modify any other feature behavior or any existing CRUD logic/data flows outside authentication/trial gating.",
-      "target": "both",
+      "text": "In Virtual Pet Hub, when the user presses the “Feed Pet” button, make the pet display perform an immediate, clearly visible reaction (not just a toast). The reaction must be shown in the pet visual area and should last briefly (e.g., ~1–2 seconds) before returning to idle.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "recent-messages"
         ],
         "quotes": [
-          "Make focused changes only. Ensure no other features or CRUD is impacted.****"
+          "Yes try it again but simpler and when the user presses the feed or play the pet should actually do something."
         ]
       },
       "acceptanceCriteria": [
-        "No backend data models, stable storage layout, or CRUD methods are changed except where strictly required for authentication/trial gating.",
-        "Authenticated users can still access and use all existing modules/pages with the same create/read/update/delete behavior as before.",
-        "Unauthenticated users remain restricted to the pre-login experience and the defined trial game allowlist; attempts to access other pages continue to redirect/block with English messaging.",
-        "No new pages/modules/features are introduced as part of this change set."
+        "Clicking “Feed Pet” triggers a visible change in the pet visual area (e.g., animation, motion, effect overlay) every time the button is pressed.",
+        "The effect is time-bounded and returns to an idle display automatically.",
+        "The existing happiness/growth save behavior remains intact (still updates via the existing save mutation)."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "In Virtual Pet Hub, when the user presses the “Play” button, make the pet display perform an immediate, clearly visible reaction distinct from the Feed reaction (not just a toast). The reaction must be shown in the pet visual area and should last briefly (e.g., ~1–2 seconds) before returning to idle.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "recent-messages"
+        ],
+        "quotes": [
+          "...when the user presses the feed or play the pet should actually do something."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Clicking “Play” triggers a visible change in the pet visual area (e.g., animation, motion, effect overlay) every time the button is pressed.",
+        "The Play effect is visually different from the Feed effect.",
+        "The effect is time-bounded and returns to an idle display automatically.",
+        "The existing happiness/growth save behavior remains intact (still updates via the existing save mutation)."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Ensure Feed/Play reactions do not block normal usage: buttons must remain functional and the page must not crash if actions are triggered repeatedly. If a user triggers an action while an animation is already playing, either restart the animation cleanly or queue/replace it in a predictable way.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "recent-messages"
+        ],
+        "quotes": [
+          "Make focused changes only. Ensure no other features or CRUD is impacted."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Rapidly clicking Feed/Play does not cause UI errors, console exceptions, or a stuck animation state.",
+        "The pet visual always returns to an idle state after reactions complete.",
+        "No other pages, flows, or CRUD features are modified as part of this change."
       ]
     }
   ],
   "constraints": [
-    "Make focused changes only; do not impact any other features or CRUD behavior.",
-    "Use English for all user-facing text.",
-    "Backend must remain single-actor (backend/main.mo); create backend/migration.mo only if state schema changes are required.",
-    "Do not edit files under frontend/src/components/ui or any paths listed as immutable in SYSTEM_CONTEXT."
+    "Make focused changes only; do not impact unrelated features or CRUD.",
+    "Do not edit files under frontend/src/components/ui or any frontend immutablePaths (compose components instead).",
+    "Keep backend schema and persistence unchanged for this update (frontend-only visual behavior)."
   ],
   "nonGoals": [
-    "Adding new games, modules, or CRUD endpoints.",
-    "Refactoring unrelated UI components or redesigning unrelated pages.",
-    "Changing authentication provider (Internet Identity only)."
+    "Implementing the full egg-to-hatch dog/cat lifecycle in this simplified attempt (only Feed/Play reactions are required here).",
+    "Adding new backend endpoints or changing the VirtualPetHub Motoko type.",
+    "Adding real-time/multiplayer pet interactions."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Gamepad2, Trophy, Volume2, VolumeX } from 'lucide-react';
-import { ModulePage } from '../App';
+import { Gamepad2, Trophy, Volume2, VolumeX, Lock } from 'lucide-react';
+import { ModulePage, TRIAL_GAMES } from '../App';
+import { toast } from 'sonner';
 
 interface GameInfo {
   id: ModulePage;
@@ -395,9 +396,10 @@ const games: GameInfo[] = [
 
 interface GamesHubProps {
   onNavigate: (page: ModulePage) => void;
+  isAuthenticated: boolean;
 }
 
-export default function GamesHub({ onNavigate }: GamesHubProps) {
+export default function GamesHub({ onNavigate, isAuthenticated }: GamesHubProps) {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
@@ -406,6 +408,21 @@ export default function GamesHub({ onNavigate }: GamesHubProps) {
   const filteredGames = selectedCategory === 'All' 
     ? games 
     : games.filter(g => g.category === selectedCategory);
+
+  const isTrialGame = (gameId: ModulePage): boolean => {
+    return TRIAL_GAMES.includes(gameId);
+  };
+
+  const handleGameClick = (gameId: ModulePage) => {
+    if (!isAuthenticated && !isTrialGame(gameId)) {
+      toast.error('Please log in to play this game.', {
+        description: 'This game is available for registered users only.',
+        duration: 4000,
+      });
+      return;
+    }
+    onNavigate(gameId);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100 p-4 md:p-8">
@@ -418,7 +435,11 @@ export default function GamesHub({ onNavigate }: GamesHubProps) {
               Games Hub 🎮
             </h1>
           </div>
-          <p className="text-xl text-gray-700">Choose a game and start playing!</p>
+          <p className="text-xl text-gray-700">
+            {isAuthenticated 
+              ? 'Choose a game and start playing!' 
+              : 'Try our trial games or login to unlock all games!'}
+          </p>
           
           {/* Sound Toggle */}
           <Button
@@ -458,67 +479,61 @@ export default function GamesHub({ onNavigate }: GamesHubProps) {
 
         {/* Games Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredGames.map(game => (
-            <Card
-              key={game.id}
-              className="border-4 hover:shadow-2xl transition-all duration-300 hover:scale-105 cursor-pointer bg-white"
-              onClick={() => onNavigate(game.id)}
-            >
-              <CardHeader className="pb-3">
-                <div className="relative">
-                  <img
-                    src={game.icon}
-                    alt={game.name}
-                    className="w-full h-40 object-cover rounded-lg border-4 border-purple-200"
-                  />
-                  <Badge className="absolute top-2 right-2 text-xs font-bold">
-                    {game.category}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <CardTitle className="text-xl">{game.name}</CardTitle>
-                <CardDescription className="text-base">
-                  {game.description}
-                </CardDescription>
-                
-                <Button className="w-full text-lg font-bold h-12">
-                  Play Now! 🎮
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+          {filteredGames.map(game => {
+            const isTrial = isTrialGame(game.id);
+            const isLocked = !isAuthenticated && !isTrial;
 
-        {/* Stats Section */}
-        <Card className="border-4 bg-gradient-to-r from-yellow-50 to-orange-50">
-          <CardHeader>
-            <CardTitle className="text-2xl flex items-center gap-2">
-              <Trophy className="w-8 h-8 text-yellow-600" />
-              Your Gaming Stats
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-              <div>
-                <div className="text-4xl font-bold text-purple-600">{games.length}</div>
-                <div className="text-gray-600">Games Available</div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-pink-600">0</div>
-                <div className="text-gray-600">Total Score</div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-blue-600">0</div>
-                <div className="text-gray-600">Achievements</div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-green-600">0</div>
-                <div className="text-gray-600">Games Played</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            return (
+              <Card
+                key={game.id}
+                className={`border-4 hover:shadow-2xl transition-all duration-300 hover:scale-105 cursor-pointer bg-white ${
+                  isLocked ? 'opacity-75' : ''
+                }`}
+                onClick={() => handleGameClick(game.id)}
+              >
+                <CardHeader className="pb-3">
+                  <div className="relative">
+                    <img
+                      src={game.icon}
+                      alt={game.name}
+                      className="w-full h-40 object-cover rounded-lg border-4 border-purple-200"
+                    />
+                    <div className="absolute top-2 right-2 flex gap-2">
+                      <Badge className="text-xs font-bold">
+                        {game.category}
+                      </Badge>
+                      {isTrial && !isAuthenticated && (
+                        <Badge className="text-xs font-bold bg-green-500">
+                          Trial
+                        </Badge>
+                      )}
+                      {isLocked && (
+                        <Badge className="text-xs font-bold bg-red-500">
+                          <Lock className="w-3 h-3 mr-1" />
+                          Locked
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <CardTitle className="text-xl">{game.name}</CardTitle>
+                  <CardDescription className="text-sm">
+                    {game.description}
+                  </CardDescription>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Trophy className="w-4 h-4 text-yellow-500" />
+                    {game.difficulty.map(diff => (
+                      <Badge key={diff} variant="outline" className="text-xs">
+                        {diff}
+                      </Badge>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

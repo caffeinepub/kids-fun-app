@@ -1,26 +1,79 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Strictly scoped login + trial gameplay access gating adjustments (frontend-only)",
+  "title": "Virtual Pet Hub: Visible Feed/Play pet reactions (frontend-only)",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Keep all changes confined to authentication, pre-login experience, and trial-game allowlist gating without affecting existing modules or CRUD behavior.",
+      "summary": "Trigger a brief, clearly visible in-pet-area Feed reaction animation/effect immediately on Feed Pet click while preserving existing save behavior.",
       "acceptanceCriteria": [
-        "Authenticated users can still access and use all existing modules/pages with the same create/read/update/delete behavior as before.",
-        "Unauthenticated users remain restricted to the pre-login experience and the defined trial game allowlist; attempts to access other pages continue to redirect/block with English messaging.",
-        "No new pages/modules/features are introduced as part of this change set."
+        "Clicking “Feed Pet” triggers a visible change in the pet visual area (e.g., animation, motion, effect overlay) every time the button is pressed.",
+        "The effect is time-bounded and returns to an idle display automatically.",
+        "The existing happiness/growth save behavior remains intact (still updates via the existing save mutation)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/pages/VirtualPetHubPage.tsx",
           "operation": "modify",
-          "description": "Tighten and centralize client-side access gating by exporting a single source of truth for the trial-game allowlist and unauthenticated page allowlist, and ensure redirect/block messaging remains English-only. Keep changes strictly limited to login/pre-login/trial gating. Use the selected \"authorization\" component’s frontend guidance to ensure unauthenticated users cannot access application data and that logout clears cached app data; verify the component's usage instructions before implementing."
+          "description": "Add a Feed reaction state that triggers immediately on “Feed Pet” click and drives a visible overlay/animation in the existing pet visual area, while keeping the existing save mutation call and happiness/growth update logic intact."
         },
         {
-          "path": "frontend/src/pages/GamesHub.tsx",
+          "path": "frontend/src/hooks/usePetReaction.ts",
+          "operation": "create",
+          "description": "Create a small hook to manage a time-bounded pet reaction state (e.g., 'feed' | 'play' | null), including restart-on-trigger behavior and automatic return to idle after ~1–2 seconds."
+        },
+        {
+          "path": "frontend/src/index.css",
           "operation": "modify",
-          "description": "Remove duplicated trial-game allowlist logic and consume the centralized trial allowlist exported from App-level gating so unauthenticated users can only launch allowlisted trial games, with consistent English lock/toast messaging. Keep changes strictly limited to trial gating behavior and do not alter game logic. Verify the component's usage instructions before implementing."
+          "description": "Add lightweight CSS keyframes/classes for the Feed reaction (e.g., pulse/scale + hearts/sparkles overlay styling) that can be applied within the pet visual area without editing any shadcn UI component files."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Trigger a brief, clearly visible in-pet-area Play reaction distinct from Feed immediately on Play click while preserving existing save behavior.",
+      "acceptanceCriteria": [
+        "Clicking “Play” triggers a visible change in the pet visual area (e.g., animation, motion, effect overlay) every time the button is pressed.",
+        "The Play effect is visually different from the Feed effect.",
+        "The effect is time-bounded and returns to an idle display automatically.",
+        "The existing happiness/growth save behavior remains intact (still updates via the existing save mutation)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/VirtualPetHubPage.tsx",
+          "operation": "modify",
+          "description": "Add a Play reaction trigger on “Play” click that renders a visibly different animation/effect in the pet visual area (separate styling from Feed), while preserving the existing save mutation call and happiness/growth update logic."
+        },
+        {
+          "path": "frontend/src/hooks/usePetReaction.ts",
+          "operation": "modify",
+          "description": "Extend the reaction hook to support a distinct 'play' reaction type (and any needed restart key/nonce) so the Play animation can reliably retrigger even on repeated clicks."
+        },
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Add CSS keyframes/classes for the Play reaction distinct from Feed (e.g., wiggle/zoom + spark burst overlay styling), ensuring the effect is clearly different and time-bounded."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Make Feed/Play reactions resilient to rapid repeated triggers without crashes, stuck states, or blocking normal usage; restart/replace reaction predictably.",
+      "acceptanceCriteria": [
+        "Rapidly clicking Feed/Play does not cause UI errors, console exceptions, or a stuck animation state.",
+        "The pet visual always returns to an idle state after reactions complete.",
+        "No other pages, flows, or CRUD features are modified as part of this change."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/usePetReaction.ts",
+          "operation": "modify",
+          "description": "Ensure reaction triggering is restart-safe: clear/replace timers on each trigger, provide a predictable replacement strategy (latest action wins), and clean up timers on unmount to avoid stuck states or console errors."
+        },
+        {
+          "path": "frontend/src/pages/VirtualPetHubPage.tsx",
+          "operation": "modify",
+          "description": "Integrate the restart/replace behavior for rapid clicks (e.g., latest reaction replaces the previous one cleanly) and ensure repeated action clicks do not crash the page; keep changes scoped to the Virtual Pet Hub page only."
         }
       ]
     }
