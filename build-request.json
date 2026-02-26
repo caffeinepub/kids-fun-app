@@ -1,0 +1,97 @@
+{
+  "kind": "build_request",
+  "title": "Fix Spin the Wheel: remove cooldown, restrict rewards to trophies and points only, wire trophies to Total Score and points to Virtual Pet",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Remove the 20-minute cooldown/wait timer between spins on the Spin the Wheel page. Users must be able to spin again immediately after each spin without any time restriction.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "The user doesn't have to wait for 20 minutes"
+        ]
+      },
+      "acceptanceCriteria": [
+        "No cooldown timer is displayed on the Spin the Wheel page.",
+        "The Spin button is enabled immediately after a spin completes.",
+        "No localStorage or state-based cooldown logic enforces a wait period between spins."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Restrict Spin the Wheel prize outcomes to exactly two reward types: trophies and points. Remove all other reward types (e.g., coins, items, pet food, accessories, or any other category) from the wheel segments and outcome logic.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "The only things the user should be able to get from the spin the wheel is trophies and Points"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The wheel only displays segments for trophies and points as prize types.",
+        "Spinning the wheel only ever yields a trophy count or a points count as a result.",
+        "No other reward type appears in wheel segments, outcome messages, or result logic."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "When the user lands on a trophies outcome from the spin wheel, add the number of trophies earned to the user's Total Score. Display a message such as 'Keep playing and Spinning to earn more!' after the result. The Total Score display should reflect the newly added trophies.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "as many trophies they got should be added to the Total Score",
+          "Keep playing and Spinning to earn more!"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Trophies earned from a spin are persisted to the backend and added to the user's Total Score.",
+        "After a trophy win, the result message reads 'Keep playing and Spinning to earn more!'",
+        "The Total Score section updates to reflect the newly earned trophies."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "When the user lands on a points outcome from the spin wheel, add those points to the Virtual Pet progress section (not directly to any other score tracker). The Virtual Pet section should display updated messaging such as 'Grow your pet by earning points from games and spin rewards!' after points are awarded.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "for the points it should add in the Your Virtual Pet",
+          "Grow your pet by earning points from games and spin rewards!"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Points earned from a spin are applied to the Virtual Pet's progress/experience, not to any other score field.",
+        "The Virtual Pet section shows the updated points after a spin reward.",
+        "The Virtual Pet section displays the message 'Grow your pet by earning points from games and spin rewards!'",
+        "No other game, CRUD feature, or scoring mechanism is changed."
+      ]
+    }
+  ],
+  "constraints": [
+    "Only modify SpinWheelPage.tsx and the backend spin/reward logic. Do not alter any other game, page, or CRUD feature.",
+    "Do not change the Virtual Pet hub, RewardsPage, or any other feature's data model beyond what is required to wire spin wheel trophy and point rewards.",
+    "All user-facing text must be in English."
+  ],
+  "nonGoals": [
+    "Adding new wheel segments or reward types beyond trophies and points.",
+    "Changing any other game's scoring, rewards, or cooldown logic.",
+    "Modifying the parental controls, admin dashboard, or any unrelated backend functions.",
+    "Redesigning the visual appearance of the Spin the Wheel page beyond what is necessary for the reward changes."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

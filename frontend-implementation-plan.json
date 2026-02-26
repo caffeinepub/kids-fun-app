@@ -1,0 +1,87 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Fix Spin the Wheel: remove cooldown, restrict rewards to trophies and points only, wire trophies to Total Score and points to Virtual Pet",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Remove the 20-minute cooldown/wait timer between spins on the Spin the Wheel page so users can spin again immediately after each spin without any time restriction",
+      "acceptanceCriteria": [
+        "No cooldown timer is displayed on the Spin the Wheel page.",
+        "The Spin button is enabled immediately after a spin completes.",
+        "No localStorage or state-based cooldown logic enforces a wait period between spins."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/SpinWheelPage.tsx",
+          "operation": "modify",
+          "description": "Remove all cooldown timer logic including: (1) Remove localStorage reads/writes for lastSpinTime; (2) Remove any state variables tracking cooldown or wait time; (3) Remove any UI elements displaying cooldown timers or 'wait X minutes' messages; (4) Ensure the spin button is always enabled after a spin animation completes; (5) Remove any useEffect hooks or intervals that check or enforce cooldown periods."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Restrict Spin the Wheel prize outcomes to exactly two reward types: trophies and points, removing all other reward types from wheel segments and outcome logic",
+      "acceptanceCriteria": [
+        "The wheel only displays segments for trophies and points as prize types.",
+        "Spinning the wheel only ever yields a trophy count or a points count as a result.",
+        "No other reward type appears in wheel segments, outcome messages, or result logic."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/SpinWheelPage.tsx",
+          "operation": "modify",
+          "description": "Restrict wheel segments and prize outcomes to only trophies and points: (1) Update the wheel segment data structure to contain only trophy and point reward types (e.g., 8 segments alternating between trophies and points with varying amounts); (2) Remove any segments for coins, items, pet food, accessories, or other reward types; (3) Update the canvas rendering logic to draw only trophy and point segments with appropriate labels and colors; (4) Update the spin result calculation to only select from trophy or point outcomes; (5) Update result display messages to show only trophy or point wins (e.g., 'You won 5 trophies!' or 'You earned 10 points!')."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "When the user lands on a trophies outcome from the spin wheel, add the number of trophies earned to the user's Total Score and display the message 'Keep playing and Spinning to earn more!' after the result",
+      "acceptanceCriteria": [
+        "Trophies earned from a spin are persisted to the backend and added to the user's Total Score.",
+        "After a trophy win, the result message reads 'Keep playing and Spinning to earn more!'",
+        "The Total Score section updates to reflect the newly earned trophies."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/SpinWheelPage.tsx",
+          "operation": "modify",
+          "description": "Wire trophy rewards to Total Score: (1) Import the useAddTrophiesFromSpin mutation hook from useQueries.ts (or create it if needed); (2) When a spin lands on a trophy segment, call the addTrophiesFromSpin(trophyCount) backend method via the mutation; (3) Display the success message 'Keep playing and Spinning to earn more!' in the result UI after a trophy win; (4) Invalidate or refetch the getTotalScore query to update the Total Score display on the page; (5) Show visual feedback (e.g., celebration animation or toast) confirming trophies were added to Total Score."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add useAddTrophiesFromSpin mutation hook if it does not already exist: (1) Create a useMutation hook that calls actor.addTrophiesFromSpin(trophies: bigint); (2) On success, invalidate the 'totalScore' query key to refresh the Total Score display; (3) Return the mutation for use in SpinWheelPage."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "When the user lands on a points outcome from the spin wheel, add those points to the Virtual Pet progress section and display updated messaging such as 'Grow your pet by earning points from games and spin rewards!' after points are awarded",
+      "acceptanceCriteria": [
+        "Points earned from a spin are applied to the Virtual Pet's progress/experience, not to any other score field.",
+        "The Virtual Pet section shows the updated points after a spin reward.",
+        "The Virtual Pet section displays the message 'Grow your pet by earning points from games and spin rewards!'",
+        "No other game, CRUD feature, or scoring mechanism is changed."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/SpinWheelPage.tsx",
+          "operation": "modify",
+          "description": "Wire point rewards to Virtual Pet: (1) Import the useAddPointsFromSpin mutation hook from useQueries.ts (or create it if needed); (2) When a spin lands on a points segment, call the addPointsFromSpin(pointsCount) backend method via the mutation; (3) Display the success message 'Grow your pet by earning points from games and spin rewards!' in the result UI after a points win; (4) Invalidate or refetch the getVirtualPetHub query to update the Virtual Pet section display; (5) Show visual feedback (e.g., celebration animation or toast) confirming points were added to the Virtual Pet."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add useAddPointsFromSpin mutation hook if it does not already exist: (1) Create a useMutation hook that calls actor.addPointsFromSpin(points: bigint); (2) On success, invalidate the 'virtualPetHub' query key to refresh the Virtual Pet display; (3) Return the mutation for use in SpinWheelPage."
+        },
+        {
+          "path": "frontend/src/pages/VirtualPetHubPage.tsx",
+          "operation": "modify",
+          "description": "Ensure the Virtual Pet Hub page displays the updated points and message after spin rewards: (1) Verify the page already fetches and displays Virtual Pet data via useGetVirtualPetHub query; (2) Add a UI section or tooltip showing 'Grow your pet by earning points from games and spin rewards!' as informational text near the pet progress display; (3) Ensure the pet's experience/progress bar reflects points earned from spins and updates in real-time when the query refetches."
+        }
+      ]
+    }
+  ]
+}

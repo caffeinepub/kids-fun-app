@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "A gamified app featuring a Spin the Wheel mechanic, Virtual Pet system, and Trophy/Score tracking. Spin the Wheel rewards users with trophies and points only (no 20-minute wait). Trophies earned are added to Total Score; points are added to the Virtual Pet's progress.",
+  "architectural_notes": [
+    "Spin the Wheel only awards trophies and points; trophies increment Total Score, points go to Virtual Pet progress",
+    "No 20-minute cooldown on Spin the Wheel"
+  ],
+  "known_issues": [
+    "Spin the Wheel was previously giving points directly to the virtual pet incorrectly and had a 20-minute wait enforced"
+  ],
+  "isFixRequest": true,
+  "existing_features": [
+    {
+      "id": "feature-remove-the-20-minute-cooldown-wait-timer-between-spins-on-the-spin-the-wheel-page-users-must-be-able-to-spin-again-immediately-after-each-spin-without-any-time-restriction",
+      "title": "Remove the 20-minute cooldown/wait timer between spins on the Spin the Wheel page. Users must be able to spin again immediately after each spin without any time restriction.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-restrict-spin-the-wheel-prize-outcomes-to-exactly-two-reward-types-trophies-and-points-remove-all-other-reward-types-e-g-coins-items-pet-food-accessories-or-any-other-category-from-the-wheel-segments-and-outcome-logic",
+      "title": "Restrict Spin the Wheel prize outcomes to exactly two reward types: trophies and points. Remove all other reward types (e.g., coins, items, pet food, accessories, or any other category) from the wheel segments and outcome logic.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-when-the-user-lands-on-a-trophies-outcome-from-the-spin-wheel-add-the-number-of-trophies-earned-to-the-user-s-total-score-display-a-message-such-as-keep-playing-and-spinning-to-earn-more-after-the-result-the-total-score-display-should-reflect-the-newly-added-trophies",
+      "title": "When the user lands on a trophies outcome from the spin wheel, add the number of trophies earned to the user's Total Score. Display a message such as 'Keep playing and Spinning to earn more!' after the result. The Total Score display should reflect the newly added trophies.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-when-the-user-lands-on-a-points-outcome-from-the-spin-wheel-add-those-points-to-the-virtual-pet-progress-section-not-directly-to-any-other-score-tracker-the-virtual-pet-section-should-display-updated-messaging-such-as-grow-your-pet-by-earning-points-from-games-and-spin-rewards-after-points-are-awarded",
+      "title": "When the user lands on a points outcome from the spin wheel, add those points to the Virtual Pet progress section (not directly to any other score tracker). The Virtual Pet section should display updated messaging such as 'Grow your pet by earning points from games and spin rewards!' after points are awarded.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Spin the Wheel: remove 20-minute wait timer between spins",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Spin the Wheel rewards limited to trophies and points only (no other rewards)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Trophies earned from Spin the Wheel are added to the Total Score",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Points earned from Spin the Wheel are added to the Virtual Pet progress section",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "projectName": "Fix Spin the Wheel: remove cooldown, restrict rewards to trophies and points only, wire trophies to Total Score and points to Virtual Pet",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}
