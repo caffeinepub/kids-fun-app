@@ -39,6 +39,11 @@ export interface SpinReward {
   'rewardType' : string,
   'timestamp' : bigint,
 }
+export interface SpinWheelResult {
+  'remainingCooldown' : bigint,
+  'pointsAdded' : bigint,
+  'message' : string,
+}
 export interface UserApprovalInfo {
   'status' : ApprovalStatus,
   'principal' : Principal,
@@ -97,13 +102,13 @@ export interface _SERVICE {
     _CaffeineStorageRefillResult
   >,
   '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
-  'addPointsFromSpin' : ActorMethod<[bigint], undefined>,
-  'addTrophiesFromSpin' : ActorMethod<[bigint], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'claimSpinReward' : ActorMethod<[bigint], SpinWheelResult>,
   'getCallerRewards' : ActorMethod<[], [] | [Reward]>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getLastSpinTime' : ActorMethod<[], [] | [bigint]>,
+  'getRemainingSpinCooldown' : ActorMethod<[], bigint>,
   'getSpinRewards' : ActorMethod<[], Array<SpinReward>>,
   'getTotalScore' : ActorMethod<[], bigint>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,

@@ -1,43 +1,28 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "A gamified app featuring a Spin the Wheel mechanic, Virtual Pet system, and Trophy/Score tracking. Spin the Wheel rewards users with trophies and points only (no 20-minute wait). Trophies earned are added to Total Score; points are added to the Virtual Pet's progress.",
+  "summary": "Project includes a Spin the Wheel feature with a 20-minute cooldown timer. Points earned go to the Virtual Pet, and trophies go to the Total Score.",
   "architectural_notes": [
-    "Spin the Wheel only awards trophies and points; trophies increment Total Score, points go to Virtual Pet progress",
-    "No 20-minute cooldown on Spin the Wheel"
+    "Spin the Wheel has a 20-minute cooldown between spins",
+    "Spin the Wheel points route to Virtual Pet; trophies route to Total Score"
   ],
   "known_issues": [
-    "Spin the Wheel was previously giving points directly to the virtual pet incorrectly and had a 20-minute wait enforced"
+    "Spin the Wheel cooldown timer not enforcing 20-minute wait",
+    "Spin the Wheel points not correctly routing to Virtual Pet"
   ],
   "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-remove-the-20-minute-cooldown-wait-timer-between-spins-on-the-spin-the-wheel-page-users-must-be-able-to-spin-again-immediately-after-each-spin-without-any-time-restriction",
-      "title": "Remove the 20-minute cooldown/wait timer between spins on the Spin the Wheel page. Users must be able to spin again immediately after each spin without any time restriction.",
-      "reqIds": [
-        "REQ-1"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-restrict-spin-the-wheel-prize-outcomes-to-exactly-two-reward-types-trophies-and-points-remove-all-other-reward-types-e-g-coins-items-pet-food-accessories-or-any-other-category-from-the-wheel-segments-and-outcome-logic",
-      "title": "Restrict Spin the Wheel prize outcomes to exactly two reward types: trophies and points. Remove all other reward types (e.g., coins, items, pet food, accessories, or any other category) from the wheel segments and outcome logic.",
+      "id": "feature-in-the-spin-the-wheel-page-frontend-src-pages-spinwheelpage-tsx-display-a-disabled-spin-button-with-a-countdown-timer-showing-the-remaining-time-mm-ss-when-the-user-is-in-cooldown-re-enable-the-button-automatically-once-the-20-minute-cooldown-expires",
+      "title": "In the Spin the Wheel page (frontend/src/pages/SpinWheelPage.tsx), display a disabled spin button with a countdown timer showing the remaining time (MM:SS) when the user is in cooldown. Re-enable the button automatically once the 20-minute cooldown expires.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-when-the-user-lands-on-a-trophies-outcome-from-the-spin-wheel-add-the-number-of-trophies-earned-to-the-user-s-total-score-display-a-message-such-as-keep-playing-and-spinning-to-earn-more-after-the-result-the-total-score-display-should-reflect-the-newly-added-trophies",
-      "title": "When the user lands on a trophies outcome from the spin wheel, add the number of trophies earned to the user's Total Score. Display a message such as 'Keep playing and Spinning to earn more!' after the result. The Total Score display should reflect the newly added trophies.",
-      "reqIds": [
-        "REQ-3"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-when-the-user-lands-on-a-points-outcome-from-the-spin-wheel-add-those-points-to-the-virtual-pet-progress-section-not-directly-to-any-other-score-tracker-the-virtual-pet-section-should-display-updated-messaging-such-as-grow-your-pet-by-earning-points-from-games-and-spin-rewards-after-points-are-awarded",
-      "title": "When the user lands on a points outcome from the spin wheel, add those points to the Virtual Pet progress section (not directly to any other score tracker). The Virtual Pet section should display updated messaging such as 'Grow your pet by earning points from games and spin rewards!' after points are awarded.",
+      "id": "feature-in-the-spin-the-wheel-page-frontend-src-pages-spinwheelpage-tsx-after-a-spin-that-yields-points-call-only-the-mutation-that-updates-the-virtual-pet-with-the-earned-points-do-not-call-any-other-reward-or-score-mutation-for-point-outcomes",
+      "title": "In the Spin the Wheel page (frontend/src/pages/SpinWheelPage.tsx), after a spin that yields points, call only the mutation that updates the Virtual Pet with the earned points. Do not call any other reward or score mutation for point outcomes.",
       "reqIds": [
         "REQ-4"
       ],
@@ -47,30 +32,40 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Spin the Wheel: remove 20-minute wait timer between spins",
+      "summary": "Spin the Wheel: enforce 20-minute cooldown before next spin",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Spin the Wheel rewards limited to trophies and points only (no other rewards)",
+      "summary": "Spin the Wheel: points earned should be added to the Virtual Pet only",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-3",
-      "summary": "Trophies earned from Spin the Wheel are added to the Total Score",
+      "summary": "Spin the Wheel: trophies earned should go to Total Score only",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-4",
-      "summary": "Points earned from Spin the Wheel are added to the Virtual Pet progress section",
-      "reqIds": [],
+      "summary": "Enforce a 20-minute cooldown on the Spin the Wheel feature in the backend. After a user spins, record the timestamp of their last spin and prevent another spin until 20 minutes have elapsed. Return the remaining cooldown time to the frontend so it can display a countdown.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "When points are won on the Spin the Wheel, add them exclusively to the Virtual Pet's points/experience in the backend (e.g., the VirtualPetHub record). Do not add spin-wheel points to any other score field or reward bucket.",
+      "reqIds": [
+        "REQ-3"
+      ],
       "status": "pending"
     }
   ],
-  "projectName": "Fix Spin the Wheel: remove cooldown, restrict rewards to trophies and points only, wire trophies to Total Score and points to Virtual Pet",
+  "projectName": "Kids Fun App",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

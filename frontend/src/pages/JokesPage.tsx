@@ -5,14 +5,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Smile, Heart, Star, Send } from 'lucide-react';
-import { useGetAllJokes, useGetJokesByCategory, useSubmitJoke, useRateJoke, useAddJokeToFavorites, useRemoveJokeFromFavorites, useGetJokeFavorites } from '../hooks/useQueries';
+import { useGetAllJokes, useSubmitJoke, useRateJoke, useAddJokeToFavorites, useRemoveJokeFromFavorites, useGetJokeFavorites } from '../hooks/useQueries';
 import { toast } from 'sonner';
 
 type JokeCategory = 'funny' | 'riddles' | 'knock-knock' | 'puns' | 'animal' | 'food' | 'school' | 'silly';
 
 export default function JokesPage() {
   const { data: allJokes = [] } = useGetAllJokes();
-  const { data: categoryJokes = [] } = useGetJokesByCategory();
   const { data: favoriteJokeIds = [] } = useGetJokeFavorites();
   const submitJoke = useSubmitJoke();
   const rateJoke = useRateJoke();

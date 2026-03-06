@@ -46,7 +46,6 @@ export default function ChatPage() {
 
     try {
       await sendMessageMutation.mutateAsync({
-        sender: currentUserId,
         recipient: selectedUser,
         content: messageText,
         isGroupChat: false,

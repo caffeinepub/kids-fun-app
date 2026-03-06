@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Music, Play, Pause, Save, Radio } from 'lucide-react';
-import { useSaveRemixStudio, useGetSavedRemixStudios } from '../hooks/useQueries';
+import { useSaveRemixStudio, useGetMusicRemixStudios } from '../hooks/useQueries';
 import { toast } from 'sonner';
 
 export default function MusicRemixPage() {
@@ -22,7 +22,7 @@ export default function MusicRemixPage() {
   const gainNodeRef = useRef<GainNode | null>(null);
 
   const saveRemixMutation = useSaveRemixStudio();
-  const { data: savedRemixes = [], isLoading: remixesLoading } = useGetSavedRemixStudios();
+  const { data: savedRemixes = [], isLoading: remixesLoading } = useGetMusicRemixStudios();
 
   useEffect(() => {
     return () => {
@@ -44,7 +44,7 @@ export default function MusicRemixPage() {
 
   const playPreview = () => {
     const audioContext = initAudio();
-    
+
     if (oscillatorRef.current) {
       oscillatorRef.current.stop();
     }
@@ -98,191 +98,175 @@ export default function MusicRemixPage() {
       });
 
       toast.success('Remix saved successfully!');
-      
-      // Also save to localStorage for immediate display
-      const remixes = JSON.parse(localStorage.getItem('remixStudios') || '[]');
-      remixes.push({
-        id: `remix_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        title: remixTitle,
-        tempo,
-        pitch,
-        volume,
-        reverb,
-        delay,
-        timestamp: Date.now(),
-      });
-      localStorage.setItem('remixStudios', JSON.stringify(remixes));
-      
       setRemixTitle('');
-      setTempo(120);
-      setPitch(0);
-      setVolume(70);
-      setReverb(0);
-      setDelay(0);
     } catch (error: any) {
-      console.error('Save remix error:', error);
-      toast.error(error?.message || 'Failed to save remix');
+      toast.error(error.message || 'Failed to save remix');
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-pink-800 to-orange-700 p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Luckiest Guy, cursive' }}>
-              Music Remix Studio
-            </h1>
-            <p className="text-white/90">Create and mix your own music tracks!</p>
-          </div>
-        </div>
+    <div className="space-y-6">
+      <div className="text-center">
+        <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+          Music Remix Studio 🎵
+        </h1>
+        <p className="text-xl text-gray-700">Create and remix your own music!</p>
+      </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          <Card className="bg-white/95 backdrop-blur">
-            <CardHeader>
-              <CardTitle>Remix Controls</CardTitle>
-              <CardDescription>Adjust the settings to create your unique sound</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label>Remix Title</Label>
-                <Input
-                  type="text"
-                  value={remixTitle}
-                  onChange={(e) => setRemixTitle(e.target.value)}
-                  placeholder="Enter remix title"
-                />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Controls */}
+        <Card className="border-4">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Music className="w-5 h-5" />
+              Remix Controls
+            </CardTitle>
+            <CardDescription>Adjust the settings to create your remix</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-2">
+              <Label>Remix Title</Label>
+              <Input
+                placeholder="Enter remix title..."
+                value={remixTitle}
+                onChange={(e) => setRemixTitle(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Tempo: {tempo} BPM</Label>
+              <Slider
+                min={60}
+                max={200}
+                step={1}
+                value={[tempo]}
+                onValueChange={([val]) => setTempo(val)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Pitch: {pitch > 0 ? `+${pitch}` : pitch}</Label>
+              <Slider
+                min={-12}
+                max={12}
+                step={1}
+                value={[pitch]}
+                onValueChange={([val]) => setPitch(val)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Volume: {volume}%</Label>
+              <Slider
+                min={0}
+                max={100}
+                step={1}
+                value={[volume]}
+                onValueChange={([val]) => setVolume(val)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Reverb: {reverb}%</Label>
+              <Slider
+                min={0}
+                max={100}
+                step={1}
+                value={[reverb]}
+                onValueChange={([val]) => setReverb(val)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Delay: {delay}%</Label>
+              <Slider
+                min={0}
+                max={100}
+                step={1}
+                value={[delay]}
+                onValueChange={([val]) => setDelay(val)}
+              />
+            </div>
+
+            <div className="flex gap-3">
+              <Button
+                onClick={isPlaying ? stopPreview : playPreview}
+                variant="outline"
+                className="flex-1"
+              >
+                {isPlaying ? (
+                  <>
+                    <Pause className="w-4 h-4 mr-2" />
+                    Stop Preview
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-4 h-4 mr-2" />
+                    Preview
+                  </>
+                )}
+              </Button>
+
+              <Button
+                onClick={handleSaveRemix}
+                disabled={saveRemixMutation.isPending || !remixTitle.trim()}
+                className="flex-1"
+              >
+                {saveRemixMutation.isPending ? (
+                  'Saving...'
+                ) : (
+                  <>
+                    <Save className="w-4 h-4 mr-2" />
+                    Save Remix
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Saved Remixes */}
+        <Card className="border-4">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Radio className="w-5 h-5" />
+              Browse Remixes
+            </CardTitle>
+            <CardDescription>Your saved remix configurations</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {remixesLoading ? (
+              <div className="text-center py-8">
+                <p className="text-gray-600">Loading remixes...</p>
               </div>
-
-              <div className="space-y-2">
-                <Label>Tempo: {tempo} BPM</Label>
-                <Slider
-                  value={[tempo]}
-                  onValueChange={([value]) => setTempo(value)}
-                  min={60}
-                  max={180}
-                  step={1}
-                />
+            ) : savedRemixes.length === 0 ? (
+              <div className="text-center py-8">
+                <Music className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                <p className="text-gray-600">No saved remixes yet</p>
+                <p className="text-sm text-gray-500 mt-2">Create and save your first remix!</p>
               </div>
-
-              <div className="space-y-2">
-                <Label>Pitch: {pitch > 0 ? '+' : ''}{pitch}</Label>
-                <Slider
-                  value={[pitch]}
-                  onValueChange={([value]) => setPitch(value)}
-                  min={-12}
-                  max={12}
-                  step={1}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Volume: {volume}%</Label>
-                <Slider
-                  value={[volume]}
-                  onValueChange={([value]) => setVolume(value)}
-                  min={0}
-                  max={100}
-                  step={1}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Reverb: {reverb}%</Label>
-                <Slider
-                  value={[reverb]}
-                  onValueChange={([value]) => setReverb(value)}
-                  min={0}
-                  max={100}
-                  step={1}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Delay: {delay}ms</Label>
-                <Slider
-                  value={[delay]}
-                  onValueChange={([value]) => setDelay(value)}
-                  min={0}
-                  max={1000}
-                  step={10}
-                />
-              </div>
-
-              <div className="flex gap-2">
-                <Button
-                  onClick={isPlaying ? stopPreview : playPreview}
-                  variant="outline"
-                  className="flex-1"
-                >
-                  {isPlaying ? (
-                    <>
-                      <Pause className="w-4 h-4 mr-2" />
-                      Stop Preview
-                    </>
-                  ) : (
-                    <>
-                      <Play className="w-4 h-4 mr-2" />
-                      Play Preview
-                    </>
-                  )}
-                </Button>
-                <Button
-                  onClick={handleSaveRemix}
-                  disabled={saveRemixMutation.isPending || !remixTitle.trim()}
-                  className="flex-1"
-                >
-                  <Save className="w-4 h-4 mr-2" />
-                  {saveRemixMutation.isPending ? 'Saving...' : 'Save Remix'}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/95 backdrop-blur">
-            <CardHeader>
-              <CardTitle>Browse Remixes</CardTitle>
-              <CardDescription>Your saved music remixes</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {remixesLoading ? (
-                <div className="text-center py-8">
-                  <p className="text-gray-600">Loading remixes...</p>
-                </div>
-              ) : savedRemixes.length === 0 ? (
-                <div className="text-center py-8">
-                  <Music className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                  <p className="text-gray-600">No remixes yet</p>
-                  <p className="text-sm text-gray-500 mt-2">Create your first remix!</p>
-                </div>
-              ) : (
-                <div className="space-y-3 max-h-[600px] overflow-y-auto">
-                  {savedRemixes.map((remix) => (
-                    <div
-                      key={remix.id}
-                      className="p-4 bg-white rounded-lg border-2 border-purple-200 hover:border-purple-400 transition-colors"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <Radio className="w-8 h-8 text-purple-600" />
-                          <div>
-                            <p className="font-semibold">{remix.title}</p>
-                            <p className="text-sm text-gray-500">
-                              Tempo: {Number(remix.tempo)} BPM • Pitch: {remix.pitch > 0 ? '+' : ''}{Number(remix.pitch)}
-                            </p>
-                            <p className="text-xs text-gray-400">
-                              Volume: {Number(remix.volume)}% • Reverb: {Number(remix.reverb)}% • Delay: {Number(remix.delay)}ms
-                            </p>
-                          </div>
-                        </div>
+            ) : (
+              <div className="space-y-3 max-h-[500px] overflow-y-auto">
+                {savedRemixes.map((remix) => (
+                  <Card key={remix.id} className="border-2">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-semibold">{remix.title}</h3>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+                      <div className="grid grid-cols-2 gap-1 text-sm text-gray-600">
+                        <span>Tempo: {Number(remix.tempo)} BPM</span>
+                        <span>Pitch: {Number(remix.pitch) > 0 ? `+${Number(remix.pitch)}` : Number(remix.pitch)}</span>
+                        <span>Volume: {Number(remix.volume)}%</span>
+                        <span>Reverb: {Number(remix.reverb)}%</span>
+                        <span>Delay: {Number(remix.delay)}%</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

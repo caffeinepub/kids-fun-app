@@ -1,29 +1,25 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-26T07:52:24.273Z",
+  "generatedAt": "2026-02-26T08:56:07.187Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
     "total": 4,
-    "implemented": 4,
+    "implemented": 2,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Remove the 20-minute cooldown/wait timer between spins on the Spin the Wheel page. Users must be able to spin again immediately after each spin without any time restriction.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/SpinWheelPage.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/SpinWheelPage.tsx"
-        ]
+        "summary": "Enforce a 20-minute cooldown on the Spin the Wheel feature in the backend. After a user spins, record the timestamp of their last spin and prevent another spin until 20 minutes have elapsed. Return the remaining cooldown time to the frontend so it can display a countdown.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       },
       {
         "id": "REQ-2",
-        "summary": "Restrict Spin the Wheel prize outcomes to exactly two reward types: trophies and points. Remove all other reward types (e.g., coins, items, pet food, accessories, or any other category) from the wheel segments and outcome logic.",
+        "summary": "In the Spin the Wheel page (frontend/src/pages/SpinWheelPage.tsx), display a disabled spin button with a countdown timer showing the remaining time (MM:SS) when the user is in cooldown. Re-enable the button automatically once the 20-minute cooldown expires.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/pages/SpinWheelPage.tsx"
@@ -34,56 +30,39 @@
       },
       {
         "id": "REQ-3",
-        "summary": "When the user lands on a trophies outcome from the spin wheel, add the number of trophies earned to the user's Total Score. Display a message such as 'Keep playing and Spinning to earn more!' after the result. The Total Score display should reflect the newly added trophies.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/SpinWheelPage.tsx",
-          "frontend/src/hooks/useQueries.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/SpinWheelPage.tsx",
-          "frontend/src/hooks/useQueries.ts"
-        ]
+        "summary": "When points are won on the Spin the Wheel, add them exclusively to the Virtual Pet's points/experience in the backend (e.g., the VirtualPetHub record). Do not add spin-wheel points to any other score field or reward bucket.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       },
       {
         "id": "REQ-4",
-        "summary": "When the user lands on a points outcome from the spin wheel, add those points to the Virtual Pet progress section (not directly to any other score tracker). The Virtual Pet section should display updated messaging such as 'Grow your pet by earning points from games and spin rewards!' after points are awarded.",
+        "summary": "In the Spin the Wheel page (frontend/src/pages/SpinWheelPage.tsx), after a spin that yields points, call only the mutation that updates the Virtual Pet with the earned points. Do not call any other reward or score mutation for point outcomes.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/SpinWheelPage.tsx",
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/pages/VirtualPetHubPage.tsx"
+          "frontend/src/pages/SpinWheelPage.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/SpinWheelPage.tsx",
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/pages/SpinWheelPage.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
     "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
-    "build-template/README.md",
-    "caffeine.lock.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/App.tsx",
     "frontend/src/backend.d.ts",
     "frontend/src/backend.ts",
     "frontend/src/declarations/backend.did.d.ts",
     "frontend/src/declarations/backend.did.js",
     "frontend/src/hooks/useQueries.ts",
-    "frontend/src/pages/AdminDashboardPage.tsx",
-    "frontend/src/pages/ArtGalleryPage.tsx",
-    "frontend/src/pages/CertificatesPage.tsx",
     "frontend/src/pages/ChatPage.tsx",
     "frontend/src/pages/JokesPage.tsx",
-    "frontend/src/pages/SmartHubPage.tsx",
+    "frontend/src/pages/MusicRemixPage.tsx",
     "frontend/src/pages/SpinWheelPage.tsx",
-    "frontend/src/pages/StoryBuilderPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

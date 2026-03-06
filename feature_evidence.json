@@ -2,31 +2,8 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-remove-the-20-minute-cooldown-wait-timer-between-spins-on-the-spin-the-wheel-page-users-must-be-able-to-spin-again-immediately-after-each-spin-without-any-time-restriction",
-      "featureTitle": "Remove the 20-minute cooldown/wait timer between spins on the Spin the Wheel page. Users must be able to spin again immediately after each spin without any time restriction.",
-      "files": [
-        "frontend/src/pages/SpinWheelPage.tsx"
-      ],
-      "components": [
-        "authorization@3.0.0",
-        "blob-storage@4.0.0",
-        "user-approval@3.0.0",
-        "camera@1.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "http-outcalls@3.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-1"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-restrict-spin-the-wheel-prize-outcomes-to-exactly-two-reward-types-trophies-and-points-remove-all-other-reward-types-e-g-coins-items-pet-food-accessories-or-any-other-category-from-the-wheel-segments-and-outcome-logic",
-      "featureTitle": "Restrict Spin the Wheel prize outcomes to exactly two reward types: trophies and points. Remove all other reward types (e.g., coins, items, pet food, accessories, or any other category) from the wheel segments and outcome logic.",
+      "featureId": "feature-in-the-spin-the-wheel-page-frontend-src-pages-spinwheelpage-tsx-display-a-disabled-spin-button-with-a-countdown-timer-showing-the-remaining-time-mm-ss-when-the-user-is-in-cooldown-re-enable-the-button-automatically-once-the-20-minute-cooldown-expires",
+      "featureTitle": "In the Spin the Wheel page (frontend/src/pages/SpinWheelPage.tsx), display a disabled spin button with a countdown timer showing the remaining time (MM:SS) when the user is in cooldown. Re-enable the button automatically once the 20-minute cooldown expires.",
       "files": [
         "frontend/src/pages/SpinWheelPage.tsx"
       ],
@@ -48,34 +25,9 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-when-the-user-lands-on-a-trophies-outcome-from-the-spin-wheel-add-the-number-of-trophies-earned-to-the-user-s-total-score-display-a-message-such-as-keep-playing-and-spinning-to-earn-more-after-the-result-the-total-score-display-should-reflect-the-newly-added-trophies",
-      "featureTitle": "When the user lands on a trophies outcome from the spin wheel, add the number of trophies earned to the user's Total Score. Display a message such as 'Keep playing and Spinning to earn more!' after the result. The Total Score display should reflect the newly added trophies.",
+      "featureId": "feature-in-the-spin-the-wheel-page-frontend-src-pages-spinwheelpage-tsx-after-a-spin-that-yields-points-call-only-the-mutation-that-updates-the-virtual-pet-with-the-earned-points-do-not-call-any-other-reward-or-score-mutation-for-point-outcomes",
+      "featureTitle": "In the Spin the Wheel page (frontend/src/pages/SpinWheelPage.tsx), after a spin that yields points, call only the mutation that updates the Virtual Pet with the earned points. Do not call any other reward or score mutation for point outcomes.",
       "files": [
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/pages/SpinWheelPage.tsx"
-      ],
-      "components": [
-        "authorization@3.0.0",
-        "blob-storage@4.0.0",
-        "user-approval@3.0.0",
-        "camera@1.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "http-outcalls@3.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-when-the-user-lands-on-a-points-outcome-from-the-spin-wheel-add-those-points-to-the-virtual-pet-progress-section-not-directly-to-any-other-score-tracker-the-virtual-pet-section-should-display-updated-messaging-such-as-grow-your-pet-by-earning-points-from-games-and-spin-rewards-after-points-are-awarded",
-      "featureTitle": "When the user lands on a points outcome from the spin wheel, add those points to the Virtual Pet progress section (not directly to any other score tracker). The Virtual Pet section should display updated messaging such as 'Grow your pet by earning points from games and spin rewards!' after points are awarded.",
-      "files": [
-        "frontend/src/hooks/useQueries.ts",
         "frontend/src/pages/SpinWheelPage.tsx"
       ],
       "components": [

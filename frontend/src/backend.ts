@@ -120,6 +120,11 @@ export interface Reward {
 export interface _CaffeineStorageRefillInformation {
     proposed_top_up_amount?: bigint;
 }
+export interface SpinWheelResult {
+    remainingCooldown: bigint;
+    pointsAdded: bigint;
+    message: string;
+}
 export interface AvatarConfig {
     body: string;
     hair: string;
@@ -171,13 +176,13 @@ export interface backendInterface {
     _caffeineStorageCreateCertificate(blobHash: string): Promise<_CaffeineStorageCreateCertificateResult>;
     _caffeineStorageRefillCashier(refillInformation: _CaffeineStorageRefillInformation | null): Promise<_CaffeineStorageRefillResult>;
     _caffeineStorageUpdateGatewayPrincipals(): Promise<void>;
-    addPointsFromSpin(points: bigint): Promise<void>;
-    addTrophiesFromSpin(trophies: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    claimSpinReward(points: bigint): Promise<SpinWheelResult>;
     getCallerRewards(): Promise<Reward | null>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getLastSpinTime(): Promise<bigint | null>;
+    getRemainingSpinCooldown(): Promise<bigint>;
     getSpinRewards(): Promise<Array<SpinReward>>;
     getTotalScore(): Promise<bigint>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
@@ -280,34 +285,6 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async addPointsFromSpin(arg0: bigint): Promise<void> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.addPointsFromSpin(arg0);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.addPointsFromSpin(arg0);
-            return result;
-        }
-    }
-    async addTrophiesFromSpin(arg0: bigint): Promise<void> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.addTrophiesFromSpin(arg0);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.addTrophiesFromSpin(arg0);
-            return result;
-        }
-    }
     async assignCallerUserRole(arg0: Principal, arg1: UserRole): Promise<void> {
         if (this.processError) {
             try {
@@ -319,6 +296,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n8(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
+    async claimSpinReward(arg0: bigint): Promise<SpinWheelResult> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.claimSpinReward(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.claimSpinReward(arg0);
             return result;
         }
     }
@@ -376,6 +367,20 @@ export class Backend implements backendInterface {
         } else {
             const result = await this.actor.getLastSpinTime();
             return from_candid_opt_n17(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getRemainingSpinCooldown(): Promise<bigint> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getRemainingSpinCooldown();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getRemainingSpinCooldown();
+            return result;
         }
     }
     async getSpinRewards(): Promise<Array<SpinReward>> {

@@ -35,6 +35,11 @@ export interface Reward {
     virtualPetLevel: bigint;
     points: bigint;
 }
+export interface SpinWheelResult {
+    remainingCooldown: bigint;
+    pointsAdded: bigint;
+    message: string;
+}
 export interface AvatarConfig {
     body: string;
     hair: string;
@@ -72,13 +77,13 @@ export enum UserRole {
     guest = "guest"
 }
 export interface backendInterface {
-    addPointsFromSpin(points: bigint): Promise<void>;
-    addTrophiesFromSpin(trophies: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    claimSpinReward(points: bigint): Promise<SpinWheelResult>;
     getCallerRewards(): Promise<Reward | null>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getLastSpinTime(): Promise<bigint | null>;
+    getRemainingSpinCooldown(): Promise<bigint>;
     getSpinRewards(): Promise<Array<SpinReward>>;
     getTotalScore(): Promise<bigint>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;

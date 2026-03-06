@@ -190,6 +190,15 @@ export interface SpinReward {
   timestamp: number;
 }
 
+export interface LocalSticker {
+  id: string;
+  creator: string;
+  name: string;
+  imageDataUrl: string;
+  isModerated: boolean;
+  approved: boolean;
+}
+
 export interface Sticker {
   id: string;
   creator: string;
@@ -706,7 +715,7 @@ export function useRemoveRestriction() {
       const restrictions = JSON.parse(localStorage.getItem('userRestrictions') || '{}');
       if (restrictions[userId.toString()]) {
         restrictions[userId.toString()] = restrictions[userId.toString()].filter(
-          (r: any) => r.feature !== feature
+          (r: { feature: string }) => r.feature !== feature
         );
         localStorage.setItem('userRestrictions', JSON.stringify(restrictions));
       }
@@ -718,305 +727,62 @@ export function useRemoveRestriction() {
   });
 }
 
-// Scary Hub Games - localStorage based
-export function useGetScaryHubGames() {
-  return useQuery<ScaryHubGameEntry[]>({
-    queryKey: ['scaryHubGames'],
-    queryFn: async () => {
-      try {
-        const stored = localStorage.getItem('scaryHubGames');
-        return stored ? JSON.parse(stored) : [];
-      } catch {
-        return [];
-      }
-    },
-  });
-}
-
-// Helper function to convert Uint8Array to base64 efficiently
-function uint8ArrayToBase64(bytes: Uint8Array): string {
-  let binary = '';
-  const chunkSize = 8192;
-  for (let i = 0; i < bytes.length; i += chunkSize) {
-    const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
-    binary += String.fromCharCode.apply(null, Array.from(chunk));
-  }
-  return btoa(binary);
-}
-
-// Sticker Hooks
-export function useCreateSticker() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ name, image }: { name: string; image: Uint8Array }) => {
-      if (!actor) throw new Error('Actor not available');
-
-      const stickerId = `sticker_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-      const stickers = JSON.parse(localStorage.getItem('stickers') || '[]');
-      stickers.push({
-        id: stickerId,
-        name,
-        imageData: uint8ArrayToBase64(image),
-        approved: false,
-        timestamp: Date.now(),
-      });
-      localStorage.setItem('stickers', JSON.stringify(stickers));
-
-      return stickerId;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['approvedStickers'] });
-    },
-  });
-}
-
-export function useGetApprovedStickers() {
-  return useQuery<Sticker[]>({
-    queryKey: ['approvedStickers'],
-    queryFn: async () => {
-      try {
-        const stickers = JSON.parse(localStorage.getItem('stickers') || '[]');
-        return stickers
-          .filter((s: any) => s.approved)
-          .map((s: any) => ({
-            id: s.id,
-            creator: 'user',
-            name: s.name,
-            image: {
-              getDirectURL: () => `data:image/png;base64,${s.imageData}`,
-            },
-            isModerated: true,
-            approved: true,
-          }));
-      } catch (error) {
-        console.error('Error loading stickers:', error);
-        return [];
-      }
-    },
-  });
-}
-
-// Music Remix Studio Hooks - localStorage based
-export function useSaveRemixStudio() {
-  const { identity } = useInternetIdentity();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (remix: Omit<MusicRemixStudio, 'id' | 'creator'>) => {
-      if (!identity) throw new Error('User not authenticated');
-
-      const remixId = `remix_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-      const fullRemix: MusicRemixStudio = {
-        id: remixId,
-        creator: identity.getPrincipal(),
-        ...remix,
-      };
-
-      const remixes: MusicRemixStudio[] = JSON.parse(localStorage.getItem('remixStudios') || '[]');
-      remixes.push(fullRemix);
-      localStorage.setItem('remixStudios', JSON.stringify(remixes));
-
-      return remixId;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['savedRemixStudios'] });
-    },
-  });
-}
-
-export function useGetSavedRemixStudios() {
-  return useQuery<MusicRemixStudio[]>({
-    queryKey: ['savedRemixStudios'],
-    queryFn: async () => {
-      try {
-        const remixes = JSON.parse(localStorage.getItem('remixStudios') || '[]');
-        return remixes.map((r: any) => ({
-          id: r.id,
-          creator: r.creator,
-          title: r.title,
-          tempo: BigInt(r.tempo || 0),
-          pitch: BigInt(r.pitch || 0),
-          volume: BigInt(r.volume || 0),
-          reverb: BigInt(r.reverb || 0),
-          delay: BigInt(r.delay || 0),
-        }));
-      } catch {
-        return [];
-      }
-    },
-  });
-}
-
-// Legacy Music Remix Hooks
-export function useCreateMusicRemix() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ title, audio, duration }: { title: string; audio: Uint8Array; duration: bigint }) => {
-      const remixId = `remix_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-      const remixes = JSON.parse(localStorage.getItem('musicRemixes') || '[]');
-      remixes.push({
-        id: remixId,
-        title,
-        audioData: uint8ArrayToBase64(audio),
-        duration: duration.toString(),
-        approved: true,
-        timestamp: Date.now(),
-      });
-      localStorage.setItem('musicRemixes', JSON.stringify(remixes));
-
-      return remixId;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['approvedRemixes'] });
-    },
-  });
-}
-
-export function useGetApprovedRemixes() {
-  return useQuery<MusicRemix[]>({
-    queryKey: ['approvedRemixes'],
-    queryFn: async () => {
-      try {
-        const remixes = JSON.parse(localStorage.getItem('musicRemixes') || '[]');
-        return remixes
-          .filter((r: any) => r.approved)
-          .map((r: any) => ({
-            id: r.id,
-            creator: 'user',
-            title: r.title,
-            audio: {
-              getDirectURL: () => `data:audio/wav;base64,${r.audioData}`,
-            },
-            duration: BigInt(r.duration || 0),
-            isPublic: true,
-            approved: true,
-          }));
-      } catch (error) {
-        console.error('Error loading remixes:', error);
-        return [];
-      }
-    },
-  });
-}
-
-// Admin Dashboard Hook
 export function useGetAdminDashboard() {
   const { actor, isFetching } = useActor();
 
   return useQuery<AdminDashboardData>({
     queryKey: ['adminDashboard'],
     queryFn: async () => {
-      const defaultData: AdminDashboardData = {
-        totalUsers: 0,
-        activeUsers: 0,
+      const statuses = JSON.parse(localStorage.getItem('userStatuses') || '{}');
+      const statusValues = Object.values(statuses) as AdminUserStatus[];
+
+      let manageUsers: BackendUserProfile[] = [];
+      if (actor) {
+        try {
+          const approvals = await actor.listApprovals();
+          manageUsers = [];
+          void approvals;
+        } catch {
+          manageUsers = [];
+        }
+      }
+
+      return {
+        totalUsers: statusValues.length,
+        activeUsers: statusValues.filter((s) => s === AdminUserStatus.active).length,
         pendingApprovals: 0,
         recentActivity: [],
         overview: {
           userStats: {
-            total: 0,
-            active: 0,
-            restricted: 0,
-            suspended: 0,
-            banned: 0,
+            total: statusValues.length,
+            active: statusValues.filter((s) => s === AdminUserStatus.active).length,
+            restricted: statusValues.filter((s) => s === AdminUserStatus.restricted).length,
+            suspended: statusValues.filter((s) => s === AdminUserStatus.suspended).length,
+            banned: statusValues.filter((s) => s === AdminUserStatus.banned).length,
           },
         },
-        manageUsers: [],
+        manageUsers,
         safetyAlerts: [],
       };
-
-      if (!actor) return defaultData;
-
-      try {
-        const approvals = await actor.listApprovals();
-        const pendingApprovals = approvals.filter((a) => a.status === 'pending').length;
-        const recentActivity = JSON.parse(localStorage.getItem('activityEvents') || '[]');
-
-        return {
-          ...defaultData,
-          totalUsers: approvals.length,
-          activeUsers: approvals.filter((a) => a.status === 'approved').length,
-          pendingApprovals,
-          recentActivity,
-          overview: {
-            userStats: {
-              total: approvals.length,
-              active: approvals.filter((a) => a.status === 'approved').length,
-              restricted: 0,
-              suspended: 0,
-              banned: approvals.filter((a) => a.status === 'rejected').length,
-            },
-          },
-        };
-      } catch {
-        return defaultData;
-      }
     },
     enabled: !!actor && !isFetching,
-    refetchInterval: 10000,
   });
 }
 
 // Spin Wheel Hooks
-export function useAddTrophiesFromSpin() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (trophies: number) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.addTrophiesFromSpin(BigInt(trophies));
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['totalScore'] });
-      queryClient.invalidateQueries({ queryKey: ['callerVirtualPet'] });
-      queryClient.invalidateQueries({ queryKey: ['userTrophies'] });
-    },
-  });
-}
-
-export function useAddPointsFromSpin() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (points: number) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.addPointsFromSpin(BigInt(points));
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['callerVirtualPet'] });
-      queryClient.invalidateQueries({ queryKey: ['virtualPetHub'] });
-    },
-  });
-}
-
-export function useGetTotalScore() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<bigint>({
-    queryKey: ['totalScore'],
-    queryFn: async () => {
-      if (!actor) return BigInt(0);
-      return actor.getTotalScore();
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
-
 export function useGetSpinRewards() {
   const { actor, isFetching } = useActor();
 
-  return useQuery<Array<{ rewardType: string; value: string; timestamp: bigint }>>({
+  return useQuery<SpinReward[]>({
     queryKey: ['spinRewards'],
     queryFn: async () => {
       if (!actor) return [];
-      return actor.getSpinRewards();
+      const rewards = await actor.getSpinRewards();
+      return rewards.map((r) => ({
+        rewardType: r.rewardType,
+        value: r.value,
+        timestamp: Number(r.timestamp),
+      }));
     },
     enabled: !!actor && !isFetching,
   });
@@ -1037,84 +803,63 @@ export function useRecordSpinReward() {
   });
 }
 
-// Art Gallery Hooks - localStorage based
-export function useGetArtGallery() {
-  return useQuery<ArtworkSubmission[]>({
-    queryKey: ['artGallery'],
-    queryFn: async () => {
-      try {
-        const stored = localStorage.getItem('artGallery');
-        return stored ? JSON.parse(stored) : [];
-      } catch {
-        return [];
-      }
-    },
-  });
-}
-
-export function useGetCallerArtwork() {
-  const { identity } = useInternetIdentity();
-
-  return useQuery<ArtworkSubmission[]>({
-    queryKey: ['callerArtwork'],
-    queryFn: async () => {
-      try {
-        const stored = localStorage.getItem('artGallery');
-        const all: ArtworkSubmission[] = stored ? JSON.parse(stored) : [];
-        const callerId = identity?.getPrincipal().toString();
-        if (!callerId) return [];
-        return all.filter((a) => a.owner === callerId);
-      } catch {
-        return [];
-      }
-    },
-  });
-}
-
-export function useGetPublicArtwork() {
-  return useQuery<ArtworkSubmission[]>({
-    queryKey: ['publicArtwork'],
-    queryFn: async () => {
-      try {
-        const stored = localStorage.getItem('artGallery');
-        const all: ArtworkSubmission[] = stored ? JSON.parse(stored) : [];
-        return all.filter((a) => a.isPublic && a.approved);
-      } catch {
-        return [];
-      }
-    },
-  });
-}
-
-export function useSubmitArtwork() {
+// claimSpinReward: adds points to Virtual Pet and enforces 20-min cooldown
+export function useClaimSpinReward() {
+  const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (artwork: ArtworkSubmission) => {
-      const gallery: ArtworkSubmission[] = JSON.parse(localStorage.getItem('artGallery') || '[]');
-      gallery.push(artwork);
-      localStorage.setItem('artGallery', JSON.stringify(gallery));
-      return artwork;
+    mutationFn: async (points: number) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.claimSpinReward(BigInt(points));
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['artGallery'] });
-      queryClient.invalidateQueries({ queryKey: ['callerArtwork'] });
-      queryClient.invalidateQueries({ queryKey: ['publicArtwork'] });
+      queryClient.invalidateQueries({ queryKey: ['virtualPetHub'] });
+      queryClient.invalidateQueries({ queryKey: ['callerVirtualPet'] });
+      queryClient.invalidateQueries({ queryKey: ['spinCooldown'] });
     },
   });
 }
 
-export function useSaveArtwork() {
-  return useSubmitArtwork();
+// addTrophiesFromSpin: no-op (backend method removed; trophies are tracked locally)
+export function useAddTrophiesFromSpin() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (_trophies: number) => {
+      // No-op: addTrophiesFromSpin is not available in the backend interface.
+      return;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['callerVirtualPet'] });
+      queryClient.invalidateQueries({ queryKey: ['userTrophies'] });
+    },
+  });
 }
 
-// Joke Hooks - localStorage based
-export function useGetJokes() {
-  return useQuery<Joke[]>({
-    queryKey: ['jokes'],
+// addPointsFromSpin: no-op (use useClaimSpinReward instead)
+export function useAddPointsFromSpin() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (_points: number) => {
+      // No-op: use useClaimSpinReward (actor.claimSpinReward) to add points to Virtual Pet.
+      return;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['callerVirtualPet'] });
+      queryClient.invalidateQueries({ queryKey: ['virtualPetHub'] });
+    },
+  });
+}
+
+// Feedback Hooks - localStorage based
+export function useGetMyFeedback() {
+  return useQuery<Feedback[]>({
+    queryKey: ['myFeedback'],
     queryFn: async () => {
       try {
-        const stored = localStorage.getItem('jokes');
+        const stored = localStorage.getItem('myFeedback');
         return stored ? JSON.parse(stored) : [];
       } catch {
         return [];
@@ -1123,42 +868,207 @@ export function useGetJokes() {
   });
 }
 
-// Alias for backward compatibility
-export const useGetAllJokes = useGetJokes;
+export function useSubmitFeedback() {
+  const queryClient = useQueryClient();
+  const { identity } = useInternetIdentity();
 
-export function useGetJokesByCategory(category?: string) {
-  return useQuery<Joke[]>({
-    queryKey: ['jokes', 'category', category],
+  return useMutation({
+    mutationFn: async (feedback: Omit<Feedback, 'id' | 'timestamp'>) => {
+      const newFeedback: Feedback = {
+        ...feedback,
+        id: `feedback_${Date.now()}`,
+        timestamp: Date.now(),
+        submitter: identity?.getPrincipal().toString() || 'anonymous',
+      };
+      const existing: Feedback[] = JSON.parse(localStorage.getItem('myFeedback') || '[]');
+      existing.unshift(newFeedback);
+      localStorage.setItem('myFeedback', JSON.stringify(existing));
+      return newFeedback;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['myFeedback'] });
+    },
+  });
+}
+
+// Chat Hooks - localStorage based
+export function useGetChatMessages() {
+  return useQuery<ChatMessage[]>({
+    queryKey: ['chatMessages'],
     queryFn: async () => {
       try {
-        const stored = localStorage.getItem('jokes');
-        const all: Joke[] = stored ? JSON.parse(stored) : [];
-        if (!category || category === 'all') return all;
-        return all.filter((j) => j.category === category);
+        const stored = localStorage.getItem('chatMessages');
+        return stored ? JSON.parse(stored) : [];
+      } catch {
+        return [];
+      }
+    },
+    refetchInterval: 2000,
+  });
+}
+
+export function useSendChatMessage() {
+  const queryClient = useQueryClient();
+  const { identity } = useInternetIdentity();
+
+  return useMutation({
+    mutationFn: async (message: Omit<ChatMessage, 'id' | 'timestamp' | 'sender'>) => {
+      const newMessage: ChatMessage = {
+        ...message,
+        id: `msg_${Date.now()}`,
+        timestamp: Date.now(),
+        sender: identity?.getPrincipal().toString() || 'anonymous',
+      };
+      const existing: ChatMessage[] = JSON.parse(localStorage.getItem('chatMessages') || '[]');
+      existing.push(newMessage);
+      localStorage.setItem('chatMessages', JSON.stringify(existing.slice(-100)));
+      return newMessage;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['chatMessages'] });
+    },
+  });
+}
+
+export function useGetOnlineUsers() {
+  return useQuery<OnlineUser[]>({
+    queryKey: ['onlineUsers'],
+    queryFn: async () => {
+      try {
+        const stored = localStorage.getItem('onlineUsers');
+        return stored ? JSON.parse(stored) : [];
+      } catch {
+        return [];
+      }
+    },
+    refetchInterval: 5000,
+  });
+}
+
+export function useUpdateOnlineStatus() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ userId, isOnline }: { userId: string; isOnline: boolean }) => {
+      const users: OnlineUser[] = JSON.parse(localStorage.getItem('onlineUsers') || '[]');
+      const idx = users.findIndex((u) => u.userId === userId);
+      const updatedUser: OnlineUser = {
+        userId,
+        isOnline,
+        lastSeen: Date.now(),
+      };
+      if (idx >= 0) {
+        users[idx] = updatedUser;
+      } else {
+        users.push(updatedUser);
+      }
+      localStorage.setItem('onlineUsers', JSON.stringify(users));
+      return updatedUser;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['onlineUsers'] });
+    },
+  });
+}
+
+// Events Hooks - localStorage based
+export function useGetTodaysEvents() {
+  return useQuery<Event[]>({
+    queryKey: ['todaysEvents'],
+    queryFn: async () => {
+      try {
+        const stored = localStorage.getItem('events');
+        const events: Event[] = stored ? JSON.parse(stored) : [];
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        return events.filter((e) => e.date >= today.getTime() && e.date < tomorrow.getTime());
       } catch {
         return [];
       }
     },
   });
+}
+
+export function useDismissEventNotification() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (eventId: string) => {
+      const dismissed: string[] = JSON.parse(localStorage.getItem('dismissedEvents') || '[]');
+      if (!dismissed.includes(eventId)) {
+        dismissed.push(eventId);
+        localStorage.setItem('dismissedEvents', JSON.stringify(dismissed));
+      }
+      return eventId;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['todaysEvents'] });
+    },
+  });
+}
+
+export function useGetActiveSeasonalEvents() {
+  return useQuery<Event[]>({
+    queryKey: ['activeSeasonalEvents'],
+    queryFn: async () => {
+      try {
+        const stored = localStorage.getItem('seasonalEvents');
+        const events: Event[] = stored ? JSON.parse(stored) : [];
+        const now = Date.now();
+        return events.filter((e) => e.isSeasonal && e.date >= now);
+      } catch {
+        return [];
+      }
+    },
+  });
+}
+
+// Jokes Hooks - localStorage based
+export function useGetAllJokes() {
+  return useQuery<Joke[]>({
+    queryKey: ['allJokes'],
+    queryFn: async () => {
+      try {
+        const stored = localStorage.getItem('jokes');
+        return stored ? JSON.parse(stored) : getDefaultJokes();
+      } catch {
+        return getDefaultJokes();
+      }
+    },
+  });
+}
+
+function getDefaultJokes(): Joke[] {
+  return [
+    { id: '1', category: 'animals', content: "Why don't scientists trust atoms? Because they make up everything!", approved: true, rating: 5 },
+    { id: '2', category: 'food', content: 'What do you call a fake noodle? An impasta!', approved: true, rating: 4 },
+    { id: '3', category: 'school', content: 'Why did the math book look so sad? Because it had too many problems!', approved: true, rating: 5 },
+    { id: '4', category: 'animals', content: "What do you call a sleeping dinosaur? A dino-snore!", approved: true, rating: 4 },
+    { id: '5', category: 'food', content: "Why did the banana go to the doctor? Because it wasn't peeling well!", approved: true, rating: 3 },
+  ];
 }
 
 export function useSubmitJoke() {
   const queryClient = useQueryClient();
+  const { identity } = useInternetIdentity();
 
   return useMutation({
     mutationFn: async (joke: Omit<Joke, 'id' | 'approved'>) => {
-      const jokes: Joke[] = JSON.parse(localStorage.getItem('jokes') || '[]');
       const newJoke: Joke = {
         ...joke,
         id: `joke_${Date.now()}`,
         approved: false,
+        submittedBy: identity?.getPrincipal().toString(),
       };
-      jokes.push(newJoke);
-      localStorage.setItem('jokes', JSON.stringify(jokes));
+      const existing: Joke[] = JSON.parse(localStorage.getItem('jokes') || JSON.stringify(getDefaultJokes()));
+      existing.push(newJoke);
+      localStorage.setItem('jokes', JSON.stringify(existing));
       return newJoke;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['jokes'] });
+      queryClient.invalidateQueries({ queryKey: ['allJokes'] });
     },
   });
 }
@@ -1168,7 +1078,7 @@ export function useRateJoke() {
 
   return useMutation({
     mutationFn: async ({ jokeId, rating }: { jokeId: string; rating: number }) => {
-      const jokes: Joke[] = JSON.parse(localStorage.getItem('jokes') || '[]');
+      const jokes: Joke[] = JSON.parse(localStorage.getItem('jokes') || JSON.stringify(getDefaultJokes()));
       const idx = jokes.findIndex((j) => j.id === jokeId);
       if (idx >= 0) {
         jokes[idx] = { ...jokes[idx], rating };
@@ -1177,7 +1087,7 @@ export function useRateJoke() {
       return { jokeId, rating };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['jokes'] });
+      queryClient.invalidateQueries({ queryKey: ['allJokes'] });
     },
   });
 }
@@ -1230,34 +1140,65 @@ export function useRemoveJokeFromFavorites() {
   });
 }
 
-// Feedback Hooks - localStorage based
-export function useSubmitFeedback() {
-  const queryClient = useQueryClient();
+// Art Gallery Hooks
+export function useGetCallerArtwork() {
+  const { identity } = useInternetIdentity();
 
-  return useMutation({
-    mutationFn: async (feedback: Omit<Feedback, 'id' | 'timestamp'>) => {
-      const feedbacks: Feedback[] = JSON.parse(localStorage.getItem('feedbacks') || '[]');
-      const newFeedback: Feedback = {
-        ...feedback,
-        id: `feedback_${Date.now()}`,
-        timestamp: Date.now(),
-      };
-      feedbacks.push(newFeedback);
-      localStorage.setItem('feedbacks', JSON.stringify(feedbacks));
-      return newFeedback;
+  return useQuery<ArtworkSubmission[]>({
+    queryKey: ['callerArtwork'],
+    queryFn: async () => {
+      try {
+        const stored = localStorage.getItem('artGallery');
+        const all: ArtworkSubmission[] = stored ? JSON.parse(stored) : [];
+        const callerId = identity?.getPrincipal().toString();
+        return callerId ? all.filter((a) => a.owner === callerId) : [];
+      } catch {
+        return [];
+      }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['feedbacks'] });
+    enabled: !!identity,
+  });
+}
+
+export function useGetPublicArtwork() {
+  return useQuery<ArtworkSubmission[]>({
+    queryKey: ['publicArtwork'],
+    queryFn: async () => {
+      try {
+        const stored = localStorage.getItem('artGallery');
+        const all: ArtworkSubmission[] = stored ? JSON.parse(stored) : [];
+        return all.filter((a) => a.isPublic && a.approved);
+      } catch {
+        return [];
+      }
     },
   });
 }
 
-export function useGetFeedbacks() {
-  return useQuery<Feedback[]>({
-    queryKey: ['feedbacks'],
+export function useSubmitArtwork() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (artwork: ArtworkSubmission) => {
+      const existing: ArtworkSubmission[] = JSON.parse(localStorage.getItem('artGallery') || '[]');
+      existing.push(artwork);
+      localStorage.setItem('artGallery', JSON.stringify(existing));
+      return artwork;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['callerArtwork'] });
+      queryClient.invalidateQueries({ queryKey: ['publicArtwork'] });
+    },
+  });
+}
+
+// Music Remix Hooks - localStorage based
+export function useGetMusicRemixStudios() {
+  return useQuery<MusicRemixStudio[]>({
+    queryKey: ['musicRemixStudios'],
     queryFn: async () => {
       try {
-        const stored = localStorage.getItem('feedbacks');
+        const stored = localStorage.getItem('musicRemixStudios');
         return stored ? JSON.parse(stored) : [];
       } catch {
         return [];
@@ -1267,91 +1208,50 @@ export function useGetFeedbacks() {
 }
 
 // Alias for backward compatibility
-export const useGetMyFeedback = useGetFeedbacks;
+export const useGetSavedRemixStudios = useGetMusicRemixStudios;
 
-// Chat Hooks - localStorage based
-export function useGetChatMessages() {
-  return useQuery<ChatMessage[]>({
-    queryKey: ['chatMessages'],
-    queryFn: async () => {
-      try {
-        const stored = localStorage.getItem('chatMessages');
-        return stored ? JSON.parse(stored) : [];
-      } catch {
-        return [];
-      }
-    },
-    refetchInterval: 2000,
-  });
-}
-
-export function useSendChatMessage() {
+export function useSaveRemixStudio() {
   const queryClient = useQueryClient();
+  const { identity } = useInternetIdentity();
 
   return useMutation({
-    mutationFn: async (message: Omit<ChatMessage, 'id' | 'timestamp'>) => {
-      const messages: ChatMessage[] = JSON.parse(localStorage.getItem('chatMessages') || '[]');
-      const newMessage: ChatMessage = {
-        ...message,
-        id: `msg_${Date.now()}`,
-        timestamp: Date.now(),
+    mutationFn: async (studio: Omit<MusicRemixStudio, 'id' | 'creator'>) => {
+      const newStudio: MusicRemixStudio = {
+        ...studio,
+        id: `studio_${Date.now()}`,
+        creator: identity?.getPrincipal() as Principal,
       };
-      messages.push(newMessage);
-      localStorage.setItem('chatMessages', JSON.stringify(messages.slice(-100)));
-      return newMessage;
+      const existing: MusicRemixStudio[] = JSON.parse(localStorage.getItem('musicRemixStudios') || '[]');
+      existing.push(newStudio);
+      localStorage.setItem('musicRemixStudios', JSON.stringify(existing));
+      return newStudio;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['chatMessages'] });
+      queryClient.invalidateQueries({ queryKey: ['musicRemixStudios'] });
     },
   });
 }
 
-// Online Users - localStorage based
-export function useGetOnlineUsers() {
-  return useQuery<OnlineUser[]>({
-    queryKey: ['onlineUsers'],
+// Sticker Hooks - localStorage based
+export function useGetApprovedStickers() {
+  return useQuery<Sticker[]>({
+    queryKey: ['approvedStickers'],
     queryFn: async () => {
       try {
-        const stored = localStorage.getItem('onlineUsers');
-        return stored ? JSON.parse(stored) : [];
-      } catch {
-        return [];
-      }
-    },
-    refetchInterval: 5000,
-  });
-}
-
-export function useUpdateOnlineStatus() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ userId, isOnline }: { userId: string; isOnline: boolean }) => {
-      const users: OnlineUser[] = JSON.parse(localStorage.getItem('onlineUsers') || '[]');
-      const idx = users.findIndex((u) => u.userId === userId);
-      const updatedUser: OnlineUser = { userId, isOnline, lastSeen: Date.now() };
-      if (idx >= 0) {
-        users[idx] = updatedUser;
-      } else {
-        users.push(updatedUser);
-      }
-      localStorage.setItem('onlineUsers', JSON.stringify(users));
-      return updatedUser;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['onlineUsers'] });
-    },
-  });
-}
-
-// Event Hooks - localStorage based
-export function useGetEvents() {
-  return useQuery<Event[]>({
-    queryKey: ['events'],
-    queryFn: async () => {
-      try {
-        const stored = localStorage.getItem('events');
-        return stored ? JSON.parse(stored) : [];
+        const stored = localStorage.getItem('stickers');
+        const stickers: LocalSticker[] = stored ? JSON.parse(stored) : [];
+        return stickers
+          .filter((s) => s.approved)
+          .map((s) => ({
+            id: s.id,
+            creator: s.creator,
+            name: s.name,
+            image: {
+              getDirectURL: () => s.imageDataUrl,
+            },
+            isModerated: s.isModerated,
+            approved: s.approved,
+          }));
       } catch {
         return [];
       }
@@ -1359,102 +1259,82 @@ export function useGetEvents() {
   });
 }
 
-export function useGetTodaysEvents() {
-  return useQuery<Event[]>({
-    queryKey: ['todaysEvents'],
+export function useCreateSticker() {
+  const queryClient = useQueryClient();
+  const { identity } = useInternetIdentity();
+
+  return useMutation({
+    mutationFn: async ({ name, image }: { name: string; image: Uint8Array }) => {
+      // Cast to Uint8Array<ArrayBuffer> to satisfy the Blob constructor's BlobPart type requirement
+      const safeImage = image.buffer instanceof ArrayBuffer
+        ? (image as Uint8Array<ArrayBuffer>)
+        : new Uint8Array(image) as Uint8Array<ArrayBuffer>;
+
+      const blob = new Blob([safeImage], { type: 'image/png' });
+      const dataUrl = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.readAsDataURL(blob);
+      });
+
+      const newSticker: LocalSticker = {
+        id: `sticker_${Date.now()}`,
+        creator: identity?.getPrincipal().toString() || 'anonymous',
+        name,
+        imageDataUrl: dataUrl,
+        isModerated: false,
+        approved: false,
+      };
+
+      const existing: LocalSticker[] = JSON.parse(localStorage.getItem('stickers') || '[]');
+      existing.push(newSticker);
+      localStorage.setItem('stickers', JSON.stringify(existing));
+      return newSticker;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['approvedStickers'] });
+    },
+  });
+}
+
+// Certificate Hooks
+export function useGetUserCertificates() {
+  const { identity } = useInternetIdentity();
+
+  return useQuery<Certificate[]>({
+    queryKey: ['userCertificates'],
     queryFn: async () => {
       try {
-        const stored = localStorage.getItem('events');
-        const all: Event[] = stored ? JSON.parse(stored) : [];
-        const today = new Date();
-        return all.filter((e) => {
-          const eventDate = new Date(Number(e.date));
-          return (
-            eventDate.getDate() === today.getDate() &&
-            eventDate.getMonth() === today.getMonth() &&
-            eventDate.getFullYear() === today.getFullYear()
-          );
-        });
+        const stored = localStorage.getItem('certificates');
+        const all: Certificate[] = stored ? JSON.parse(stored) : [];
+        const userId = identity?.getPrincipal().toString();
+        return userId ? all.filter((c) => c.userId === userId) : [];
       } catch {
         return [];
       }
     },
+    enabled: !!identity,
   });
 }
 
-export function useDismissEventNotification() {
+export function useCreateCertificate() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (eventId: string) => {
-      const dismissed: string[] = JSON.parse(localStorage.getItem('dismissedEventNotifications') || '[]');
-      if (!dismissed.includes(eventId)) {
-        dismissed.push(eventId);
-        localStorage.setItem('dismissedEventNotifications', JSON.stringify(dismissed));
-      }
-      return eventId;
+    mutationFn: async (certificate: Certificate) => {
+      const existing: Certificate[] = JSON.parse(localStorage.getItem('certificates') || '[]');
+      existing.push(certificate);
+      localStorage.setItem('certificates', JSON.stringify(existing));
+      return certificate;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['todaysEvents'] });
+      queryClient.invalidateQueries({ queryKey: ['userCertificates'] });
     },
   });
 }
 
-export function useSaveEvent() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (event: Event) => {
-      const events: Event[] = JSON.parse(localStorage.getItem('events') || '[]');
-      const idx = events.findIndex((e) => e.id === event.id);
-      if (idx >= 0) {
-        events[idx] = event;
-      } else {
-        events.push(event);
-      }
-      localStorage.setItem('events', JSON.stringify(events));
-      return event;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['events'] });
-    },
-  });
-}
-
-export function useDeleteEvent() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (eventId: string) => {
-      const events: Event[] = JSON.parse(localStorage.getItem('events') || '[]');
-      const filtered = events.filter((e) => e.id !== eventId);
-      localStorage.setItem('events', JSON.stringify(filtered));
-      return eventId;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['events'] });
-    },
-  });
-}
-
-// Seasonal Events Hook - localStorage based
-export function useGetActiveSeasonalEvents() {
-  return useQuery<Event[]>({
-    queryKey: ['activeSeasonalEvents'],
-    queryFn: async () => {
-      try {
-        const stored = localStorage.getItem('events');
-        const all: Event[] = stored ? JSON.parse(stored) : [];
-        return all.filter((e) => e.isSeasonal);
-      } catch {
-        return [];
-      }
-    },
-  });
-}
-
-// Invention Story Hooks - localStorage based
-export function useGetInventionStories() {
+// Invention Stories Hooks - localStorage based
+export function useGetAllInventionStories() {
   return useQuery<InventionStory[]>({
     queryKey: ['inventionStories'],
     queryFn: async () => {
@@ -1466,45 +1346,4 @@ export function useGetInventionStories() {
       }
     },
   });
-}
-
-// Alias for backward compatibility
-export const useGetAllInventionStories = useGetInventionStories;
-
-// Certificate Hooks - localStorage based
-export function useGetCertificates() {
-  return useQuery<Certificate[]>({
-    queryKey: ['certificates'],
-    queryFn: async () => {
-      try {
-        const stored = localStorage.getItem('certificates');
-        return stored ? JSON.parse(stored) : [];
-      } catch {
-        return [];
-      }
-    },
-  });
-}
-
-// Aliases for backward compatibility
-export const useGetUserCertificates = useGetCertificates;
-
-export function useSaveCertificate() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (cert: Certificate) => {
-      const certs: Certificate[] = JSON.parse(localStorage.getItem('certificates') || '[]');
-      certs.push(cert);
-      localStorage.setItem('certificates', JSON.stringify(certs));
-      return cert;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['certificates'] });
-    },
-  });
-}
-
-export function useCreateCertificate() {
-  return useSaveCertificate();
 }

@@ -12,16 +12,15 @@ import Time "mo:core/Time";
 import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
 import Nat "mo:core/Nat";
-import Migration "migration";
+import Int "mo:core/Int";
 
-(with migration = Migration.run)
 actor {
   include MixinStorage();
 
   let accessControlState = AccessControl.initState();
   let approvalState = UserApproval.initState(accessControlState);
 
-  let SPIN_COOLDOWN = 1200000000000; // 20 minutes
+  let SPIN_COOLDOWN = 1200000000000; // 20 minutes in nanoseconds
   let DEFAULT_TROPHIES : Nat = 70;
   let TROPHIES_PER_GAME : Nat = 2;
   let WELCOME_BACK_BONUS : Nat = 40;
@@ -734,7 +733,6 @@ actor {
     };
   };
 
-  // Total Score: returns the caller's accumulated points (trophies added from spin wheel)
   public query ({ caller }) func getTotalScore() : async Nat {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view their total score");
@@ -745,36 +743,34 @@ actor {
     };
   };
 
-  // Add trophies earned from the spin wheel to the user's Total Score (rewards map points + totalTrophies).
-  // Preserves all existing reward fields and existing VirtualPetHub fields.
-  public shared ({ caller }) func addTrophiesFromSpin(trophies : Nat) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can earn trophies from spinning");
-    };
+  public type SpinWheelResult = {
+    pointsAdded : Nat;
+    remainingCooldown : Nat;
+    message : Text;
+  };
 
-    // Update rewards map: add trophies to points and totalTrophies
-    let currentReward = switch (rewards.get(caller)) {
-      case (?r) { r };
-      case (null) {
-        {
-          userId = caller;
-          points = 0;
-          badges = [];
-          achievements = [];
-          virtualPetLevel = 0;
-          totalTrophies = 0;
-        }
+  public shared ({ caller }) func claimSpinReward(points : Nat) : async SpinWheelResult {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can claim spin rewards");
+    };
+    let now = Time.now();
+    let lastSpin = switch (lastSpinTime.get(caller)) {
+      case (?t) { t };
+      case (null) { 0 };
+    };
+    // Enforce 20-minute cooldown
+    if (now - lastSpin < SPIN_COOLDOWN) {
+      let remaining = ((lastSpin + SPIN_COOLDOWN) - now) / 1_000_000_000;
+      return {
+        pointsAdded = 0;
+        // Always convert remaining to Nat type, using Int::toNat() from mo:core module for type compatibility.
+        remainingCooldown = remaining.toNat();
+        message = "SPIN IS ON COOLDOWN";
       };
     };
-
-    let updatedReward : Reward = {
-      currentReward with
-      points = currentReward.points + trophies;
-      totalTrophies = currentReward.totalTrophies + trophies;
-    };
-    rewards.add(caller, updatedReward);
-
-    // Also reflect trophies in the VirtualPetHub trophies field, preserving existing pet data
+    // Record the spin timestamp
+    lastSpinTime.add(caller, now);
+    // Add points EXCLUSIVELY to VirtualPetHub trophies (not to any other score/reward field)
     let currentPet = switch (virtualPetHubMap.get(caller)) {
       case (?p) { p };
       case (null) {
@@ -788,51 +784,40 @@ actor {
           homeStyle = "";
           warnedAboutExtremeChanges = false;
           trophies = 0;
-        }
+        };
       };
     };
-
     let updatedPet : VirtualPetHub = {
       currentPet with
-      trophies = currentPet.trophies + trophies;
+      trophies = currentPet.trophies + points;
     };
     virtualPetHubMap.add(caller, updatedPet);
+    {
+      pointsAdded = points;
+      remainingCooldown = 0;
+      message = "Points added to Virtual Pet";
+    };
   };
 
-  // Add points earned from the spin wheel to the Virtual Pet progress only (happinessLevel).
-  // Points from spin wheel do NOT go to the rewards/total-score tracker.
-  // Preserves all existing VirtualPetHub fields.
-  public shared ({ caller }) func addPointsFromSpin(points : Nat) : async () {
+  public query ({ caller }) func getRemainingSpinCooldown() : async Nat {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can earn points from spinning");
+      Runtime.trap("Unauthorized: Only users can check spin cooldown");
     };
-
-    let currentPet = switch (virtualPetHubMap.get(caller)) {
-      case (?p) { p };
-      case (null) {
-        {
-          userId = caller;
-          petName = "";
-          happinessLevel = 0;
-          growthStage = 0;
-          accessories = [];
-          decorations = [];
-          homeStyle = "";
-          warnedAboutExtremeChanges = false;
-          trophies = 0;
-        }
+    let now = Time.now();
+    switch (lastSpinTime.get(caller)) {
+      case (?last) {
+        if (now - last < SPIN_COOLDOWN) {
+          let remaining = ((last + SPIN_COOLDOWN) - now) / 1_000_000_000;
+          // Always convert remaining to Nat type, using Int::toNat() from mo:core module for type compatibility.
+          remaining.toNat();
+        } else {
+          0;
+        };
       };
+      case (null) { 0 };
     };
-
-    let updatedPet : VirtualPetHub = {
-      currentPet with
-      happinessLevel = currentPet.happinessLevel + points;
-    };
-    virtualPetHubMap.add(caller, updatedPet);
-    // Points go only to Virtual Pet progress, not to the rewards/total-score map
   };
 
-  // Get the caller's VirtualPetHub data
   public query ({ caller }) func getVirtualPetHub() : async ?VirtualPetHub {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view their virtual pet");
@@ -840,7 +825,6 @@ actor {
     virtualPetHubMap.get(caller);
   };
 
-  // Save/update the caller's VirtualPetHub data
   public shared ({ caller }) func saveVirtualPetHub(pet : VirtualPetHub) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can update their virtual pet");
@@ -848,7 +832,6 @@ actor {
     virtualPetHubMap.add(caller, { pet with userId = caller });
   };
 
-  // Get the caller's rewards record
   public query ({ caller }) func getCallerRewards() : async ?Reward {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view their rewards");
@@ -856,7 +839,6 @@ actor {
     rewards.get(caller);
   };
 
-  // Save/update the caller's rewards record
   public shared ({ caller }) func saveCallerRewards(reward : Reward) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can update their rewards");
@@ -864,7 +846,6 @@ actor {
     rewards.add(caller, { reward with userId = caller });
   };
 
-  // Get spin rewards history for the caller
   public query ({ caller }) func getSpinRewards() : async [SpinReward] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view their spin rewards");
@@ -875,7 +856,6 @@ actor {
     };
   };
 
-  // Record a spin reward for the caller
   public shared ({ caller }) func recordSpinReward(reward : SpinReward) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can record spin rewards");
@@ -885,10 +865,9 @@ actor {
       case (null) { [] };
     };
     spinRewards.add(caller, existing.concat([reward]));
-    lastSpinTime.add(caller, Time.now());
+    // NOTE: lastSpinTime is NOT updated here; cooldown is enforced only in claimSpinReward.
   };
 
-  // Get the last spin time for the caller
   public query ({ caller }) func getLastSpinTime() : async ?Int {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view their spin time");

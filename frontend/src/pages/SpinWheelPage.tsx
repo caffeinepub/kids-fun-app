@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { Trophy, Star, ArrowLeft, Sparkles } from 'lucide-react';
+import { Trophy, Star, ArrowLeft, Sparkles, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
 import { useActor } from '../hooks/useActor';
@@ -76,17 +76,25 @@ function drawWheel(canvas: HTMLCanvasElement, rotation: number) {
   ctx.fillText('⭐', cx, cy);
 }
 
+function formatCountdown(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
 export default function SpinWheelPage() {
   const navigate = useNavigate();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animFrameRef = useRef<number | null>(null);
-  const { actor } = useActor();
+  const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const { actor, isFetching: actorFetching } = useActor();
   const queryClient = useQueryClient();
 
   const [isSpinning, setIsSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
   const [result, setResult] = useState<{ type: string; value: number; label: string } | null>(null);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [cooldownSeconds, setCooldownSeconds] = useState<number>(0);
   const [spinHistory, setSpinHistory] = useState<Array<{ label: string; type: string; value: number; timestamp: number }>>(() => {
     try {
       return JSON.parse(localStorage.getItem('spinHistory') || '[]');
@@ -95,14 +103,14 @@ export default function SpinWheelPage() {
     }
   });
 
-  // Fetch total score
-  const { data: totalScore, refetch: refetchTotalScore } = useQuery({
-    queryKey: ['totalScore'],
+  // Fetch remaining cooldown on mount
+  const { data: remainingCooldownData, refetch: refetchCooldown } = useQuery({
+    queryKey: ['spinCooldown'],
     queryFn: async () => {
       if (!actor) return 0n;
-      return actor.getTotalScore();
+      return actor.getRemainingSpinCooldown();
     },
-    enabled: !!actor,
+    enabled: !!actor && !actorFetching,
   });
 
   // Fetch virtual pet hub
@@ -112,36 +120,75 @@ export default function SpinWheelPage() {
       if (!actor) return null;
       return actor.getVirtualPetHub();
     },
-    enabled: !!actor,
+    enabled: !!actor && !actorFetching,
   });
 
-  // Add trophies mutation
-  const addTrophiesMutation = useMutation({
-    mutationFn: async (trophies: number) => {
-      if (!actor) throw new Error('Actor not available');
-      await actor.addTrophiesFromSpin(BigInt(trophies));
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['totalScore'] });
-      queryClient.invalidateQueries({ queryKey: ['virtualPetHub'] });
-      refetchTotalScore();
-      refetchVirtualPet();
-    },
-  });
+  // Start countdown when cooldown data arrives
+  useEffect(() => {
+    if (remainingCooldownData === undefined || remainingCooldownData === null) return;
+    const secs = Number(remainingCooldownData);
+    if (secs <= 0) {
+      setCooldownSeconds(0);
+      return;
+    }
+    setCooldownSeconds(secs);
+  }, [remainingCooldownData]);
 
-  // Add points mutation
-  const addPointsMutation = useMutation({
+  // Tick the countdown every second
+  useEffect(() => {
+    if (cooldownSeconds <= 0) {
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+        countdownIntervalRef.current = null;
+      }
+      return;
+    }
+
+    if (countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current);
+    }
+
+    countdownIntervalRef.current = setInterval(() => {
+      setCooldownSeconds(prev => {
+        if (prev <= 1) {
+          if (countdownIntervalRef.current) {
+            clearInterval(countdownIntervalRef.current);
+            countdownIntervalRef.current = null;
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+        countdownIntervalRef.current = null;
+      }
+    };
+  }, [cooldownSeconds > 0 ? 'active' : 'inactive']); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Claim spin reward mutation (adds points to Virtual Pet)
+  const claimSpinRewardMutation = useMutation({
     mutationFn: async (points: number) => {
       if (!actor) throw new Error('Actor not available');
-      await actor.addPointsFromSpin(BigInt(points));
+      return actor.claimSpinReward(BigInt(points));
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['virtualPetHub'] });
       refetchVirtualPet();
+      // If backend returned a remaining cooldown, start it
+      if (data && data.remainingCooldown > 0n) {
+        setCooldownSeconds(Number(data.remainingCooldown));
+      } else {
+        // Start 20-minute cooldown after successful spin
+        setCooldownSeconds(1200);
+      }
     },
   });
 
-  // Record spin reward mutation
+  // Record spin reward mutation (for history/logging only)
   const recordSpinMutation = useMutation({
     mutationFn: async (reward: { rewardType: string; value: string; timestamp: bigint }) => {
       if (!actor) throw new Error('Actor not available');
@@ -156,7 +203,7 @@ export default function SpinWheelPage() {
   }, [rotation]);
 
   const spin = useCallback(() => {
-    if (isSpinning) return;
+    if (isSpinning || cooldownSeconds > 0) return;
     setIsSpinning(true);
     setResult(null);
     setShowCelebration(false);
@@ -189,10 +236,7 @@ export default function SpinWheelPage() {
         animFrameRef.current = requestAnimationFrame(animate);
       } else {
         // Determine winning segment
-        // The pointer is at the top (angle = -PI/2 from center)
-        // Normalize rotation to find which segment is at the top
         const normalizedAngle = ((currentRotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-        // Pointer at top = -PI/2 = 3PI/2 in positive terms
         const pointerAngle = (3 * Math.PI) / 2;
         const relativeAngle = (pointerAngle - normalizedAngle + 2 * Math.PI) % (2 * Math.PI);
         const winningIndex = Math.floor(relativeAngle / SEGMENT_ANGLE) % SEGMENT_COUNT;
@@ -213,32 +257,37 @@ export default function SpinWheelPage() {
         setSpinHistory(newHistory);
         localStorage.setItem('spinHistory', JSON.stringify(newHistory));
 
-        // Apply rewards
-        if (winningSegment.type === 'trophy') {
-          addTrophiesMutation.mutate(winningSegment.value);
-        } else if (winningSegment.type === 'points') {
-          addPointsMutation.mutate(winningSegment.value);
+        // Apply rewards:
+        // Points → add to Virtual Pet via claimSpinReward (backend enforces cooldown & updates pet)
+        // Trophies → record only (no separate backend method for trophies)
+        if (winningSegment.type === 'points') {
+          claimSpinRewardMutation.mutate(winningSegment.value);
+        } else {
+          // For trophies: record the spin and start cooldown locally
+          recordSpinMutation.mutate({
+            rewardType: winningSegment.type,
+            value: String(winningSegment.value),
+            timestamp: BigInt(Date.now()),
+          });
+          // Start 20-minute cooldown
+          setCooldownSeconds(1200);
         }
-
-        // Record spin reward
-        recordSpinMutation.mutate({
-          rewardType: winningSegment.type,
-          value: String(winningSegment.value),
-          timestamp: BigInt(Date.now()),
-        });
       }
     };
 
     animFrameRef.current = requestAnimationFrame(animate);
-  }, [isSpinning, rotation, spinHistory, addTrophiesMutation, addPointsMutation, recordSpinMutation]);
+  }, [isSpinning, cooldownSeconds, rotation, spinHistory, claimSpinRewardMutation, recordSpinMutation]);
 
   useEffect(() => {
     return () => {
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
     };
   }, []);
 
-  const isMutating = addTrophiesMutation.isPending || addPointsMutation.isPending;
+  const isMutating = claimSpinRewardMutation.isPending || recordSpinMutation.isPending;
+  const isOnCooldown = cooldownSeconds > 0;
+  const isDisabled = isSpinning || isMutating || isOnCooldown;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-950 to-violet-950 text-white">
@@ -254,23 +303,13 @@ export default function SpinWheelPage() {
         </Button>
         <h1 className="text-2xl font-bold text-yellow-300 font-hero">🎡 Spin the Wheel</h1>
         <div className="ml-auto flex items-center gap-4">
-          {/* Total Score */}
-          <div className="flex items-center gap-2 bg-yellow-500/20 border border-yellow-400/30 rounded-xl px-4 py-2">
-            <Trophy className="w-4 h-4 text-yellow-400" />
-            <div>
-              <div className="text-xs text-yellow-300/70">Total Score</div>
-              <div className="text-lg font-bold text-yellow-300">
-                {totalScore !== undefined ? Number(totalScore) : 0}
-              </div>
-            </div>
-          </div>
           {/* Virtual Pet Points */}
           <div className="flex items-center gap-2 bg-purple-500/20 border border-purple-400/30 rounded-xl px-4 py-2">
             <Star className="w-4 h-4 text-purple-300" />
             <div>
-              <div className="text-xs text-purple-300/70">Pet Happiness</div>
+              <div className="text-xs text-purple-300/70">Pet Trophies</div>
               <div className="text-lg font-bold text-purple-200">
-                {virtualPetHub ? Number(virtualPetHub.happinessLevel) : 0}
+                {virtualPetHub ? Number(virtualPetHub.trophies) : 0}
               </div>
             </div>
           </div>
@@ -297,8 +336,8 @@ export default function SpinWheelPage() {
             {/* Spin Button */}
             <Button
               onClick={spin}
-              disabled={isSpinning || isMutating}
-              className="w-48 h-14 text-xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-300 hover:to-orange-400 text-black border-0 rounded-full shadow-lg shadow-yellow-500/30 disabled:opacity-60 transition-all"
+              disabled={isDisabled}
+              className="w-56 h-14 text-xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-300 hover:to-orange-400 text-black border-0 rounded-full shadow-lg shadow-yellow-500/30 disabled:opacity-60 transition-all"
             >
               {isSpinning ? (
                 <span className="flex items-center gap-2">
@@ -308,12 +347,25 @@ export default function SpinWheelPage() {
                 <span className="flex items-center gap-2">
                   <span className="animate-spin">⏳</span> Saving...
                 </span>
+              ) : isOnCooldown ? (
+                <span className="flex items-center gap-2 text-base">
+                  <Clock className="w-5 h-5" />
+                  {formatCountdown(cooldownSeconds)}
+                </span>
               ) : (
                 <span className="flex items-center gap-2">
                   <Sparkles className="w-5 h-5" /> SPIN!
                 </span>
               )}
             </Button>
+
+            {/* Cooldown message */}
+            {isOnCooldown && (
+              <p className="text-sm text-white/50 text-center">
+                Next spin available in{' '}
+                <span className="text-yellow-300 font-semibold">{formatCountdown(cooldownSeconds)}</span>
+              </p>
+            )}
           </div>
 
           {/* Result & Info Section */}
@@ -338,9 +390,7 @@ export default function SpinWheelPage() {
                 <div className="text-sm text-white/70 mt-2">
                   {result.type === 'trophy' ? (
                     <>
-                      <span className="text-yellow-300 font-semibold">Added to your Total Score!</span>
-                      <br />
-                      <span className="mt-1 block">Keep playing and Spinning to earn more!</span>
+                      <span className="text-yellow-300 font-semibold">Keep playing and Spinning to earn more!</span>
                     </>
                   ) : (
                     <>
@@ -378,14 +428,6 @@ export default function SpinWheelPage() {
                 <Star className="w-5 h-5 text-purple-300" /> Your Progress
               </h2>
               <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-white/70 text-sm flex items-center gap-2">
-                    <Trophy className="w-4 h-4 text-yellow-400" /> Total Score
-                  </span>
-                  <span className="font-bold text-yellow-300 text-lg">
-                    {totalScore !== undefined ? Number(totalScore) : 0}
-                  </span>
-                </div>
                 <div className="flex justify-between items-center">
                   <span className="text-white/70 text-sm flex items-center gap-2">
                     <Star className="w-4 h-4 text-purple-300" /> Pet Happiness

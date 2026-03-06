@@ -1,94 +1,95 @@
 {
   "kind": "build_request",
-  "title": "Fix Spin the Wheel: remove cooldown, restrict rewards to trophies and points only, wire trophies to Total Score and points to Virtual Pet",
+  "title": "Fix Spin the Wheel: enforce 20-minute cooldown and route points to Virtual Pet",
+  "projectName": "Kids Fun App",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Remove the 20-minute cooldown/wait timer between spins on the Spin the Wheel page. Users must be able to spin again immediately after each spin without any time restriction.",
-      "target": "frontend",
+      "text": "Enforce a 20-minute cooldown on the Spin the Wheel feature in the backend. After a user spins, record the timestamp of their last spin and prevent another spin until 20 minutes have elapsed. Return the remaining cooldown time to the frontend so it can display a countdown.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-recent"
         ],
         "quotes": [
-          "The user doesn't have to wait for 20 minutes"
+          "Spin the wheel should wait for 20 minutes for next time"
         ]
       },
       "acceptanceCriteria": [
-        "No cooldown timer is displayed on the Spin the Wheel page.",
-        "The Spin button is enabled immediately after a spin completes.",
-        "No localStorage or state-based cooldown logic enforces a wait period between spins."
+        "After spinning, the backend records the spin timestamp for the user.",
+        "If fewer than 20 minutes have passed since the last spin, the backend rejects a new spin attempt.",
+        "The backend returns the remaining cooldown duration (in seconds) so the frontend can display it.",
+        "Users who have never spun, or whose 20-minute window has expired, can spin freely."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Restrict Spin the Wheel prize outcomes to exactly two reward types: trophies and points. Remove all other reward types (e.g., coins, items, pet food, accessories, or any other category) from the wheel segments and outcome logic.",
+      "text": "In the Spin the Wheel page (frontend/src/pages/SpinWheelPage.tsx), display a disabled spin button with a countdown timer showing the remaining time (MM:SS) when the user is in cooldown. Re-enable the button automatically once the 20-minute cooldown expires.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-recent"
         ],
         "quotes": [
-          "The only things the user should be able to get from the spin the wheel is trophies and Points"
+          "Spin the wheel should wait for 20 minutes for next time"
         ]
       },
       "acceptanceCriteria": [
-        "The wheel only displays segments for trophies and points as prize types.",
-        "Spinning the wheel only ever yields a trophy count or a points count as a result.",
-        "No other reward type appears in wheel segments, outcome messages, or result logic."
+        "The spin button is disabled and shows remaining cooldown time (e.g., '18:42 until next spin') when the cooldown is active.",
+        "The countdown ticks down in real time on the frontend.",
+        "The spin button becomes enabled automatically when the cooldown expires.",
+        "No other UI elements or pages are affected."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "When the user lands on a trophies outcome from the spin wheel, add the number of trophies earned to the user's Total Score. Display a message such as 'Keep playing and Spinning to earn more!' after the result. The Total Score display should reflect the newly added trophies.",
-      "target": "both",
+      "text": "When points are won on the Spin the Wheel, add them exclusively to the Virtual Pet's points/experience in the backend (e.g., the VirtualPetHub record). Do not add spin-wheel points to any other score field or reward bucket.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-recent"
         ],
         "quotes": [
-          "as many trophies they got should be added to the Total Score",
-          "Keep playing and Spinning to earn more!"
+          "The points you get should be added to the virtual pet"
         ]
       },
       "acceptanceCriteria": [
-        "Trophies earned from a spin are persisted to the backend and added to the user's Total Score.",
-        "After a trophy win, the result message reads 'Keep playing and Spinning to earn more!'",
-        "The Total Score section updates to reflect the newly earned trophies."
+        "Points from a spin result are added to the Virtual Pet's points/experience field in the backend.",
+        "Points are not added to any other aggregate score, total score, or reward field.",
+        "All other game point flows are unaffected."
       ]
     },
     {
       "id": "REQ-4",
-      "text": "When the user lands on a points outcome from the spin wheel, add those points to the Virtual Pet progress section (not directly to any other score tracker). The Virtual Pet section should display updated messaging such as 'Grow your pet by earning points from games and spin rewards!' after points are awarded.",
-      "target": "both",
+      "text": "In the Spin the Wheel page (frontend/src/pages/SpinWheelPage.tsx), after a spin that yields points, call only the mutation that updates the Virtual Pet with the earned points. Do not call any other reward or score mutation for point outcomes.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-recent"
         ],
         "quotes": [
-          "for the points it should add in the Your Virtual Pet",
-          "Grow your pet by earning points from games and spin rewards!"
+          "The points you get should be added to the virtual pet"
         ]
       },
       "acceptanceCriteria": [
-        "Points earned from a spin are applied to the Virtual Pet's progress/experience, not to any other score field.",
-        "The Virtual Pet section shows the updated points after a spin reward.",
-        "The Virtual Pet section displays the message 'Grow your pet by earning points from games and spin rewards!'",
-        "No other game, CRUD feature, or scoring mechanism is changed."
+        "After winning points, the frontend calls the Virtual Pet update mutation with the earned points.",
+        "No other mutation (e.g., total score or generic rewards) is called for a points outcome.",
+        "The Virtual Pet on the Virtual Pet Hub page reflects the newly added points after a spin."
       ]
     }
   ],
   "constraints": [
-    "Only modify SpinWheelPage.tsx and the backend spin/reward logic. Do not alter any other game, page, or CRUD feature.",
-    "Do not change the Virtual Pet hub, RewardsPage, or any other feature's data model beyond what is required to wire spin wheel trophy and point rewards.",
-    "All user-facing text must be in English."
+    "Do not modify any backend logic, data models, or frontend pages unrelated to Spin the Wheel.",
+    "Do not change how trophies are handled — only points routing and cooldown are in scope.",
+    "Do not alter any immutable frontend paths.",
+    "Keep all Motoko logic within the single main actor (backend/main.mo)."
   ],
   "nonGoals": [
-    "Adding new wheel segments or reward types beyond trophies and points.",
-    "Changing any other game's scoring, rewards, or cooldown logic.",
-    "Modifying the parental controls, admin dashboard, or any unrelated backend functions.",
-    "Redesigning the visual appearance of the Spin the Wheel page beyond what is necessary for the reward changes."
+    "Changing trophy routing or total score logic.",
+    "Modifying any other game, feature, or CRUD operation.",
+    "Redesigning the Spin the Wheel UI beyond adding the cooldown countdown.",
+    "Adding migration.mo unless the backend state schema requires a new field not already present."
   ],
   "imageRequirements": {
     "required": [],

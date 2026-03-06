@@ -24,6 +24,11 @@ export const UserRole = IDL.Variant({
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
+export const SpinWheelResult = IDL.Record({
+  'remainingCooldown' : IDL.Nat,
+  'pointsAdded' : IDL.Nat,
+  'message' : IDL.Text,
+});
 export const Reward = IDL.Record({
   'userId' : IDL.Principal,
   'badges' : IDL.Vec(IDL.Text),
@@ -111,13 +116,13 @@ export const idlService = IDL.Service({
       [],
     ),
   '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
-  'addPointsFromSpin' : IDL.Func([IDL.Nat], [], []),
-  'addTrophiesFromSpin' : IDL.Func([IDL.Nat], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'claimSpinReward' : IDL.Func([IDL.Nat], [SpinWheelResult], []),
   'getCallerRewards' : IDL.Func([], [IDL.Opt(Reward)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getLastSpinTime' : IDL.Func([], [IDL.Opt(IDL.Int)], ['query']),
+  'getRemainingSpinCooldown' : IDL.Func([], [IDL.Nat], ['query']),
   'getSpinRewards' : IDL.Func([], [IDL.Vec(SpinReward)], ['query']),
   'getTotalScore' : IDL.Func([], [IDL.Nat], ['query']),
   'getUserProfile' : IDL.Func(
@@ -156,6 +161,11 @@ export const idlFactory = ({ IDL }) => {
     'admin' : IDL.Null,
     'user' : IDL.Null,
     'guest' : IDL.Null,
+  });
+  const SpinWheelResult = IDL.Record({
+    'remainingCooldown' : IDL.Nat,
+    'pointsAdded' : IDL.Nat,
+    'message' : IDL.Text,
   });
   const Reward = IDL.Record({
     'userId' : IDL.Principal,
@@ -244,13 +254,13 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
-    'addPointsFromSpin' : IDL.Func([IDL.Nat], [], []),
-    'addTrophiesFromSpin' : IDL.Func([IDL.Nat], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'claimSpinReward' : IDL.Func([IDL.Nat], [SpinWheelResult], []),
     'getCallerRewards' : IDL.Func([], [IDL.Opt(Reward)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getLastSpinTime' : IDL.Func([], [IDL.Opt(IDL.Int)], ['query']),
+    'getRemainingSpinCooldown' : IDL.Func([], [IDL.Nat], ['query']),
     'getSpinRewards' : IDL.Func([], [IDL.Vec(SpinReward)], ['query']),
     'getTotalScore' : IDL.Func([], [IDL.Nat], ['query']),
     'getUserProfile' : IDL.Func(

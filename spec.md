@@ -1,13 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Fix the Spin the Wheel feature by removing the cooldown timer, restricting prizes to trophies and points only, and wiring trophy wins to Total Score and point wins to the Virtual Pet.
+**Goal:** Fix the Spin the Wheel feature by enforcing a 20-minute cooldown between spins and routing any points earned directly to the Virtual Pet.
 
 **Planned changes:**
-- Remove the 20-minute cooldown/wait timer so the Spin button is immediately available after each spin
-- Restrict wheel segments and outcome logic to only two reward types: trophies and points (remove all others)
-- When trophies are won, add them to the user's Total Score and display the message "Keep playing and Spinning to earn more!"
-- When points are won, add them to the Virtual Pet's progress/experience and display the message "Grow your pet by earning points from games and spin rewards!"
-- Persist trophy and point rewards to the backend and update the relevant UI sections accordingly
+- Backend: Record the timestamp of each spin per user and reject new spin attempts until 20 minutes have elapsed, returning the remaining cooldown in seconds.
+- Backend: When a spin yields points, add them exclusively to the Virtual Pet's points/experience field (not to any other score or reward field).
+- Frontend (SpinWheelPage): Disable the spin button and show a live MM:SS countdown when the cooldown is active; re-enable the button automatically when it expires.
+- Frontend (SpinWheelPage): After a points-winning spin, call only the Virtual Pet update mutation with the earned points — no other score or reward mutation.
 
-**User-visible outcome:** Users can spin the wheel repeatedly without waiting, will only ever win trophies or points, see their Total Score update on trophy wins, and see their Virtual Pet progress update on point wins.
+**User-visible outcome:** Users must wait 20 minutes between spins and will see a countdown timer on the disabled spin button. Points won from spinning are reflected on the Virtual Pet Hub page.
