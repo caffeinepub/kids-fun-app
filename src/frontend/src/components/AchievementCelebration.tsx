@@ -1,16 +1,19 @@
-import { useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 interface CelebrationEvent {
   id: string;
-  type: 'confetti' | 'fireworks';
+  type: "confetti" | "fireworks";
   message: string;
 }
 
 let celebrationQueue: CelebrationEvent[] = [];
 let triggerCelebration: ((event: CelebrationEvent) => void) | null = null;
 
-export function triggerAchievementCelebration(message: string, type: 'confetti' | 'fireworks' = 'confetti') {
+export function triggerAchievementCelebration(
+  message: string,
+  type: "confetti" | "fireworks" = "confetti",
+) {
   const event: CelebrationEvent = {
     id: Date.now().toString(),
     type,
@@ -34,7 +37,9 @@ export default function AchievementCelebration() {
       }, 5000);
     };
 
-    celebrationQueue.forEach((event) => triggerCelebration?.(event));
+    for (const event of celebrationQueue) {
+      triggerCelebration?.(event);
+    }
     celebrationQueue = [];
 
     return () => {
@@ -45,26 +50,24 @@ export default function AchievementCelebration() {
   if (celebrations.length === 0) return null;
 
   return createPortal(
-    <>
-      {celebrations.map((celebration) => (
-        <div
-          key={celebration.id}
-          className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center"
-        >
-          {celebration.type === 'confetti' && <ConfettiEffect />}
-          {celebration.type === 'fireworks' && <FireworksEffect />}
-          <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-8 border-4 border-yellow-400 animate-bounce">
-            <div className="text-center space-y-4">
-              <div className="text-6xl">🎉</div>
-              <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                {celebration.message}
-              </h2>
-            </div>
+    celebrations.map((celebration) => (
+      <div
+        key={celebration.id}
+        className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center"
+      >
+        {celebration.type === "confetti" && <ConfettiEffect />}
+        {celebration.type === "fireworks" && <FireworksEffect />}
+        <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-8 border-4 border-yellow-400 animate-bounce">
+          <div className="text-center space-y-4">
+            <div className="text-6xl">🎉</div>
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              {celebration.message}
+            </h2>
           </div>
         </div>
-      ))}
-    </>,
-    document.body
+      </div>
+    )),
+    document.body,
   );
 }
 
@@ -74,7 +77,15 @@ function ConfettiEffect() {
     left: Math.random() * 100,
     delay: Math.random() * 2,
     duration: 3 + Math.random() * 2,
-    color: ['#FF6B9D', '#C44569', '#FFA502', '#FFD32A', '#05C46B', '#0ABDE3', '#4834DF'][Math.floor(Math.random() * 7)],
+    color: [
+      "#FF6B9D",
+      "#C44569",
+      "#FFA502",
+      "#FFD32A",
+      "#05C46B",
+      "#0ABDE3",
+      "#4834DF",
+    ][Math.floor(Math.random() * 7)],
   }));
 
   return (
@@ -85,7 +96,7 @@ function ConfettiEffect() {
           className="absolute w-3 h-3 rounded-full animate-fall"
           style={{
             left: `${piece.left}%`,
-            top: '-10%',
+            top: "-10%",
             backgroundColor: piece.color,
             animationDelay: `${piece.delay}s`,
             animationDuration: `${piece.duration}s`,

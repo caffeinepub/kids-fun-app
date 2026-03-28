@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import GameLayout from '../../components/GameLayout';
-import { ModulePage } from '../../App';
+import { useEffect, useState } from "react";
+import type { ModulePage } from "../../App";
+import GameLayout from "../../components/GameLayout";
 
 interface Card {
   id: number;
@@ -22,13 +22,30 @@ export default function MemoryMatch({ onNavigate }: MemoryMatchProps) {
   const [gameOver, setGameOver] = useState(false);
   const [highScore, setHighScore] = useState(0);
 
-  const emojis = ['🎮', '🎨', '🎭', '🎪', '🎯', '🎲', '🎸', '🎹', '🎺', '🎻', '🏀', '⚽', '🏈', '⚾', '🎾', '🏐'];
+  const emojis = [
+    "🎮",
+    "🎨",
+    "🎭",
+    "🎪",
+    "🎯",
+    "🎲",
+    "🎸",
+    "🎹",
+    "🎺",
+    "🎻",
+    "🏀",
+    "⚽",
+    "🏈",
+    "⚾",
+    "🎾",
+    "🏐",
+  ];
 
   const initializeGame = (gridSize: number) => {
     const pairsNeeded = (gridSize * gridSize) / 2;
     const selectedEmojis = emojis.slice(0, pairsNeeded);
     const cardPairs = [...selectedEmojis, ...selectedEmojis];
-    
+
     const shuffled = cardPairs
       .sort(() => Math.random() - 0.5)
       .map((emoji, index) => ({
@@ -37,7 +54,7 @@ export default function MemoryMatch({ onNavigate }: MemoryMatchProps) {
         flipped: false,
         matched: false,
       }));
-    
+
     setCards(shuffled);
     setFlippedCards([]);
     setMoves(0);
@@ -52,41 +69,41 @@ export default function MemoryMatch({ onNavigate }: MemoryMatchProps) {
   useEffect(() => {
     if (flippedCards.length === 2) {
       const [first, second] = flippedCards;
-      const firstCard = cards.find(c => c.id === first);
-      const secondCard = cards.find(c => c.id === second);
+      const firstCard = cards.find((c) => c.id === first);
+      const secondCard = cards.find((c) => c.id === second);
 
       if (firstCard && secondCard && firstCard.emoji === secondCard.emoji) {
         setTimeout(() => {
-          setCards(prev =>
-            prev.map(card =>
+          setCards((prev) =>
+            prev.map((card) =>
               card.id === first || card.id === second
                 ? { ...card, matched: true }
-                : card
-            )
+                : card,
+            ),
           );
-          setScore(prev => prev + 10);
+          setScore((prev) => prev + 10);
           setFlippedCards([]);
         }, 500);
       } else {
         setTimeout(() => {
-          setCards(prev =>
-            prev.map(card =>
+          setCards((prev) =>
+            prev.map((card) =>
               card.id === first || card.id === second
                 ? { ...card, flipped: false }
-                : card
-            )
+                : card,
+            ),
           );
           setFlippedCards([]);
         }, 1000);
       }
-      setMoves(prev => prev + 1);
+      setMoves((prev) => prev + 1);
     }
   }, [flippedCards, cards]);
 
   useEffect(() => {
-    if (cards.length > 0 && cards.every(card => card.matched)) {
-      setLevel(prev => prev + 1);
-      setScore(prev => prev + 50);
+    if (cards.length > 0 && cards.every((card) => card.matched)) {
+      setLevel((prev) => prev + 1);
+      setScore((prev) => prev + 50);
     }
   }, [cards]);
 
@@ -98,14 +115,14 @@ export default function MemoryMatch({ onNavigate }: MemoryMatchProps) {
 
   const handleCardClick = (cardId: number) => {
     if (flippedCards.length >= 2 || flippedCards.includes(cardId)) return;
-    
-    const card = cards.find(c => c.id === cardId);
+
+    const card = cards.find((c) => c.id === cardId);
     if (!card || card.matched) return;
 
-    setCards(prev =>
-      prev.map(c => (c.id === cardId ? { ...c, flipped: true } : c))
+    setCards((prev) =>
+      prev.map((c) => (c.id === cardId ? { ...c, flipped: true } : c)),
     );
-    setFlippedCards(prev => [...prev, cardId]);
+    setFlippedCards((prev) => [...prev, cardId]);
   };
 
   const startGame = () => {
@@ -146,24 +163,24 @@ export default function MemoryMatch({ onNavigate }: MemoryMatchProps) {
               maxWidth: `${gridSize * 100}px`,
             }}
           >
-            {cards.map(card => (
+            {cards.map((card) => (
               <div
                 key={card.id}
                 className={`aspect-square cursor-pointer transition-all duration-300 ${
-                  card.flipped || card.matched ? 'rotate-0' : 'rotate-y-180'
+                  card.flipped || card.matched ? "rotate-0" : "rotate-y-180"
                 }`}
                 onClick={() => handleCardClick(card.id)}
               >
                 <div
                   className={`w-full h-full rounded-lg border-4 flex items-center justify-center text-4xl font-bold transition-all ${
                     card.matched
-                      ? 'bg-green-300 border-green-500'
+                      ? "bg-green-300 border-green-500"
                       : card.flipped
-                      ? 'bg-white border-purple-300'
-                      : 'bg-purple-400 border-purple-600 hover:bg-purple-500'
+                        ? "bg-white border-purple-300"
+                        : "bg-purple-400 border-purple-600 hover:bg-purple-500"
                   }`}
                 >
-                  {card.flipped || card.matched ? card.emoji : '?'}
+                  {card.flipped || card.matched ? card.emoji : "?"}
                 </div>
               </div>
             ))}

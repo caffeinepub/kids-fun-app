@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import GameLayout from '../../components/GameLayout';
-import { ModulePage } from '../../App';
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { ModulePage } from "../../App";
+import GameLayout from "../../components/GameLayout";
 
 interface Position {
   x: number;
@@ -33,8 +33,18 @@ export default function PacMan({ onNavigate }: PacManProps) {
   const directionRef = useRef<{ dx: number; dy: number }>({ dx: 1, dy: 0 });
   const nextDirectionRef = useRef<{ dx: number; dy: number }>({ dx: 1, dy: 0 });
   const ghostsRef = useRef<Ghost[]>([
-    { id: 1, position: { x: 18, y: 1 }, color: '#FF0000', direction: { dx: -1, dy: 0 } },
-    { id: 2, position: { x: 18, y: 18 }, color: '#00FFFF', direction: { dx: 0, dy: -1 } },
+    {
+      id: 1,
+      position: { x: 18, y: 1 },
+      color: "#FF0000",
+      direction: { dx: -1, dy: 0 },
+    },
+    {
+      id: 2,
+      position: { x: 18, y: 18 },
+      color: "#00FFFF",
+      direction: { dx: 0, dy: -1 },
+    },
   ]);
   const pelletsRef = useRef<Set<string>>(new Set());
   const animationFrameRef = useRef<number | undefined>(undefined);
@@ -45,8 +55,10 @@ export default function PacMan({ onNavigate }: PacManProps) {
   const mazeRef = useRef<number[][]>([]);
 
   const initializeMaze = useCallback(() => {
-    const maze: number[][] = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(0));
-    
+    const maze: number[][] = Array(GRID_SIZE)
+      .fill(0)
+      .map(() => Array(GRID_SIZE).fill(0));
+
     // Create border walls
     for (let i = 0; i < GRID_SIZE; i++) {
       maze[0][i] = 1;
@@ -87,8 +99,18 @@ export default function PacMan({ onNavigate }: PacManProps) {
     directionRef.current = { dx: 1, dy: 0 };
     nextDirectionRef.current = { dx: 1, dy: 0 };
     ghostsRef.current = [
-      { id: 1, position: { x: 18, y: 1 }, color: '#FF0000', direction: { dx: -1, dy: 0 } },
-      { id: 2, position: { x: 18, y: 18 }, color: '#00FFFF', direction: { dx: 0, dy: -1 } },
+      {
+        id: 1,
+        position: { x: 18, y: 1 },
+        color: "#FF0000",
+        direction: { dx: -1, dy: 0 },
+      },
+      {
+        id: 2,
+        position: { x: 18, y: 18 },
+        color: "#00FFFF",
+        direction: { dx: 0, dy: -1 },
+      },
     ];
     initializeMaze();
     lastMoveTimeRef.current = 0;
@@ -106,23 +128,23 @@ export default function PacMan({ onNavigate }: PacManProps) {
       setShowInstructions(false);
 
       const key = e.key.toLowerCase();
-      if (key === 'arrowup' || key === 'w') {
+      if (key === "arrowup" || key === "w") {
         nextDirectionRef.current = { dx: 0, dy: -1 };
         e.preventDefault();
-      } else if (key === 'arrowdown' || key === 's') {
+      } else if (key === "arrowdown" || key === "s") {
         nextDirectionRef.current = { dx: 0, dy: 1 };
         e.preventDefault();
-      } else if (key === 'arrowleft' || key === 'a') {
+      } else if (key === "arrowleft" || key === "a") {
         nextDirectionRef.current = { dx: -1, dy: 0 };
         e.preventDefault();
-      } else if (key === 'arrowright' || key === 'd') {
+      } else if (key === "arrowright" || key === "d") {
         nextDirectionRef.current = { dx: 1, dy: 0 };
         e.preventDefault();
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [gameOver]);
 
   const isValidMove = useCallback((x: number, y: number): boolean => {
@@ -130,9 +152,12 @@ export default function PacMan({ onNavigate }: PacManProps) {
     return mazeRef.current[y][x] === 0;
   }, []);
 
-  const checkCollision = useCallback((pos1: Position, pos2: Position): boolean => {
-    return pos1.x === pos2.x && pos1.y === pos2.y;
-  }, []);
+  const checkCollision = useCallback(
+    (pos1: Position, pos2: Position): boolean => {
+      return pos1.x === pos2.x && pos1.y === pos2.y;
+    },
+    [],
+  );
 
   // Game loop
   useEffect(() => {
@@ -161,7 +186,7 @@ export default function PacMan({ onNavigate }: PacManProps) {
       // Move Pac-Man
       const newX = pacManRef.current.x + directionRef.current.dx;
       const newY = pacManRef.current.y + directionRef.current.dy;
-      
+
       if (isValidMove(newX, newY)) {
         pacManRef.current = { x: newX, y: newY };
 
@@ -169,7 +194,7 @@ export default function PacMan({ onNavigate }: PacManProps) {
         const pelletKey = `${newX},${newY}`;
         if (pelletsRef.current.has(pelletKey)) {
           pelletsRef.current.delete(pelletKey);
-          setScore(prev => prev + 10);
+          setScore((prev) => prev + 10);
         }
 
         // Check win condition
@@ -179,7 +204,7 @@ export default function PacMan({ onNavigate }: PacManProps) {
       }
 
       // Move ghosts with simple AI
-      ghostsRef.current = ghostsRef.current.map(ghost => {
+      ghostsRef.current = ghostsRef.current.map((ghost) => {
         const dx = pacManRef.current.x - ghost.position.x;
         const dy = pacManRef.current.y - ghost.position.y;
 
@@ -213,7 +238,7 @@ export default function PacMan({ onNavigate }: PacManProps) {
 
         return {
           ...ghost,
-          position: isValidMove(newGhostX, newGhostY) 
+          position: isValidMove(newGhostX, newGhostY)
             ? { x: newGhostX, y: newGhostY }
             : ghost.position,
           direction: newDir,
@@ -223,7 +248,7 @@ export default function PacMan({ onNavigate }: PacManProps) {
       // Check collision with ghosts
       for (const ghost of ghostsRef.current) {
         if (checkCollision(pacManRef.current, ghost.position)) {
-          setLives(prev => {
+          setLives((prev) => {
             const newLives = prev - 1;
             if (newLives <= 0) {
               setGameOver(true);
@@ -272,7 +297,9 @@ export default function PacMan({ onNavigate }: PacManProps) {
         <div className="mb-4 flex items-center gap-2 bg-white px-6 py-3 rounded-full border-4 border-yellow-400">
           <span className="text-xl font-bold">Lives:</span>
           {Array.from({ length: lives }).map((_, i) => (
-            <span key={i} className="text-2xl">🟡</span>
+            <span key={i} className="text-2xl">
+              🟡
+            </span>
           ))}
         </div>
 
@@ -298,13 +325,13 @@ export default function PacMan({ onNavigate }: PacManProps) {
                     height: CELL_SIZE,
                   }}
                 />
-              ) : null
-            )
+              ) : null,
+            ),
           )}
 
           {/* Pellets */}
-          {Array.from(pelletsRef.current).map(key => {
-            const [x, y] = key.split(',').map(Number);
+          {Array.from(pelletsRef.current).map((key) => {
+            const [x, y] = key.split(",").map(Number);
             return (
               <div
                 key={`pellet-${key}`}
@@ -330,14 +357,18 @@ export default function PacMan({ onNavigate }: PacManProps) {
             }}
           >
             <div className="absolute inset-0 flex items-center justify-center text-lg">
-              {directionRef.current.dx === 1 ? '▶' : 
-               directionRef.current.dx === -1 ? '◀' :
-               directionRef.current.dy === -1 ? '▲' : '▼'}
+              {directionRef.current.dx === 1
+                ? "▶"
+                : directionRef.current.dx === -1
+                  ? "◀"
+                  : directionRef.current.dy === -1
+                    ? "▲"
+                    : "▼"}
             </div>
           </div>
 
           {/* Ghosts */}
-          {ghostsRef.current.map(ghost => (
+          {ghostsRef.current.map((ghost) => (
             <div
               key={ghost.id}
               className="absolute rounded-t-full transition-all duration-100"
@@ -359,7 +390,9 @@ export default function PacMan({ onNavigate }: PacManProps) {
           {showInstructions && !gameOver && (
             <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-10">
               <div className="bg-white p-6 rounded-lg border-4 border-yellow-400 text-center max-w-sm">
-                <h2 className="text-2xl font-bold mb-3 text-yellow-600">How to Play</h2>
+                <h2 className="text-2xl font-bold mb-3 text-yellow-600">
+                  How to Play
+                </h2>
                 <p className="mb-2">🟡 Eat all pellets to win!</p>
                 <p className="mb-2">👻 Avoid the ghosts!</p>
                 <p className="mb-3">⌨️ Use Arrow Keys or WASD</p>
@@ -375,7 +408,9 @@ export default function PacMan({ onNavigate }: PacManProps) {
         </div>
 
         <div className="mt-4 text-white text-center">
-          <p className="text-sm">Pellets Remaining: {pelletsRef.current.size}</p>
+          <p className="text-sm">
+            Pellets Remaining: {pelletsRef.current.size}
+          </p>
         </div>
       </div>
     </GameLayout>

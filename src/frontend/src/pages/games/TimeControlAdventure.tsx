@@ -1,14 +1,14 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import GameLayout from '../../components/GameLayout';
-import { ModulePage } from '../../App';
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { ModulePage } from "../../App";
+import GameLayout from "../../components/GameLayout";
 
-type TimePower = 'normal' | 'slow' | 'freeze' | 'rewind';
+type TimePower = "normal" | "slow" | "freeze" | "rewind";
 
 interface Enemy {
   id: number;
   x: number;
   y: number;
-  type: 'chaser' | 'shooter' | 'patrol';
+  type: "chaser" | "shooter" | "patrol";
   speed: number;
   health: number;
 }
@@ -32,12 +32,14 @@ interface TimeControlAdventureProps {
   onNavigate: (page: ModulePage) => void;
 }
 
-export default function TimeControlAdventure({ onNavigate }: TimeControlAdventureProps) {
+export default function TimeControlAdventure({
+  onNavigate,
+}: TimeControlAdventureProps) {
   const [score, setScore] = useState(0);
   const [playerX, setPlayerX] = useState(20);
   const [playerY, setPlayerY] = useState(50);
   const [playerHealth, setPlayerHealth] = useState(100);
-  const [timePower, setTimePower] = useState<TimePower>('normal');
+  const [timePower, setTimePower] = useState<TimePower>("normal");
   const [powerCooldown, setPowerCooldown] = useState(0);
   const [enemies, setEnemies] = useState<Enemy[]>([]);
   const [projectiles, setProjectiles] = useState<Projectile[]>([]);
@@ -59,7 +61,7 @@ export default function TimeControlAdventure({ onNavigate }: TimeControlAdventur
     setPlayerX(20);
     setPlayerY(50);
     setPlayerHealth(100);
-    setTimePower('normal');
+    setTimePower("normal");
     setPowerCooldown(0);
     setEnemies([]);
     setProjectiles([]);
@@ -84,57 +86,78 @@ export default function TimeControlAdventure({ onNavigate }: TimeControlAdventur
       const deltaTime = (now - lastUpdateRef.current) / 1000;
       lastUpdateRef.current = now;
 
-      const speedMultiplier = timePower === 'slow' ? 0.3 : timePower === 'freeze' ? 0 : 1;
+      const speedMultiplier =
+        timePower === "slow" ? 0.3 : timePower === "freeze" ? 0 : 1;
 
       // Spawn enemies
-      if (now - lastEnemySpawnRef.current > 2000 / difficulty && enemies.length < 8) {
-        const enemyType: 'chaser' | 'shooter' | 'patrol' = 
-          Math.random() < 0.5 ? 'chaser' : Math.random() < 0.7 ? 'shooter' : 'patrol';
-        
-        const spawnSide = Math.random() < 0.5 ? 'right' : 'top';
+      if (
+        now - lastEnemySpawnRef.current > 2000 / difficulty &&
+        enemies.length < 8
+      ) {
+        const enemyType: "chaser" | "shooter" | "patrol" =
+          Math.random() < 0.5
+            ? "chaser"
+            : Math.random() < 0.7
+              ? "shooter"
+              : "patrol";
+
+        const spawnSide = Math.random() < 0.5 ? "right" : "top";
         const newEnemy: Enemy = {
           id: nextId,
-          x: spawnSide === 'right' ? 95 : Math.random() * 80 + 10,
-          y: spawnSide === 'right' ? Math.random() * 80 + 10 : 5,
+          x: spawnSide === "right" ? 95 : Math.random() * 80 + 10,
+          y: spawnSide === "right" ? Math.random() * 80 + 10 : 5,
           type: enemyType,
-          speed: (1 + difficulty * 0.3 + Math.random() * 0.5),
+          speed: 1 + difficulty * 0.3 + Math.random() * 0.5,
           health: 1,
         };
-        
-        setEnemies(prev => [...prev, newEnemy]);
-        setNextId(id => id + 1);
+
+        setEnemies((prev) => [...prev, newEnemy]);
+        setNextId((id) => id + 1);
         lastEnemySpawnRef.current = now;
       }
 
       // Spawn coins
-      if (now - lastCoinSpawnRef.current > 3000 && coins.filter(c => !c.collected).length < 5) {
-        setCoins(prev => [...prev, {
-          id: nextId + 10000,
-          x: Math.random() * 70 + 15,
-          y: Math.random() * 70 + 15,
-          collected: false,
-        }]);
-        setNextId(id => id + 1);
+      if (
+        now - lastCoinSpawnRef.current > 3000 &&
+        coins.filter((c) => !c.collected).length < 5
+      ) {
+        setCoins((prev) => [
+          ...prev,
+          {
+            id: nextId + 10000,
+            x: Math.random() * 70 + 15,
+            y: Math.random() * 70 + 15,
+            collected: false,
+          },
+        ]);
+        setNextId((id) => id + 1);
         lastCoinSpawnRef.current = now;
       }
 
       // Spawn projectiles from shooter enemies
-      if (now - lastProjectileSpawnRef.current > 1500 && timePower !== 'freeze') {
-        setEnemies(prev => {
-          const shooters = prev.filter(e => e.type === 'shooter');
+      if (
+        now - lastProjectileSpawnRef.current > 1500 &&
+        timePower !== "freeze"
+      ) {
+        setEnemies((prev) => {
+          const shooters = prev.filter((e) => e.type === "shooter");
           if (shooters.length > 0) {
-            const shooter = shooters[Math.floor(Math.random() * shooters.length)];
+            const shooter =
+              shooters[Math.floor(Math.random() * shooters.length)];
             const angle = Math.atan2(playerY - shooter.y, playerX - shooter.x);
             const projectileSpeed = 15;
-            
-            setProjectiles(p => [...p, {
-              id: nextId + 20000,
-              x: shooter.x,
-              y: shooter.y,
-              velocityX: Math.cos(angle) * projectileSpeed,
-              velocityY: Math.sin(angle) * projectileSpeed,
-            }]);
-            setNextId(id => id + 1);
+
+            setProjectiles((p) => [
+              ...p,
+              {
+                id: nextId + 20000,
+                x: shooter.x,
+                y: shooter.y,
+                velocityX: Math.cos(angle) * projectileSpeed,
+                velocityY: Math.sin(angle) * projectileSpeed,
+              },
+            ]);
+            setNextId((id) => id + 1);
             lastProjectileSpawnRef.current = now;
           }
           return prev;
@@ -142,48 +165,90 @@ export default function TimeControlAdventure({ onNavigate }: TimeControlAdventur
       }
 
       // Update enemy positions
-      setEnemies(prev => prev.map(enemy => {
-        let newX = enemy.x;
-        let newY = enemy.y;
+      setEnemies((prev) =>
+        prev
+          .map((enemy) => {
+            let newX = enemy.x;
+            let newY = enemy.y;
 
-        if (enemy.type === 'chaser') {
-          // Chase the player
-          const dx = playerX - enemy.x;
-          const dy = playerY - enemy.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          
-          if (distance > 0) {
-            newX += (dx / distance) * enemy.speed * speedMultiplier * deltaTime * 60;
-            newY += (dy / distance) * enemy.speed * speedMultiplier * deltaTime * 60;
-          }
-        } else if (enemy.type === 'patrol') {
-          // Patrol horizontally
-          newX -= enemy.speed * speedMultiplier * deltaTime * 60;
-          if (newX < 5) newX = 95;
-        } else if (enemy.type === 'shooter') {
-          // Move slowly toward player but maintain distance
-          const dx = playerX - enemy.x;
-          const dy = playerY - enemy.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          
-          if (distance > 30) {
-            newX += (dx / distance) * enemy.speed * 0.5 * speedMultiplier * deltaTime * 60;
-            newY += (dy / distance) * enemy.speed * 0.5 * speedMultiplier * deltaTime * 60;
-          } else if (distance < 20) {
-            newX -= (dx / distance) * enemy.speed * 0.3 * speedMultiplier * deltaTime * 60;
-            newY -= (dy / distance) * enemy.speed * 0.3 * speedMultiplier * deltaTime * 60;
-          }
-        }
+            if (enemy.type === "chaser") {
+              // Chase the player
+              const dx = playerX - enemy.x;
+              const dy = playerY - enemy.y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
 
-        return { ...enemy, x: newX, y: newY };
-      }).filter(e => e.x > -5 && e.x < 105 && e.y > -5 && e.y < 105));
+              if (distance > 0) {
+                newX +=
+                  (dx / distance) *
+                  enemy.speed *
+                  speedMultiplier *
+                  deltaTime *
+                  60;
+                newY +=
+                  (dy / distance) *
+                  enemy.speed *
+                  speedMultiplier *
+                  deltaTime *
+                  60;
+              }
+            } else if (enemy.type === "patrol") {
+              // Patrol horizontally
+              newX -= enemy.speed * speedMultiplier * deltaTime * 60;
+              if (newX < 5) newX = 95;
+            } else if (enemy.type === "shooter") {
+              // Move slowly toward player but maintain distance
+              const dx = playerX - enemy.x;
+              const dy = playerY - enemy.y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+
+              if (distance > 30) {
+                newX +=
+                  (dx / distance) *
+                  enemy.speed *
+                  0.5 *
+                  speedMultiplier *
+                  deltaTime *
+                  60;
+                newY +=
+                  (dy / distance) *
+                  enemy.speed *
+                  0.5 *
+                  speedMultiplier *
+                  deltaTime *
+                  60;
+              } else if (distance < 20) {
+                newX -=
+                  (dx / distance) *
+                  enemy.speed *
+                  0.3 *
+                  speedMultiplier *
+                  deltaTime *
+                  60;
+                newY -=
+                  (dy / distance) *
+                  enemy.speed *
+                  0.3 *
+                  speedMultiplier *
+                  deltaTime *
+                  60;
+              }
+            }
+
+            return { ...enemy, x: newX, y: newY };
+          })
+          .filter((e) => e.x > -5 && e.x < 105 && e.y > -5 && e.y < 105),
+      );
 
       // Update projectile positions
-      setProjectiles(prev => prev.map(proj => ({
-        ...proj,
-        x: proj.x + proj.velocityX * speedMultiplier * deltaTime,
-        y: proj.y + proj.velocityY * speedMultiplier * deltaTime,
-      })).filter(p => p.x > -10 && p.x < 110 && p.y > -10 && p.y < 110));
+      setProjectiles((prev) =>
+        prev
+          .map((proj) => ({
+            ...proj,
+            x: proj.x + proj.velocityX * speedMultiplier * deltaTime,
+            y: proj.y + proj.velocityY * speedMultiplier * deltaTime,
+          }))
+          .filter((p) => p.x > -10 && p.x < 110 && p.y > -10 && p.y < 110),
+      );
 
       animationFrameRef.current = requestAnimationFrame(gameLoop);
     };
@@ -195,13 +260,23 @@ export default function TimeControlAdventure({ onNavigate }: TimeControlAdventur
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [gameStarted, gameOver, timePower, playerX, playerY, enemies.length, coins.length, difficulty, nextId]);
+  }, [
+    gameStarted,
+    gameOver,
+    timePower,
+    playerX,
+    playerY,
+    enemies.length,
+    coins.length,
+    difficulty,
+    nextId,
+  ]);
 
   // Cooldown timer
   useEffect(() => {
     if (powerCooldown > 0) {
       const cooldownTimer = setTimeout(() => {
-        setPowerCooldown(prev => prev - 1);
+        setPowerCooldown((prev) => prev - 1);
       }, 100);
       return () => clearTimeout(cooldownTimer);
     }
@@ -217,7 +292,7 @@ export default function TimeControlAdventure({ onNavigate }: TimeControlAdventur
   // Store player history for rewind
   useEffect(() => {
     if (!gameStarted || gameOver) return;
-    
+
     playerHistoryRef.current.push({ x: playerX, y: playerY });
     if (playerHistoryRef.current.length > 50) {
       playerHistoryRef.current.shift();
@@ -231,9 +306,9 @@ export default function TimeControlAdventure({ onNavigate }: TimeControlAdventur
     let healthLoss = 0;
 
     // Check collision with enemies
-    enemies.forEach(enemy => {
+    enemies.forEach((enemy) => {
       const distance = Math.sqrt(
-        Math.pow(playerX - enemy.x, 2) + Math.pow(playerY - enemy.y, 2)
+        (playerX - enemy.x) ** 2 + (playerY - enemy.y) ** 2,
       );
       if (distance < 6) {
         healthLoss += 20;
@@ -241,18 +316,18 @@ export default function TimeControlAdventure({ onNavigate }: TimeControlAdventur
     });
 
     // Check collision with projectiles
-    projectiles.forEach(proj => {
+    projectiles.forEach((proj) => {
       const distance = Math.sqrt(
-        Math.pow(playerX - proj.x, 2) + Math.pow(playerY - proj.y, 2)
+        (playerX - proj.x) ** 2 + (playerY - proj.y) ** 2,
       );
       if (distance < 4) {
         healthLoss += 10;
-        setProjectiles(prev => prev.filter(p => p.id !== proj.id));
+        setProjectiles((prev) => prev.filter((p) => p.id !== proj.id));
       }
     });
 
     if (healthLoss > 0) {
-      setPlayerHealth(prev => {
+      setPlayerHealth((prev) => {
         const newHealth = Math.max(0, prev - healthLoss);
         if (newHealth <= 0) {
           setGameOver(true);
@@ -262,16 +337,16 @@ export default function TimeControlAdventure({ onNavigate }: TimeControlAdventur
     }
 
     // Check coin collection
-    coins.forEach(coin => {
+    coins.forEach((coin) => {
       if (!coin.collected) {
         const distance = Math.sqrt(
-          Math.pow(playerX - coin.x, 2) + Math.pow(playerY - coin.y, 2)
+          (playerX - coin.x) ** 2 + (playerY - coin.y) ** 2,
         );
         if (distance < 5) {
-          setCoins(prev => prev.map(c => 
-            c.id === coin.id ? { ...c, collected: true } : c
-          ));
-          setScore(prev => prev + 10);
+          setCoins((prev) =>
+            prev.map((c) => (c.id === coin.id ? { ...c, collected: true } : c)),
+          );
+          setScore((prev) => prev + 10);
         }
       }
     });
@@ -282,7 +357,7 @@ export default function TimeControlAdventure({ onNavigate }: TimeControlAdventur
     if (!gameStarted || gameOver) return;
 
     const difficultyInterval = setInterval(() => {
-      setDifficulty(prev => Math.min(prev + 0.1, 3));
+      setDifficulty((prev) => Math.min(prev + 0.1, 3));
     }, 10000);
 
     return () => clearInterval(difficultyInterval);
@@ -290,43 +365,56 @@ export default function TimeControlAdventure({ onNavigate }: TimeControlAdventur
 
   const activatePower = (power: TimePower) => {
     if (powerCooldown > 0 || !gameStarted || gameOver) return;
-    
-    if (power === 'rewind' && playerHistoryRef.current.length > 15) {
-      const pastPosition = playerHistoryRef.current[Math.max(0, playerHistoryRef.current.length - 20)];
+
+    if (power === "rewind" && playerHistoryRef.current.length > 15) {
+      const pastPosition =
+        playerHistoryRef.current[
+          Math.max(0, playerHistoryRef.current.length - 20)
+        ];
       setPlayerX(pastPosition.x);
       setPlayerY(pastPosition.y);
       setPowerCooldown(60);
-    } else if (power !== 'normal') {
+    } else if (power !== "normal") {
       setTimePower(power);
       setPowerCooldown(40);
-      setTimeout(() => setTimePower('normal'), 3000);
+      setTimeout(() => setTimePower("normal"), 3000);
     }
   };
 
-  const handleKeyPress = useCallback((e: KeyboardEvent) => {
-    if (!gameStarted || gameOver) return;
-    
-    const speed = 2.5;
-    if (e.key === 'ArrowUp') setPlayerY(prev => Math.max(5, prev - speed));
-    else if (e.key === 'ArrowDown') setPlayerY(prev => Math.min(95, prev + speed));
-    else if (e.key === 'ArrowLeft') setPlayerX(prev => Math.max(5, prev - speed));
-    else if (e.key === 'ArrowRight') setPlayerX(prev => Math.min(95, prev + speed));
-    else if (e.key === '1') activatePower('slow');
-    else if (e.key === '2') activatePower('freeze');
-    else if (e.key === '3') activatePower('rewind');
-  }, [gameStarted, gameOver, powerCooldown]);
+  const handleKeyPress = useCallback(
+    (e: KeyboardEvent) => {
+      if (!gameStarted || gameOver) return;
+
+      const speed = 2.5;
+      if (e.key === "ArrowUp") setPlayerY((prev) => Math.max(5, prev - speed));
+      else if (e.key === "ArrowDown")
+        setPlayerY((prev) => Math.min(95, prev + speed));
+      else if (e.key === "ArrowLeft")
+        setPlayerX((prev) => Math.max(5, prev - speed));
+      else if (e.key === "ArrowRight")
+        setPlayerX((prev) => Math.min(95, prev + speed));
+      else if (e.key === "1") activatePower("slow");
+      else if (e.key === "2") activatePower("freeze");
+      else if (e.key === "3") activatePower("rewind");
+    },
+    [gameStarted, gameOver, powerCooldown],
+  );
 
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
   }, [handleKeyPress]);
 
   const getEnemyEmoji = (type: string) => {
     switch (type) {
-      case 'chaser': return '👾';
-      case 'shooter': return '🔫';
-      case 'patrol': return '🤖';
-      default: return '👾';
+      case "chaser":
+        return "👾";
+      case "shooter":
+        return "🔫";
+      case "patrol":
+        return "🤖";
+      default:
+        return "👾";
     }
   };
 
@@ -341,10 +429,10 @@ export default function TimeControlAdventure({ onNavigate }: TimeControlAdventur
     >
       <div className="relative w-full h-[600px] bg-gradient-to-br from-indigo-300 via-purple-300 to-pink-300 overflow-hidden rounded-lg border-4 border-purple-400">
         {/* Time effect overlay */}
-        {timePower === 'slow' && (
+        {timePower === "slow" && (
           <div className="absolute inset-0 bg-blue-500/20 animate-pulse pointer-events-none z-10" />
         )}
-        {timePower === 'freeze' && (
+        {timePower === "freeze" && (
           <div className="absolute inset-0 bg-cyan-500/30 pointer-events-none z-10" />
         )}
 
@@ -352,20 +440,41 @@ export default function TimeControlAdventure({ onNavigate }: TimeControlAdventur
         {!gameStarted && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-30">
             <div className="bg-white px-8 py-6 rounded-lg border-4 border-purple-400 text-center max-w-lg">
-              <h2 className="text-3xl font-bold mb-4 text-purple-600">⏰ Time-Control Adventure</h2>
-              <p className="font-bold mb-3 text-lg">Use arrow keys to move and avoid enemies!</p>
+              <h2 className="text-3xl font-bold mb-4 text-purple-600">
+                ⏰ Time-Control Adventure
+              </h2>
+              <p className="font-bold mb-3 text-lg">
+                Use arrow keys to move and avoid enemies!
+              </p>
               <div className="text-left mb-4 space-y-2">
-                <p className="text-sm"><strong>👾 Chasers:</strong> Hunt you down relentlessly</p>
-                <p className="text-sm"><strong>🔫 Shooters:</strong> Fire projectiles from a distance</p>
-                <p className="text-sm"><strong>🤖 Patrols:</strong> Move in patterns across the field</p>
+                <p className="text-sm">
+                  <strong>👾 Chasers:</strong> Hunt you down relentlessly
+                </p>
+                <p className="text-sm">
+                  <strong>🔫 Shooters:</strong> Fire projectiles from a distance
+                </p>
+                <p className="text-sm">
+                  <strong>🤖 Patrols:</strong> Move in patterns across the field
+                </p>
               </div>
               <div className="text-left mb-4 space-y-1">
                 <p className="text-sm font-bold">Time Powers:</p>
-                <p className="text-sm">Press <kbd className="px-2 py-1 bg-gray-200 rounded">1</kbd> - Slow Time 🐌</p>
-                <p className="text-sm">Press <kbd className="px-2 py-1 bg-gray-200 rounded">2</kbd> - Freeze Time ❄️</p>
-                <p className="text-sm">Press <kbd className="px-2 py-1 bg-gray-200 rounded">3</kbd> - Rewind Position ⏪</p>
+                <p className="text-sm">
+                  Press <kbd className="px-2 py-1 bg-gray-200 rounded">1</kbd> -
+                  Slow Time 🐌
+                </p>
+                <p className="text-sm">
+                  Press <kbd className="px-2 py-1 bg-gray-200 rounded">2</kbd> -
+                  Freeze Time ❄️
+                </p>
+                <p className="text-sm">
+                  Press <kbd className="px-2 py-1 bg-gray-200 rounded">3</kbd> -
+                  Rewind Position ⏪
+                </p>
               </div>
-              <p className="text-sm mb-4">Collect coins 🪙 for points! Difficulty increases over time.</p>
+              <p className="text-sm mb-4">
+                Collect coins 🪙 for points! Difficulty increases over time.
+              </p>
               <button
                 onClick={startGame}
                 className="px-6 py-3 bg-purple-600 text-white rounded-lg font-bold hover:bg-purple-700 transition-colors"
@@ -384,7 +493,11 @@ export default function TimeControlAdventure({ onNavigate }: TimeControlAdventur
               <div className="w-48 h-4 bg-gray-300 rounded-full overflow-hidden">
                 <div
                   className={`h-full transition-all duration-300 ${
-                    playerHealth > 60 ? 'bg-green-500' : playerHealth > 30 ? 'bg-yellow-500' : 'bg-red-500'
+                    playerHealth > 60
+                      ? "bg-green-500"
+                      : playerHealth > 30
+                        ? "bg-yellow-500"
+                        : "bg-red-500"
                   }`}
                   style={{ width: `${playerHealth}%` }}
                 />
@@ -397,7 +510,9 @@ export default function TimeControlAdventure({ onNavigate }: TimeControlAdventur
         {/* Difficulty indicator */}
         {gameStarted && (
           <div className="absolute top-16 left-1/2 transform -translate-x-1/2 bg-white px-3 py-1 rounded-lg border-2 border-purple-300 z-20">
-            <span className="text-xs font-bold">Difficulty: {difficulty.toFixed(1)}x</span>
+            <span className="text-xs font-bold">
+              Difficulty: {difficulty.toFixed(1)}x
+            </span>
           </div>
         )}
 
@@ -406,25 +521,29 @@ export default function TimeControlAdventure({ onNavigate }: TimeControlAdventur
           <div className="absolute bottom-4 left-4 bg-white p-3 rounded-lg border-4 border-purple-300 z-20">
             <div className="flex gap-2">
               <button
-                onClick={() => activatePower('slow')}
+                onClick={() => activatePower("slow")}
                 disabled={powerCooldown > 0}
                 className={`px-3 py-2 rounded border-2 font-bold text-sm transition-colors ${
-                  timePower === 'slow' ? 'bg-blue-200 border-blue-600' : 'bg-white border-gray-300 hover:bg-gray-100'
+                  timePower === "slow"
+                    ? "bg-blue-200 border-blue-600"
+                    : "bg-white border-gray-300 hover:bg-gray-100"
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 🐌 Slow (1)
               </button>
               <button
-                onClick={() => activatePower('freeze')}
+                onClick={() => activatePower("freeze")}
                 disabled={powerCooldown > 0}
                 className={`px-3 py-2 rounded border-2 font-bold text-sm transition-colors ${
-                  timePower === 'freeze' ? 'bg-cyan-200 border-cyan-600' : 'bg-white border-gray-300 hover:bg-gray-100'
+                  timePower === "freeze"
+                    ? "bg-cyan-200 border-cyan-600"
+                    : "bg-white border-gray-300 hover:bg-gray-100"
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 ❄️ Freeze (2)
               </button>
               <button
-                onClick={() => activatePower('rewind')}
+                onClick={() => activatePower("rewind")}
                 disabled={powerCooldown > 0}
                 className="px-3 py-2 rounded border-2 border-gray-300 bg-white hover:bg-gray-100 font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
@@ -446,7 +565,7 @@ export default function TimeControlAdventure({ onNavigate }: TimeControlAdventur
             style={{
               left: `${playerX}%`,
               top: `${playerY}%`,
-              transform: 'translate(-50%, -50%)',
+              transform: "translate(-50%, -50%)",
             }}
           >
             <div className="text-5xl drop-shadow-lg">🧙</div>
@@ -454,29 +573,31 @@ export default function TimeControlAdventure({ onNavigate }: TimeControlAdventur
         )}
 
         {/* Enemies */}
-        {enemies.map(enemy => (
+        {enemies.map((enemy) => (
           <div
             key={enemy.id}
             className="absolute z-10"
             style={{
               left: `${enemy.x}%`,
               top: `${enemy.y}%`,
-              transform: 'translate(-50%, -50%)',
+              transform: "translate(-50%, -50%)",
             }}
           >
-            <div className="text-4xl drop-shadow-lg">{getEnemyEmoji(enemy.type)}</div>
+            <div className="text-4xl drop-shadow-lg">
+              {getEnemyEmoji(enemy.type)}
+            </div>
           </div>
         ))}
 
         {/* Projectiles */}
-        {projectiles.map(proj => (
+        {projectiles.map((proj) => (
           <div
             key={proj.id}
             className="absolute z-10"
             style={{
               left: `${proj.x}%`,
               top: `${proj.y}%`,
-              transform: 'translate(-50%, -50%)',
+              transform: "translate(-50%, -50%)",
             }}
           >
             <div className="text-2xl">💥</div>
@@ -484,21 +605,22 @@ export default function TimeControlAdventure({ onNavigate }: TimeControlAdventur
         ))}
 
         {/* Coins */}
-        {coins.map(coin => (
-          !coin.collected && (
-            <div
-              key={coin.id}
-              className="absolute animate-bounce z-10"
-              style={{
-                left: `${coin.x}%`,
-                top: `${coin.y}%`,
-                transform: 'translate(-50%, -50%)',
-              }}
-            >
-              <div className="text-3xl drop-shadow-lg">🪙</div>
-            </div>
-          )
-        ))}
+        {coins.map(
+          (coin) =>
+            !coin.collected && (
+              <div
+                key={coin.id}
+                className="absolute animate-bounce z-10"
+                style={{
+                  left: `${coin.x}%`,
+                  top: `${coin.y}%`,
+                  transform: "translate(-50%, -50%)",
+                }}
+              >
+                <div className="text-3xl drop-shadow-lg">🪙</div>
+              </div>
+            ),
+        )}
       </div>
     </GameLayout>
   );

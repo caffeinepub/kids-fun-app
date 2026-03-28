@@ -1,10 +1,10 @@
-import { useState, useRef, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Play, Pause, Camera, CameraOff } from 'lucide-react';
-import { ModulePage } from '../App';
-import { useCamera } from '../camera/useCamera';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft, Camera, CameraOff, Pause, Play } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import type { ModulePage } from "../App";
+import { useCamera } from "../camera/useCamera";
 
 interface DanceChallengePageProps {
   onNavigate: (page: ModulePage) => void;
@@ -13,37 +13,59 @@ interface DanceChallengePageProps {
 interface DanceRoutine {
   id: string;
   title: string;
-  difficulty: 'Easy' | 'Medium' | 'Hard';
+  difficulty: "Easy" | "Medium" | "Hard";
   duration: number;
   poses: string[];
 }
 
 const routines: DanceRoutine[] = [
   {
-    id: 'beginner',
-    title: 'Happy Dance',
-    difficulty: 'Easy',
+    id: "beginner",
+    title: "Happy Dance",
+    difficulty: "Easy",
     duration: 30,
-    poses: ['Wave your hands', 'Jump up', 'Spin around', 'Clap your hands', 'Strike a pose!'],
+    poses: [
+      "Wave your hands",
+      "Jump up",
+      "Spin around",
+      "Clap your hands",
+      "Strike a pose!",
+    ],
   },
   {
-    id: 'intermediate',
-    title: 'Groove Master',
-    difficulty: 'Medium',
+    id: "intermediate",
+    title: "Groove Master",
+    difficulty: "Medium",
     duration: 45,
-    poses: ['Side step left', 'Side step right', 'Jump and turn', 'Wave arms up', 'Freeze!'],
+    poses: [
+      "Side step left",
+      "Side step right",
+      "Jump and turn",
+      "Wave arms up",
+      "Freeze!",
+    ],
   },
   {
-    id: 'advanced',
-    title: 'Dance Champion',
-    difficulty: 'Hard',
+    id: "advanced",
+    title: "Dance Champion",
+    difficulty: "Hard",
     duration: 60,
-    poses: ['Moonwalk', 'Spin twice', 'Jump high', 'Wave like a robot', 'Final pose!'],
+    poses: [
+      "Moonwalk",
+      "Spin twice",
+      "Jump high",
+      "Wave like a robot",
+      "Final pose!",
+    ],
   },
 ];
 
-export default function DanceChallengePage({ onNavigate }: DanceChallengePageProps) {
-  const [selectedRoutine, setSelectedRoutine] = useState<DanceRoutine | null>(null);
+export default function DanceChallengePage({
+  onNavigate,
+}: DanceChallengePageProps) {
+  const [selectedRoutine, setSelectedRoutine] = useState<DanceRoutine | null>(
+    null,
+  );
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentPose, setCurrentPose] = useState(0);
   const [showCamera, setShowCamera] = useState(false);
@@ -58,7 +80,7 @@ export default function DanceChallengePage({ onNavigate }: DanceChallengePagePro
     videoRef,
     canvasRef,
   } = useCamera({
-    facingMode: 'user',
+    facingMode: "user",
     width: 640,
     height: 480,
   });
@@ -82,7 +104,8 @@ export default function DanceChallengePage({ onNavigate }: DanceChallengePagePro
       }
     } else {
       setIsPlaying(true);
-      const poseInterval = (selectedRoutine.duration * 1000) / selectedRoutine.poses.length;
+      const poseInterval =
+        (selectedRoutine.duration * 1000) / selectedRoutine.poses.length;
       intervalRef.current = setInterval(() => {
         setCurrentPose((prev) => {
           if (prev >= selectedRoutine.poses.length - 1) {
@@ -119,14 +142,14 @@ export default function DanceChallengePage({ onNavigate }: DanceChallengePagePro
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'Easy':
-        return 'bg-green-500';
-      case 'Medium':
-        return 'bg-yellow-500';
-      case 'Hard':
-        return 'bg-red-500';
+      case "Easy":
+        return "bg-green-500";
+      case "Medium":
+        return "bg-yellow-500";
+      case "Hard":
+        return "bg-red-500";
       default:
-        return 'bg-gray-500';
+        return "bg-gray-500";
     }
   };
 
@@ -136,7 +159,10 @@ export default function DanceChallengePage({ onNavigate }: DanceChallengePagePro
         <h1 className="text-4xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
           Dance Challenge
         </h1>
-        <Button variant="outline" onClick={() => onNavigate('creative-fun-hub')}>
+        <Button
+          variant="outline"
+          onClick={() => onNavigate("creative-fun-hub")}
+        >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Hub
         </Button>
@@ -155,7 +181,9 @@ export default function DanceChallengePage({ onNavigate }: DanceChallengePagePro
             {routines.map((routine) => (
               <Button
                 key={routine.id}
-                variant={selectedRoutine?.id === routine.id ? 'default' : 'outline'}
+                variant={
+                  selectedRoutine?.id === routine.id ? "default" : "outline"
+                }
                 className="w-full justify-start h-auto py-4"
                 onClick={() => handleRoutineSelect(routine)}
               >
@@ -255,7 +283,9 @@ export default function DanceChallengePage({ onNavigate }: DanceChallengePagePro
                   </div>
 
                   {error && (
-                    <p className="text-sm text-red-600">Camera error: {error.message}</p>
+                    <p className="text-sm text-red-600">
+                      Camera error: {error.message}
+                    </p>
                   )}
 
                   <div className="bg-gray-100 rounded-lg p-4">
@@ -266,11 +296,13 @@ export default function DanceChallengePage({ onNavigate }: DanceChallengePagePro
                           key={index}
                           className={`flex items-center gap-2 ${
                             index === currentPose && isPlaying
-                              ? 'text-purple-600 font-bold'
-                              : 'text-gray-600'
+                              ? "text-purple-600 font-bold"
+                              : "text-gray-600"
                           }`}
                         >
-                          <span className="text-lg">{index === currentPose && isPlaying ? '👉' : '•'}</span>
+                          <span className="text-lg">
+                            {index === currentPose && isPlaying ? "👉" : "•"}
+                          </span>
                           <span>{pose}</span>
                         </div>
                       ))}
@@ -286,7 +318,9 @@ export default function DanceChallengePage({ onNavigate }: DanceChallengePagePro
 
                 {!isPlaying && currentPose > 0 && (
                   <div className="text-center py-4">
-                    <p className="text-2xl font-bold text-orange-600 mb-2">🎉 Awesome moves! 🎉</p>
+                    <p className="text-2xl font-bold text-orange-600 mb-2">
+                      🎉 Awesome moves! 🎉
+                    </p>
                     <p className="text-gray-600">You completed the routine!</p>
                   </div>
                 )}

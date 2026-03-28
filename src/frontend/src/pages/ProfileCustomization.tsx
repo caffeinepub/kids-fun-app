@@ -1,59 +1,103 @@
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { User, Palette, Image as ImageIcon, Trophy } from 'lucide-react';
-import { toast } from 'sonner';
-import { useGetCallerUserProfile, useSaveCallerUserProfile } from '../hooks/useQueries';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { Principal } from '@icp-sdk/core/principal';
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Principal } from "@icp-sdk/core/principal";
+import { Image as ImageIcon, Palette, Trophy, User } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
+import {
+  useGetCallerUserProfile,
+  useSaveCallerUserProfile,
+} from "../hooks/useQueries";
 
 export default function ProfileCustomization() {
-  const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
+  const {
+    data: userProfile,
+    isLoading: profileLoading,
+    isFetched,
+  } = useGetCallerUserProfile();
   const saveProfile = useSaveCallerUserProfile();
   const { identity } = useInternetIdentity();
 
-  const [name, setName] = useState('');
+  const [name, setName] = useState("");
   const [age, setAge] = useState<number>(10);
-  const [selectedAvatar, setSelectedAvatar] = useState('😊');
-  const [selectedTheme, setSelectedTheme] = useState('purple');
+  const [selectedAvatar, setSelectedAvatar] = useState("😊");
+  const [selectedTheme, setSelectedTheme] = useState("purple");
 
   // Initialize form values when profile loads
   useEffect(() => {
     if (userProfile) {
-      setName(userProfile.name || '');
+      setName(userProfile.name || "");
       setAge(Number(userProfile.age) || 10);
-      setSelectedAvatar(userProfile.avatarUrl || '😊');
-      setSelectedTheme(userProfile.theme || 'purple');
+      setSelectedAvatar(userProfile.avatarUrl || "😊");
+      setSelectedTheme(userProfile.theme || "purple");
     }
   }, [userProfile]);
 
   const avatars = [
-    '😊', '😄', '😎', '🤓', '🥳', '🤩',
-    '🦁', '🐯', '🐻', '🐼', '🐨', '🐸',
-    '🦄', '🐉', '🦋', '🌟', '⭐', '🌈',
+    "😊",
+    "😄",
+    "😎",
+    "🤓",
+    "🥳",
+    "🤩",
+    "🦁",
+    "🐯",
+    "🐻",
+    "🐼",
+    "🐨",
+    "🐸",
+    "🦄",
+    "🐉",
+    "🦋",
+    "🌟",
+    "⭐",
+    "🌈",
   ];
 
   const themes = [
-    { id: 'purple', name: 'Purple Dream', color: 'from-purple-400 to-pink-400' },
-    { id: 'blue', name: 'Ocean Blue', color: 'from-blue-400 to-cyan-400' },
-    { id: 'green', name: 'Forest Green', color: 'from-green-400 to-teal-400' },
-    { id: 'orange', name: 'Sunset Orange', color: 'from-orange-400 to-red-400' },
-    { id: 'rainbow', name: 'Rainbow', color: 'from-red-400 via-yellow-400 to-blue-400' },
-    { id: 'galaxy', name: 'Galaxy', color: 'from-indigo-400 via-purple-400 to-pink-400' },
+    {
+      id: "purple",
+      name: "Purple Dream",
+      color: "from-purple-400 to-pink-400",
+    },
+    { id: "blue", name: "Ocean Blue", color: "from-blue-400 to-cyan-400" },
+    { id: "green", name: "Forest Green", color: "from-green-400 to-teal-400" },
+    {
+      id: "orange",
+      name: "Sunset Orange",
+      color: "from-orange-400 to-red-400",
+    },
+    {
+      id: "rainbow",
+      name: "Rainbow",
+      color: "from-red-400 via-yellow-400 to-blue-400",
+    },
+    {
+      id: "galaxy",
+      name: "Galaxy",
+      color: "from-indigo-400 via-purple-400 to-pink-400",
+    },
   ];
 
   const handleSaveProfile = async () => {
     if (!name.trim()) {
-      toast.error('Please enter your name');
+      toast.error("Please enter your name");
       return;
     }
 
     if (!identity) {
-      toast.error('Please log in to save your profile');
+      toast.error("Please log in to save your profile");
       return;
     }
 
@@ -65,10 +109,10 @@ export default function ProfileCustomization() {
         parentPrincipal: identity.getPrincipal(), // Use current user as parent for now
         approvedContacts: userProfile?.approvedContacts || [],
         screenTimeLimit: userProfile?.screenTimeLimit || BigInt(120),
-        contentFilterLevel: userProfile?.contentFilterLevel || 'moderate',
+        contentFilterLevel: userProfile?.contentFilterLevel || "moderate",
         avatarUrl: selectedAvatar,
         theme: selectedTheme,
-        mascotPreference: userProfile?.mascotPreference || 'friendly',
+        mascotPreference: userProfile?.mascotPreference || "friendly",
         accessibilitySettings: userProfile?.accessibilitySettings || {
           readAloudEnabled: false,
           highContrastMode: false,
@@ -78,9 +122,9 @@ export default function ProfileCustomization() {
       };
 
       await saveProfile.mutateAsync(profileToSave);
-      toast.success('Profile updated successfully! ✨');
+      toast.success("Profile updated successfully! ✨");
     } catch (error) {
-      toast.error('Failed to update profile');
+      toast.error("Failed to update profile");
       console.error(error);
     }
   };
@@ -102,7 +146,9 @@ export default function ProfileCustomization() {
         <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
           Profile Customization 👤
         </h1>
-        <p className="text-lg text-gray-700">Personalize your profile and settings</p>
+        <p className="text-lg text-gray-700">
+          Personalize your profile and settings
+        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -117,10 +163,12 @@ export default function ProfileCustomization() {
                   {selectedAvatar}
                 </AvatarFallback>
               </Avatar>
-              <h2 className="text-2xl font-bold">{name || 'Your Name'}</h2>
+              <h2 className="text-2xl font-bold">{name || "Your Name"}</h2>
               <p className="text-gray-500">Age: {age}</p>
             </div>
-            <div className={`h-24 bg-gradient-to-r ${themes.find(t => t.id === selectedTheme)?.color} rounded-lg border-4 border-white shadow-lg`}></div>
+            <div
+              className={`h-24 bg-gradient-to-r ${themes.find((t) => t.id === selectedTheme)?.color} rounded-lg border-4 border-white shadow-lg`}
+            />
           </CardContent>
         </Card>
 
@@ -160,12 +208,18 @@ export default function ProfileCustomization() {
                       min="1"
                       max="18"
                       value={age}
-                      onChange={(e) => setAge(parseInt(e.target.value) || 10)}
+                      onChange={(e) =>
+                        setAge(Number.parseInt(e.target.value) || 10)
+                      }
                       className="text-lg h-12"
                     />
                   </div>
-                  <Button onClick={handleSaveProfile} disabled={saveProfile.isPending} className="w-full text-lg h-12 font-bold">
-                    {saveProfile.isPending ? 'Saving...' : 'Save Changes'}
+                  <Button
+                    onClick={handleSaveProfile}
+                    disabled={saveProfile.isPending}
+                    className="w-full text-lg h-12 font-bold"
+                  >
+                    {saveProfile.isPending ? "Saving..." : "Save Changes"}
                   </Button>
                 </CardContent>
               </Card>
@@ -178,7 +232,9 @@ export default function ProfileCustomization() {
                     <ImageIcon className="w-6 h-6" />
                     Choose Your Avatar
                   </CardTitle>
-                  <CardDescription>Select an avatar that represents you</CardDescription>
+                  <CardDescription>
+                    Select an avatar that represents you
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-6 gap-4">
@@ -186,7 +242,9 @@ export default function ProfileCustomization() {
                       <Card
                         key={index}
                         className={`cursor-pointer hover:shadow-lg transition-all ${
-                          selectedAvatar === avatar ? 'border-4 border-primary scale-110' : 'border-2'
+                          selectedAvatar === avatar
+                            ? "border-4 border-primary scale-110"
+                            : "border-2"
                         }`}
                         onClick={() => setSelectedAvatar(avatar)}
                       >
@@ -207,7 +265,9 @@ export default function ProfileCustomization() {
                     <Palette className="w-6 h-6" />
                     Profile Theme
                   </CardTitle>
-                  <CardDescription>Choose your favorite color theme</CardDescription>
+                  <CardDescription>
+                    Choose your favorite color theme
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -215,13 +275,19 @@ export default function ProfileCustomization() {
                       <Card
                         key={theme.id}
                         className={`cursor-pointer hover:shadow-lg transition-all ${
-                          selectedTheme === theme.id ? 'border-4 border-primary' : 'border-2'
+                          selectedTheme === theme.id
+                            ? "border-4 border-primary"
+                            : "border-2"
                         }`}
                         onClick={() => setSelectedTheme(theme.id)}
                       >
                         <CardContent className="p-4">
-                          <div className={`h-20 bg-gradient-to-r ${theme.color} rounded-lg mb-2`}></div>
-                          <p className="font-semibold text-center">{theme.name}</p>
+                          <div
+                            className={`h-20 bg-gradient-to-r ${theme.color} rounded-lg mb-2`}
+                          />
+                          <p className="font-semibold text-center">
+                            {theme.name}
+                          </p>
                         </CardContent>
                       </Card>
                     ))}
@@ -240,12 +306,14 @@ export default function ProfileCustomization() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-4 gap-4">
-                {['🏆', '⭐', '🎮', '🎨', '💬', '🎉', '😄', '🎬'].map((emoji, index) => (
-                  <div key={index} className="text-center">
-                    <div className="text-4xl mb-2">{emoji}</div>
-                    <p className="text-xs text-gray-600">Badge {index + 1}</p>
-                  </div>
-                ))}
+                {["🏆", "⭐", "🎮", "🎨", "💬", "🎉", "😄", "🎬"].map(
+                  (emoji, index) => (
+                    <div key={index} className="text-center">
+                      <div className="text-4xl mb-2">{emoji}</div>
+                      <p className="text-xs text-gray-600">Badge {index + 1}</p>
+                    </div>
+                  ),
+                )}
               </div>
             </CardContent>
           </Card>

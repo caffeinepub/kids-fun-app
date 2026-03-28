@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { X, Volume2, VolumeX, HelpCircle } from 'lucide-react';
-import { ModulePage } from '../App';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { HelpCircle, Volume2, VolumeX, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import type { ModulePage } from "../App";
 
 interface MascotGuideProps {
   currentPage: ModulePage;
@@ -10,7 +10,7 @@ interface MascotGuideProps {
 
 export default function MascotGuide({ currentPage }: MascotGuideProps) {
   const [isVisible, setIsVisible] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [voiceEnabled, setVoiceEnabled] = useState(false);
 
   const messages: Record<string, string> = {
@@ -23,15 +23,16 @@ export default function MascotGuide({ currentPage }: MascotGuideProps) {
     jokes: "Time to laugh! 😄 Share jokes and spread joy!",
     rewards: "Check your achievements! 🏆 You're doing great!",
     profile: "Customize your profile! 👤 Make it uniquely yours!",
-    'seasonal-events': "Celebrate the season! 🎄 Enjoy special holiday activities!",
-    'avatar-creator': "Create your avatar! 🎭 Mix and match to look awesome!",
-    'story-builder': "Tell your story! 📖 Build amazing scenes and adventures!",
-    'craft-diy': "Get crafty! ✂️ Follow the steps and create something cool!",
-    'art-gallery': "Show your art! 🖼️ Share your creativity with the world!",
+    "seasonal-events":
+      "Celebrate the season! 🎄 Enjoy special holiday activities!",
+    "avatar-creator": "Create your avatar! 🎭 Mix and match to look awesome!",
+    "story-builder": "Tell your story! 📖 Build amazing scenes and adventures!",
+    "craft-diy": "Get crafty! ✂️ Follow the steps and create something cool!",
+    "art-gallery": "Show your art! 🖼️ Share your creativity with the world!",
   };
 
   useEffect(() => {
-    const pageKey = currentPage.startsWith('game:') ? 'games' : currentPage;
+    const pageKey = currentPage.startsWith("game:") ? "games" : currentPage;
     const newMessage = messages[pageKey] || "Have fun exploring! 🌟";
     setMessage(newMessage);
     setIsVisible(true);
@@ -45,10 +46,10 @@ export default function MascotGuide({ currentPage }: MascotGuideProps) {
     }, 8000);
 
     return () => clearTimeout(timer);
-  }, [currentPage]);
+  }, [currentPage, voiceEnabled]);
 
   const speakMessage = (text: string) => {
-    if ('speechSynthesis' in window) {
+    if ("speechSynthesis" in window) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.rate = 0.9;
       utterance.pitch = 1.2;
@@ -81,7 +82,11 @@ export default function MascotGuide({ currentPage }: MascotGuideProps) {
         className="fixed bottom-6 right-6 rounded-full w-16 h-16 shadow-2xl z-40 hover:scale-110 transition-transform"
         size="icon"
       >
-        <img src="/assets/generated/mascot-guide.dim_200x200.png" alt="Mascot" className="w-12 h-12" />
+        <img
+          src="/assets/generated/mascot-guide.dim_200x200.png"
+          alt="Mascot"
+          className="w-12 h-12"
+        />
       </Button>
     );
   }
@@ -90,7 +95,11 @@ export default function MascotGuide({ currentPage }: MascotGuideProps) {
     <Card className="fixed bottom-6 right-6 w-80 shadow-2xl border-4 border-primary z-40 animate-in slide-in-from-bottom-5">
       <CardContent className="p-4">
         <div className="flex items-start gap-3">
-          <img src="/assets/generated/mascot-guide.dim_200x200.png" alt="Mascot" className="w-16 h-16 flex-shrink-0" />
+          <img
+            src="/assets/generated/mascot-guide.dim_200x200.png"
+            alt="Mascot"
+            className="w-16 h-16 flex-shrink-0"
+          />
           <div className="flex-1">
             <p className="text-lg font-semibold text-gray-800">{message}</p>
           </div>
@@ -102,8 +111,12 @@ export default function MascotGuide({ currentPage }: MascotGuideProps) {
             onClick={toggleVoice}
             className="flex-1"
           >
-            {voiceEnabled ? <Volume2 className="w-4 h-4 mr-2" /> : <VolumeX className="w-4 h-4 mr-2" />}
-            Voice {voiceEnabled ? 'On' : 'Off'}
+            {voiceEnabled ? (
+              <Volume2 className="w-4 h-4 mr-2" />
+            ) : (
+              <VolumeX className="w-4 h-4 mr-2" />
+            )}
+            Voice {voiceEnabled ? "On" : "Off"}
           </Button>
           <Button
             variant="ghost"

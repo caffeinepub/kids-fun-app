@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
-import GameLayout from '../../components/GameLayout';
-import { ModulePage } from '../../App';
+import { useEffect, useRef, useState } from "react";
+import type { ModulePage } from "../../App";
+import GameLayout from "../../components/GameLayout";
 
 interface SoundBasedWorldProps {
   onNavigate: (page: ModulePage) => void;
@@ -11,12 +11,17 @@ export default function SoundBasedWorld({ onNavigate }: SoundBasedWorldProps) {
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
-  
+
   const gameStateRef = useRef({
     player: { x: 400, y: 300 },
     goal: { x: 700, y: 100 },
     obstacles: [] as { x: number; y: number; width: number; height: number }[],
-    soundWaves: [] as { x: number; y: number; radius: number; maxRadius: number }[],
+    soundWaves: [] as {
+      x: number;
+      y: number;
+      radius: number;
+      maxRadius: number;
+    }[],
     keys: {} as Record<string, boolean>,
     stepTimer: 0,
   });
@@ -28,7 +33,7 @@ export default function SoundBasedWorld({ onNavigate }: SoundBasedWorldProps) {
     state.obstacles = [];
     state.soundWaves = [];
     state.stepTimer = 0;
-    
+
     // Create obstacles
     for (let i = 0; i < 8; i++) {
       state.obstacles.push({
@@ -38,7 +43,7 @@ export default function SoundBasedWorld({ onNavigate }: SoundBasedWorldProps) {
         height: 50 + Math.random() * 100,
       });
     }
-    
+
     setScore(0);
     setGameOver(false);
   };
@@ -55,7 +60,7 @@ export default function SoundBasedWorld({ onNavigate }: SoundBasedWorldProps) {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -66,8 +71,8 @@ export default function SoundBasedWorld({ onNavigate }: SoundBasedWorldProps) {
       gameStateRef.current.keys[e.key] = false;
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
 
     let animationId: number;
 
@@ -78,30 +83,30 @@ export default function SoundBasedWorld({ onNavigate }: SoundBasedWorldProps) {
         // Player movement
         const speed = 3;
         let moved = false;
-        
+
         const oldX = state.player.x;
         const oldY = state.player.y;
-        
-        if (state.keys['ArrowLeft'] || state.keys['a']) {
+
+        if (state.keys.ArrowLeft || state.keys.a) {
           state.player.x -= speed;
           moved = true;
         }
-        if (state.keys['ArrowRight'] || state.keys['d']) {
+        if (state.keys.ArrowRight || state.keys.d) {
           state.player.x += speed;
           moved = true;
         }
-        if (state.keys['ArrowUp'] || state.keys['w']) {
+        if (state.keys.ArrowUp || state.keys.w) {
           state.player.y -= speed;
           moved = true;
         }
-        if (state.keys['ArrowDown'] || state.keys['s']) {
+        if (state.keys.ArrowDown || state.keys.s) {
           state.player.y += speed;
           moved = true;
         }
 
         // Collision with obstacles
         let collision = false;
-        state.obstacles.forEach(obs => {
+        state.obstacles.forEach((obs) => {
           if (
             state.player.x + 15 > obs.x &&
             state.player.x - 15 < obs.x + obs.width &&
@@ -135,7 +140,7 @@ export default function SoundBasedWorld({ onNavigate }: SoundBasedWorldProps) {
         }
 
         // Update sound waves
-        state.soundWaves = state.soundWaves.filter(wave => {
+        state.soundWaves = state.soundWaves.filter((wave) => {
           wave.radius += 3;
           return wave.radius < wave.maxRadius;
         });
@@ -145,34 +150,41 @@ export default function SoundBasedWorld({ onNavigate }: SoundBasedWorldProps) {
         const dy = state.goal.y - state.player.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         if (dist < 40) {
-          setScore(s => s + 100);
+          setScore((s) => s + 100);
           setGameOver(true);
           if (score + 100 > highScore) setHighScore(score + 100);
         }
       }
 
       // Render
-      ctx.fillStyle = '#000000';
+      ctx.fillStyle = "#000000";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Sound waves reveal environment
-      state.soundWaves.forEach(wave => {
-        const gradient = ctx.createRadialGradient(wave.x, wave.y, 0, wave.x, wave.y, wave.radius);
-        gradient.addColorStop(0, 'rgba(100, 200, 255, 0.3)');
-        gradient.addColorStop(1, 'rgba(100, 200, 255, 0)');
-        
+      state.soundWaves.forEach((wave) => {
+        const gradient = ctx.createRadialGradient(
+          wave.x,
+          wave.y,
+          0,
+          wave.x,
+          wave.y,
+          wave.radius,
+        );
+        gradient.addColorStop(0, "rgba(100, 200, 255, 0.3)");
+        gradient.addColorStop(1, "rgba(100, 200, 255, 0)");
+
         ctx.fillStyle = gradient;
         ctx.beginPath();
         ctx.arc(wave.x, wave.y, wave.radius, 0, Math.PI * 2);
         ctx.fill();
 
         // Reveal obstacles
-        state.obstacles.forEach(obs => {
+        state.obstacles.forEach((obs) => {
           const distToObs = Math.sqrt(
-            Math.pow(wave.x - (obs.x + obs.width / 2), 2) +
-            Math.pow(wave.y - (obs.y + obs.height / 2), 2)
+            (wave.x - (obs.x + obs.width / 2)) ** 2 +
+              (wave.y - (obs.y + obs.height / 2)) ** 2,
           );
-          
+
           if (distToObs < wave.radius) {
             const alpha = Math.max(0, 1 - (wave.radius - distToObs) / 50);
             ctx.fillStyle = `rgba(139, 92, 246, ${alpha * 0.8})`;
@@ -185,10 +197,9 @@ export default function SoundBasedWorld({ onNavigate }: SoundBasedWorldProps) {
 
         // Reveal goal
         const distToGoal = Math.sqrt(
-          Math.pow(wave.x - state.goal.x, 2) +
-          Math.pow(wave.y - state.goal.y, 2)
+          (wave.x - state.goal.x) ** 2 + (wave.y - state.goal.y) ** 2,
         );
-        
+
         if (distToGoal < wave.radius) {
           const alpha = Math.max(0, 1 - (wave.radius - distToGoal) / 50);
           ctx.fillStyle = `rgba(34, 197, 94, ${alpha})`;
@@ -196,42 +207,46 @@ export default function SoundBasedWorld({ onNavigate }: SoundBasedWorldProps) {
           ctx.arc(state.goal.x, state.goal.y, 30, 0, Math.PI * 2);
           ctx.fill();
           ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
-          ctx.font = '32px Arial';
-          ctx.textAlign = 'center';
-          ctx.fillText('🎯', state.goal.x, state.goal.y + 10);
+          ctx.font = "32px Arial";
+          ctx.textAlign = "center";
+          ctx.fillText("🎯", state.goal.x, state.goal.y + 10);
         }
       });
 
       // Player (always visible)
-      ctx.fillStyle = '#60a5fa';
+      ctx.fillStyle = "#60a5fa";
       ctx.beginPath();
       ctx.arc(state.player.x, state.player.y, 15, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = '#fff';
+      ctx.strokeStyle = "#fff";
       ctx.lineWidth = 3;
       ctx.stroke();
 
       // Small light around player
       const playerGlow = ctx.createRadialGradient(
-        state.player.x, state.player.y, 0,
-        state.player.x, state.player.y, 40
+        state.player.x,
+        state.player.y,
+        0,
+        state.player.x,
+        state.player.y,
+        40,
       );
-      playerGlow.addColorStop(0, 'rgba(96, 165, 250, 0.4)');
-      playerGlow.addColorStop(1, 'rgba(96, 165, 250, 0)');
+      playerGlow.addColorStop(0, "rgba(96, 165, 250, 0.4)");
+      playerGlow.addColorStop(1, "rgba(96, 165, 250, 0)");
       ctx.fillStyle = playerGlow;
       ctx.beginPath();
       ctx.arc(state.player.x, state.player.y, 40, 0, Math.PI * 2);
       ctx.fill();
 
       // UI
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+      ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
       ctx.fillRect(10, 10, 280, 80);
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 14px Arial';
-      ctx.textAlign = 'left';
-      ctx.fillText('Move to create sound waves!', 20, 35);
-      ctx.fillText('Sound reveals the environment', 20, 60);
-      ctx.fillText('Find the goal 🎯', 20, 85);
+      ctx.fillStyle = "#fff";
+      ctx.font = "bold 14px Arial";
+      ctx.textAlign = "left";
+      ctx.fillText("Move to create sound waves!", 20, 35);
+      ctx.fillText("Sound reveals the environment", 20, 60);
+      ctx.fillText("Find the goal 🎯", 20, 85);
 
       animationId = requestAnimationFrame(gameLoop);
     };
@@ -240,8 +255,8 @@ export default function SoundBasedWorld({ onNavigate }: SoundBasedWorldProps) {
 
     return () => {
       cancelAnimationFrame(animationId);
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
     };
   }, [gameOver, score, highScore]);
 
@@ -257,7 +272,9 @@ export default function SoundBasedWorld({ onNavigate }: SoundBasedWorldProps) {
       <div className="flex flex-col items-center justify-center p-4 bg-gradient-to-br from-black to-gray-900">
         <div className="mb-4 text-center text-white">
           <p className="text-lg font-semibold">Navigate using sound!</p>
-          <p className="text-sm">Arrow keys/WASD to move • Sound waves reveal the world</p>
+          <p className="text-sm">
+            Arrow keys/WASD to move • Sound waves reveal the world
+          </p>
         </div>
         <canvas
           ref={canvasRef}

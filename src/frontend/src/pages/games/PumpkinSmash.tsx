@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
-import GameLayout from '../../components/GameLayout';
-import { ModulePage } from '../../App';
+import { useEffect, useRef, useState } from "react";
+import type { ModulePage } from "../../App";
+import GameLayout from "../../components/GameLayout";
 
 interface PumpkinSmashProps {
   onNavigate: (page: ModulePage) => void;
@@ -45,10 +45,10 @@ export default function PumpkinSmash({ onNavigate }: PumpkinSmashProps) {
     if (gameOver || timeLeft <= 0) return;
 
     const timer = setInterval(() => {
-      setTimeLeft(prev => {
+      setTimeLeft((prev) => {
         if (prev <= 1) {
           setGameOver(true);
-          setHighScore(h => Math.max(h, score));
+          setHighScore((h) => Math.max(h, score));
           return 0;
         }
         return prev - 1;
@@ -63,17 +63,17 @@ export default function PumpkinSmash({ onNavigate }: PumpkinSmashProps) {
     const canvas = canvasRef.current;
     if (!canvas || gameOver) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     const animate = () => {
       // Clear canvas
-      ctx.fillStyle = '#1a0033';
+      ctx.fillStyle = "#1a0033";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Update and draw pumpkins
-      setPumpkins(prev => {
-        const updated = prev.map(p => {
+      setPumpkins((prev) => {
+        const updated = prev.map((p) => {
           let newX = p.x + p.vx;
           let newY = p.y + p.vy;
           let newVx = p.vx;
@@ -93,9 +93,9 @@ export default function PumpkinSmash({ onNavigate }: PumpkinSmashProps) {
         });
 
         // Draw pumpkins
-        updated.forEach(p => {
+        updated.forEach((p) => {
           ctx.font = `${p.size}px Arial`;
-          ctx.fillText('🎃', p.x, p.y + p.size);
+          ctx.fillText("🎃", p.x, p.y + p.size);
         });
 
         return updated;
@@ -124,17 +124,17 @@ export default function PumpkinSmash({ onNavigate }: PumpkinSmashProps) {
     const y = e.clientY - rect.top;
 
     // Check if clicked on a pumpkin
-    const clickedIndex = pumpkins.findIndex(p =>
-      x >= p.x && x <= p.x + p.size && y >= p.y && y <= p.y + p.size
+    const clickedIndex = pumpkins.findIndex(
+      (p) => x >= p.x && x <= p.x + p.size && y >= p.y && y <= p.y + p.size,
     );
 
     if (clickedIndex !== -1) {
-      setPumpkins(prev => prev.filter((_, i) => i !== clickedIndex));
-      setScore(prev => prev + 10);
+      setPumpkins((prev) => prev.filter((_, i) => i !== clickedIndex));
+      setScore((prev) => prev + 10);
 
       // Spawn new pumpkin
       setTimeout(() => {
-        setPumpkins(prev => [
+        setPumpkins((prev) => [
           ...prev,
           {
             id: Date.now(),

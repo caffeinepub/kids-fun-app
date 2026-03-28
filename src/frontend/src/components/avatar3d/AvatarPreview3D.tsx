@@ -1,14 +1,16 @@
-import { useState, useRef, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { RotateCcw } from 'lucide-react';
-import { getAvatarVariants } from './avatarVariants';
-import type { AvatarConfig } from '../../hooks/useQueries';
+import { Button } from "@/components/ui/button";
+import { RotateCcw } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import type { AvatarConfig } from "../../hooks/useQueries";
+import { getAvatarVariants } from "./avatarVariants";
 
 interface AvatarPreview3DProps {
   avatarConfig: AvatarConfig;
 }
 
-export default function AvatarPreview3D({ avatarConfig }: AvatarPreview3DProps) {
+export default function AvatarPreview3D({
+  avatarConfig,
+}: AvatarPreview3DProps) {
   const [rotation, setRotation] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -75,24 +77,39 @@ export default function AvatarPreview3D({ avatarConfig }: AvatarPreview3DProps) 
             }}
           >
             {/* Headwear */}
-            {variants.headwear.type !== 'none' && (
+            {variants.headwear.type !== "none" && (
               <div
                 className="avatar-part headwear"
                 style={{
                   backgroundColor: variants.headwear.color,
-                  width: variants.headwear.type === 'crown' ? '70px' : variants.headwear.type === 'beanie' ? '65px' : '60px',
-                  height: variants.headwear.type === 'tophat' ? '50px' : variants.headwear.type === 'beanie' ? '35px' : '30px',
-                  top: variants.headwear.type === 'tophat' ? '-50px' : variants.headwear.type === 'beanie' ? '-10px' : '-25px',
+                  width:
+                    variants.headwear.type === "crown"
+                      ? "70px"
+                      : variants.headwear.type === "beanie"
+                        ? "65px"
+                        : "60px",
+                  height:
+                    variants.headwear.type === "tophat"
+                      ? "50px"
+                      : variants.headwear.type === "beanie"
+                        ? "35px"
+                        : "30px",
+                  top:
+                    variants.headwear.type === "tophat"
+                      ? "-50px"
+                      : variants.headwear.type === "beanie"
+                        ? "-10px"
+                        : "-25px",
                 }}
               >
-                {variants.headwear.type === 'crown' && (
+                {variants.headwear.type === "crown" && (
                   <div className="crown-spikes">
                     {[0, 1, 2, 3, 4].map((i) => (
                       <div key={i} className="crown-spike" />
                     ))}
                   </div>
                 )}
-                {variants.headwear.type === 'cap' && (
+                {variants.headwear.type === "cap" && (
                   <div
                     className="cap-visor"
                     style={{ backgroundColor: variants.headwear.color }}

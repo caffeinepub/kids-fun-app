@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import GameLayout from '../../components/GameLayout';
-import { ModulePage } from '../../App';
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { ModulePage } from "../../App";
+import GameLayout from "../../components/GameLayout";
 
 interface Position {
   x: number;
@@ -100,8 +100,8 @@ export default function SpaceInvaders({ onNavigate }: SpaceInvadersProps) {
       if (gameOver) return;
       const key = e.key.toLowerCase();
       keysRef.current.add(key);
-      
-      if (key === ' ' || key === 'spacebar') {
+
+      if (key === " " || key === "spacebar") {
         setShowInstructions(false);
         // Shoot
         const bullet: Bullet = {
@@ -119,11 +119,11 @@ export default function SpaceInvaders({ onNavigate }: SpaceInvadersProps) {
       keysRef.current.delete(e.key.toLowerCase());
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
     };
   }, [gameOver]);
 
@@ -138,52 +138,58 @@ export default function SpaceInvaders({ onNavigate }: SpaceInvadersProps) {
 
     const animate = (currentTime: number) => {
       // Move player
-      if (keysRef.current.has('arrowleft') || keysRef.current.has('a')) {
+      if (keysRef.current.has("arrowleft") || keysRef.current.has("a")) {
         playerXRef.current = Math.max(0, playerXRef.current - 5);
         setShowInstructions(false);
       }
-      if (keysRef.current.has('arrowright') || keysRef.current.has('d')) {
-        playerXRef.current = Math.min(GAME_WIDTH - PLAYER_SIZE, playerXRef.current + 5);
+      if (keysRef.current.has("arrowright") || keysRef.current.has("d")) {
+        playerXRef.current = Math.min(
+          GAME_WIDTH - PLAYER_SIZE,
+          playerXRef.current + 5,
+        );
         setShowInstructions(false);
       }
 
       // Move bullets
-      bulletsRef.current = bulletsRef.current.filter(bullet => {
+      bulletsRef.current = bulletsRef.current.filter((bullet) => {
         if (bullet.isPlayerBullet) {
           bullet.y -= 8;
           return bullet.y > 0;
-        } else {
-          bullet.y += 5;
-          
-          // Check collision with player
-          if (
-            bullet.y + BULLET_SIZE >= GAME_HEIGHT - 50 &&
-            bullet.x >= playerXRef.current &&
-            bullet.x <= playerXRef.current + PLAYER_SIZE
-          ) {
-            setLives(prev => {
-              const newLives = prev - 1;
-              if (newLives <= 0) {
-                setGameOver(true);
-              }
-              return newLives;
-            });
-            return false;
-          }
-          
-          return bullet.y < GAME_HEIGHT;
         }
+        bullet.y += 5;
+
+        // Check collision with player
+        if (
+          bullet.y + BULLET_SIZE >= GAME_HEIGHT - 50 &&
+          bullet.x >= playerXRef.current &&
+          bullet.x <= playerXRef.current + PLAYER_SIZE
+        ) {
+          setLives((prev) => {
+            const newLives = prev - 1;
+            if (newLives <= 0) {
+              setGameOver(true);
+            }
+            return newLives;
+          });
+          return false;
+        }
+
+        return bullet.y < GAME_HEIGHT;
       });
 
       // Move enemies
-      if (currentTime - lastEnemyMoveRef.current > Math.max(500 - wave * 50, 200)) {
+      if (
+        currentTime - lastEnemyMoveRef.current >
+        Math.max(500 - wave * 50, 200)
+      ) {
         lastEnemyMoveRef.current = currentTime;
-        
+
         let shouldMoveDown = false;
         for (const enemy of enemiesRef.current) {
           if (enemy.alive) {
             if (
-              (enemyDirectionRef.current > 0 && enemy.x + ENEMY_SIZE >= GAME_WIDTH - 10) ||
+              (enemyDirectionRef.current > 0 &&
+                enemy.x + ENEMY_SIZE >= GAME_WIDTH - 10) ||
               (enemyDirectionRef.current < 0 && enemy.x <= 10)
             ) {
               shouldMoveDown = true;
@@ -194,10 +200,10 @@ export default function SpaceInvaders({ onNavigate }: SpaceInvadersProps) {
 
         if (shouldMoveDown) {
           enemyDirectionRef.current *= -1;
-          enemiesRef.current.forEach(enemy => {
+          enemiesRef.current.forEach((enemy) => {
             if (enemy.alive) {
               enemy.y += 20;
-              
+
               // Check if enemies reached bottom
               if (enemy.y + ENEMY_SIZE >= GAME_HEIGHT - 60) {
                 setGameOver(true);
@@ -205,7 +211,7 @@ export default function SpaceInvaders({ onNavigate }: SpaceInvadersProps) {
             }
           });
         } else {
-          enemiesRef.current.forEach(enemy => {
+          enemiesRef.current.forEach((enemy) => {
             if (enemy.alive) {
               enemy.x += enemyDirectionRef.current * 10;
             }
@@ -216,9 +222,10 @@ export default function SpaceInvaders({ onNavigate }: SpaceInvadersProps) {
       // Enemy shooting
       if (currentTime - lastEnemyShootRef.current > 1500) {
         lastEnemyShootRef.current = currentTime;
-        const aliveEnemies = enemiesRef.current.filter(e => e.alive);
+        const aliveEnemies = enemiesRef.current.filter((e) => e.alive);
         if (aliveEnemies.length > 0) {
-          const shooter = aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)];
+          const shooter =
+            aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)];
           bulletsRef.current.push({
             id: nextBulletIdRef.current++,
             x: shooter.x + ENEMY_SIZE / 2 - BULLET_SIZE / 2,
@@ -229,7 +236,7 @@ export default function SpaceInvaders({ onNavigate }: SpaceInvadersProps) {
       }
 
       // Check bullet-enemy collisions
-      bulletsRef.current = bulletsRef.current.filter(bullet => {
+      bulletsRef.current = bulletsRef.current.filter((bullet) => {
         if (!bullet.isPlayerBullet) return true;
 
         for (const enemy of enemiesRef.current) {
@@ -241,7 +248,7 @@ export default function SpaceInvaders({ onNavigate }: SpaceInvadersProps) {
             bullet.y <= enemy.y + ENEMY_SIZE
           ) {
             enemy.alive = false;
-            setScore(prev => prev + 10 * wave);
+            setScore((prev) => prev + 10 * wave);
             return false;
           }
         }
@@ -249,8 +256,8 @@ export default function SpaceInvaders({ onNavigate }: SpaceInvadersProps) {
       });
 
       // Check if all enemies destroyed
-      if (enemiesRef.current.every(e => !e.alive)) {
-        setWave(prev => {
+      if (enemiesRef.current.every((e) => !e.alive)) {
+        setWave((prev) => {
           const newWave = prev + 1;
           enemiesRef.current = createEnemies(newWave);
           enemyDirectionRef.current = 1;
@@ -292,7 +299,9 @@ export default function SpaceInvaders({ onNavigate }: SpaceInvadersProps) {
           <div className="flex items-center gap-2">
             <span className="text-xl font-bold">Lives:</span>
             {Array.from({ length: lives }).map((_, i) => (
-              <span key={i} className="text-2xl">🚀</span>
+              <span key={i} className="text-2xl">
+                🚀
+              </span>
             ))}
           </div>
           <div className="text-xl font-bold">Wave: {wave}</div>
@@ -328,12 +337,12 @@ export default function SpaceInvaders({ onNavigate }: SpaceInvadersProps) {
               bottom: 10,
               width: PLAYER_SIZE,
               height: PLAYER_SIZE,
-              clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)',
+              clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)",
             }}
           />
 
           {/* Enemies */}
-          {enemiesRef.current.map(enemy =>
+          {enemiesRef.current.map((enemy) =>
             enemy.alive ? (
               <div
                 key={enemy.id}
@@ -343,17 +352,17 @@ export default function SpaceInvaders({ onNavigate }: SpaceInvadersProps) {
                   top: enemy.y,
                   width: ENEMY_SIZE,
                   height: ENEMY_SIZE,
-                  borderRadius: '50% 50% 0 0',
+                  borderRadius: "50% 50% 0 0",
                 }}
               >
                 <div className="absolute top-1/3 left-1/4 w-2 h-2 bg-red-500 rounded-full" />
                 <div className="absolute top-1/3 right-1/4 w-2 h-2 bg-red-500 rounded-full" />
               </div>
-            ) : null
+            ) : null,
           )}
 
           {/* Bullets */}
-          {bulletsRef.current.map(bullet => (
+          {bulletsRef.current.map((bullet) => (
             <div
               key={bullet.id}
               className="absolute rounded-full"
@@ -362,7 +371,7 @@ export default function SpaceInvaders({ onNavigate }: SpaceInvadersProps) {
                 top: bullet.y,
                 width: BULLET_SIZE,
                 height: BULLET_SIZE * 2,
-                backgroundColor: bullet.isPlayerBullet ? '#00FFFF' : '#FF0000',
+                backgroundColor: bullet.isPlayerBullet ? "#00FFFF" : "#FF0000",
               }}
             />
           ))}
@@ -371,7 +380,9 @@ export default function SpaceInvaders({ onNavigate }: SpaceInvadersProps) {
           {showInstructions && !gameOver && (
             <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-10">
               <div className="bg-white p-6 rounded-lg border-4 border-cyan-400 text-center max-w-sm">
-                <h2 className="text-2xl font-bold mb-3 text-cyan-600">How to Play</h2>
+                <h2 className="text-2xl font-bold mb-3 text-cyan-600">
+                  How to Play
+                </h2>
                 <p className="mb-2">⬅️➡️ or A/D: Move</p>
                 <p className="mb-2">Space: Shoot</p>
                 <p className="mb-2">👾 Destroy all enemies!</p>
@@ -388,7 +399,10 @@ export default function SpaceInvaders({ onNavigate }: SpaceInvadersProps) {
         </div>
 
         <div className="mt-4 text-white text-center">
-          <p className="text-sm">Enemies Remaining: {enemiesRef.current.filter(e => e.alive).length}</p>
+          <p className="text-sm">
+            Enemies Remaining:{" "}
+            {enemiesRef.current.filter((e) => e.alive).length}
+          </p>
         </div>
       </div>
     </GameLayout>

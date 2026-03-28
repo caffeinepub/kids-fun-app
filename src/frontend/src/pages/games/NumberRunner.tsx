@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
-import GameLayout from '../../components/GameLayout';
-import { ModulePage } from '../../App';
+import { useCallback, useEffect, useState } from "react";
+import type { ModulePage } from "../../App";
+import GameLayout from "../../components/GameLayout";
 
 interface Obstacle {
   id: number;
@@ -24,21 +24,21 @@ export default function NumberRunner({ onNavigate }: NumberRunnerProps) {
   const [highScore, setHighScore] = useState(0);
 
   const generateMathProblem = useCallback(() => {
-    const operations = ['+', '-', '×'];
+    const operations = ["+", "-", "×"];
     const operation = operations[Math.floor(Math.random() * operations.length)];
     let num1 = Math.floor(Math.random() * 10) + 1;
     let num2 = Math.floor(Math.random() * 10) + 1;
     let answer = 0;
 
     switch (operation) {
-      case '+':
+      case "+":
         answer = num1 + num2;
         break;
-      case '-':
+      case "-":
         if (num1 < num2) [num1, num2] = [num2, num1];
         answer = num1 - num2;
         break;
-      case '×':
+      case "×":
         num1 = Math.floor(Math.random() * 5) + 1;
         num2 = Math.floor(Math.random() * 5) + 1;
         answer = num1 * num2;
@@ -82,8 +82,8 @@ export default function NumberRunner({ onNavigate }: NumberRunnerProps) {
     if (gameOver) return;
 
     const spawnInterval = setInterval(() => {
-      setNextId(id => id + 1);
-      setObstacles(prev => [...prev, createObstacle()]);
+      setNextId((id) => id + 1);
+      setObstacles((prev) => [...prev, createObstacle()]);
     }, 3000);
 
     return () => clearInterval(spawnInterval);
@@ -93,16 +93,16 @@ export default function NumberRunner({ onNavigate }: NumberRunnerProps) {
     if (gameOver) return;
 
     const moveInterval = setInterval(() => {
-      setObstacles(prev => {
-        const updated = prev.map(obs => ({ ...obs, x: obs.x - speed }));
-        
+      setObstacles((prev) => {
+        const updated = prev.map((obs) => ({ ...obs, x: obs.x - speed }));
+
         // Check for collisions
-        const collision = updated.find(obs => obs.x < 20 && obs.x > 0);
+        const collision = updated.find((obs) => obs.x < 20 && obs.x > 0);
         if (collision) {
           setGameOver(true);
         }
-        
-        return updated.filter(obs => obs.x > -20);
+
+        return updated.filter((obs) => obs.x > -20);
       });
     }, 50);
 
@@ -111,7 +111,7 @@ export default function NumberRunner({ onNavigate }: NumberRunnerProps) {
 
   useEffect(() => {
     if (score > 0 && score % 50 === 0) {
-      setSpeed(prev => Math.min(prev + 0.5, 5));
+      setSpeed((prev) => Math.min(prev + 0.5, 5));
     }
   }, [score]);
 
@@ -121,25 +121,28 @@ export default function NumberRunner({ onNavigate }: NumberRunnerProps) {
     }
   }, [gameOver, score, highScore]);
 
-  const handleKeyPress = useCallback((e: KeyboardEvent) => {
-    if (gameOver) return;
-    
-    if (e.key === 'ArrowUp' && playerLane > 0) {
-      setPlayerLane(prev => prev - 1);
-    } else if (e.key === 'ArrowDown' && playerLane < 2) {
-      setPlayerLane(prev => prev + 1);
-    }
-  }, [gameOver, playerLane]);
+  const handleKeyPress = useCallback(
+    (e: KeyboardEvent) => {
+      if (gameOver) return;
+
+      if (e.key === "ArrowUp" && playerLane > 0) {
+        setPlayerLane((prev) => prev - 1);
+      } else if (e.key === "ArrowDown" && playerLane < 2) {
+        setPlayerLane((prev) => prev + 1);
+      }
+    },
+    [gameOver, playerLane],
+  );
 
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
   }, [handleKeyPress]);
 
   const answerQuestion = (obstacle: Obstacle, selectedAnswer: number) => {
     if (selectedAnswer === obstacle.answer) {
-      setScore(prev => prev + 10);
-      setObstacles(prev => prev.filter(obs => obs.id !== obstacle.id));
+      setScore((prev) => prev + 10);
+      setObstacles((prev) => prev.filter((obs) => obs.id !== obstacle.id));
     } else {
       setGameOver(true);
     }
@@ -168,7 +171,7 @@ export default function NumberRunner({ onNavigate }: NumberRunnerProps) {
 
         {/* Lanes */}
         <div className="absolute inset-0 flex flex-col">
-          {[0, 1, 2].map(lane => (
+          {[0, 1, 2].map((lane) => (
             <div
               key={lane}
               className="flex-1 border-b-4 border-white/30 relative"
@@ -190,8 +193,8 @@ export default function NumberRunner({ onNavigate }: NumberRunnerProps) {
             className="absolute"
             style={{
               left: `${obstacle.x}%`,
-              top: `${16.67 + index % 3 * 33.33}%`,
-              transform: 'translateY(-50%)',
+              top: `${16.67 + (index % 3) * 33.33}%`,
+              transform: "translateY(-50%)",
             }}
           >
             <div className="bg-white p-4 rounded-lg border-4 border-purple-400 shadow-lg">
@@ -199,7 +202,7 @@ export default function NumberRunner({ onNavigate }: NumberRunnerProps) {
                 {obstacle.question} = ?
               </div>
               <div className="flex gap-2">
-                {obstacle.options.map(option => (
+                {obstacle.options.map((option) => (
                   <button
                     key={option}
                     onClick={() => answerQuestion(obstacle, option)}

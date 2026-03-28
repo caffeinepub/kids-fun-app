@@ -1,8 +1,8 @@
-import { useState, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Star, CheckCircle2 } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { CheckCircle2, Star } from "lucide-react";
+import { useRef, useState } from "react";
 
 interface Lesson {
   id: string;
@@ -18,80 +18,114 @@ interface ArtsMusicActivityProps {
 }
 
 type ColorMixingGame = {
-  type: 'color-mixing';
-  mixes: { color1: string; color2: string; result: string; emoji: string; }[];
+  type: "color-mixing";
+  mixes: { color1: string; color2: string; result: string; emoji: string }[];
 };
 
 type DrawingGame = {
-  type: 'drawing';
-  shapes: { name: string; steps: string[]; emoji: string; }[];
+  type: "drawing";
+  shapes: { name: string; steps: string[]; emoji: string }[];
 };
 
 type RhythmGame = {
-  type: 'rhythm';
-  patterns: { name: string; pattern: string[]; speed: number; }[];
+  type: "rhythm";
+  patterns: { name: string; pattern: string[]; speed: number }[];
 };
 
 type InstrumentsGame = {
-  type: 'instruments';
-  instruments: { name: string; emoji: string; sound: string; family: string; }[];
+  type: "instruments";
+  instruments: { name: string; emoji: string; sound: string; family: string }[];
 };
 
 type CreativeGame = {
-  type: 'creative';
-  prompts: { title: string; description: string; emoji: string; }[];
+  type: "creative";
+  prompts: { title: string; description: string; emoji: string }[];
 };
 
-type GameData = ColorMixingGame | DrawingGame | RhythmGame | InstrumentsGame | CreativeGame;
+type GameData =
+  | ColorMixingGame
+  | DrawingGame
+  | RhythmGame
+  | InstrumentsGame
+  | CreativeGame;
 
 const artsGames: Record<string, GameData> = {
-  'arts-1': {
-    type: 'color-mixing',
+  "arts-1": {
+    type: "color-mixing",
     mixes: [
-      { color1: 'red', color2: 'blue', result: 'purple', emoji: '🟣' },
-      { color1: 'red', color2: 'yellow', result: 'orange', emoji: '🟠' },
-      { color1: 'blue', color2: 'yellow', result: 'green', emoji: '🟢' },
+      { color1: "red", color2: "blue", result: "purple", emoji: "🟣" },
+      { color1: "red", color2: "yellow", result: "orange", emoji: "🟠" },
+      { color1: "blue", color2: "yellow", result: "green", emoji: "🟢" },
     ],
   },
-  'arts-2': {
-    type: 'drawing',
+  "arts-2": {
+    type: "drawing",
     shapes: [
-      { name: 'Circle', steps: ['Draw a round shape', 'Make it smooth', 'Color it in'], emoji: '⭕' },
-      { name: 'Square', steps: ['Draw four equal sides', 'Connect the corners', 'Make it neat'], emoji: '🟦' },
-      { name: 'Triangle', steps: ['Draw three sides', 'Connect the points', 'Color it bright'], emoji: '🔺' },
+      {
+        name: "Circle",
+        steps: ["Draw a round shape", "Make it smooth", "Color it in"],
+        emoji: "⭕",
+      },
+      {
+        name: "Square",
+        steps: ["Draw four equal sides", "Connect the corners", "Make it neat"],
+        emoji: "🟦",
+      },
+      {
+        name: "Triangle",
+        steps: ["Draw three sides", "Connect the points", "Color it bright"],
+        emoji: "🔺",
+      },
     ],
   },
-  'arts-3': {
-    type: 'rhythm',
+  "arts-3": {
+    type: "rhythm",
     patterns: [
-      { name: 'Simple Beat', pattern: ['👏', '👏', '🦶', '🦶'], speed: 1000 },
-      { name: 'Fast Clap', pattern: ['👏', '👏', '👏', '👏'], speed: 500 },
-      { name: 'Mixed Beat', pattern: ['👏', '🦶', '👏', '🦶'], speed: 800 },
+      { name: "Simple Beat", pattern: ["👏", "👏", "🦶", "🦶"], speed: 1000 },
+      { name: "Fast Clap", pattern: ["👏", "👏", "👏", "👏"], speed: 500 },
+      { name: "Mixed Beat", pattern: ["👏", "🦶", "👏", "🦶"], speed: 800 },
     ],
   },
-  'arts-4': {
-    type: 'instruments',
+  "arts-4": {
+    type: "instruments",
     instruments: [
-      { name: 'Piano', emoji: '🎹', sound: 'ding ding', family: 'keyboard' },
-      { name: 'Guitar', emoji: '🎸', sound: 'strum strum', family: 'string' },
-      { name: 'Drums', emoji: '🥁', sound: 'boom boom', family: 'percussion' },
-      { name: 'Trumpet', emoji: '🎺', sound: 'toot toot', family: 'brass' },
+      { name: "Piano", emoji: "🎹", sound: "ding ding", family: "keyboard" },
+      { name: "Guitar", emoji: "🎸", sound: "strum strum", family: "string" },
+      { name: "Drums", emoji: "🥁", sound: "boom boom", family: "percussion" },
+      { name: "Trumpet", emoji: "🎺", sound: "toot toot", family: "brass" },
     ],
   },
-  'arts-5': {
-    type: 'creative',
+  "arts-5": {
+    type: "creative",
     prompts: [
-      { title: 'Draw Your Happy Place', description: 'What makes you smile?', emoji: '😊' },
-      { title: 'Create a Rainbow', description: 'Use all the colors!', emoji: '🌈' },
-      { title: 'Design a Pattern', description: 'Repeat shapes and colors', emoji: '🎨' },
+      {
+        title: "Draw Your Happy Place",
+        description: "What makes you smile?",
+        emoji: "😊",
+      },
+      {
+        title: "Create a Rainbow",
+        description: "Use all the colors!",
+        emoji: "🌈",
+      },
+      {
+        title: "Design a Pattern",
+        description: "Repeat shapes and colors",
+        emoji: "🎨",
+      },
     ],
   },
 };
 
-export default function ArtsMusicActivity({ lesson, voiceEnabled, onComplete, onBack }: ArtsMusicActivityProps) {
+export default function ArtsMusicActivity({
+  lesson,
+  voiceEnabled,
+  onComplete,
+  onBack,
+}: ArtsMusicActivityProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [score, setScore] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [_selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [rhythmIndex, setRhythmIndex] = useState(0);
@@ -99,16 +133,21 @@ export default function ArtsMusicActivity({ lesson, voiceEnabled, onComplete, on
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const gameData = artsGames[lesson.id];
-  const totalSteps = gameData.type === 'color-mixing' ? gameData.mixes.length :
-                     gameData.type === 'drawing' ? gameData.shapes.length :
-                     gameData.type === 'rhythm' ? gameData.patterns.length :
-                     gameData.type === 'instruments' ? gameData.instruments.length :
-                     gameData.prompts.length;
+  const totalSteps =
+    gameData.type === "color-mixing"
+      ? gameData.mixes.length
+      : gameData.type === "drawing"
+        ? gameData.shapes.length
+        : gameData.type === "rhythm"
+          ? gameData.patterns.length
+          : gameData.type === "instruments"
+            ? gameData.instruments.length
+            : gameData.prompts.length;
 
   const progress = ((currentStep + 1) / totalSteps) * 100;
 
   const speakText = (text: string) => {
-    if ('speechSynthesis' in window && voiceEnabled) {
+    if ("speechSynthesis" in window && voiceEnabled) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.rate = 0.8;
       utterance.pitch = 1.2;
@@ -117,7 +156,7 @@ export default function ArtsMusicActivity({ lesson, voiceEnabled, onComplete, on
   };
 
   const handleColorMix = (result: string) => {
-    if (gameData.type !== 'color-mixing') return;
+    if (gameData.type !== "color-mixing") return;
     const mix = gameData.mixes[currentStep];
 
     const correct = result === mix.result;
@@ -127,9 +166,9 @@ export default function ArtsMusicActivity({ lesson, voiceEnabled, onComplete, on
 
     if (correct) {
       setScore(score + 1);
-      speakText('Perfect! You mixed the colors correctly!');
+      speakText("Perfect! You mixed the colors correctly!");
     } else {
-      speakText('Try mixing again!');
+      speakText("Try mixing again!");
     }
 
     setTimeout(() => {
@@ -138,7 +177,8 @@ export default function ArtsMusicActivity({ lesson, voiceEnabled, onComplete, on
       if (correct && currentStep < totalSteps - 1) {
         setCurrentStep(currentStep + 1);
       } else if (correct) {
-        const stars = score >= totalSteps * 0.8 ? 3 : score >= totalSteps * 0.6 ? 2 : 1;
+        const stars =
+          score >= totalSteps * 0.8 ? 3 : score >= totalSteps * 0.6 ? 2 : 1;
         onComplete(stars);
       }
     }, 2000);
@@ -154,7 +194,7 @@ export default function ArtsMusicActivity({ lesson, voiceEnabled, onComplete, on
   };
 
   const playRhythm = () => {
-    if (gameData.type !== 'rhythm') return;
+    if (gameData.type !== "rhythm") return;
     const pattern = gameData.patterns[currentStep];
     setIsPlaying(true);
     setRhythmIndex(0);
@@ -173,20 +213,26 @@ export default function ArtsMusicActivity({ lesson, voiceEnabled, onComplete, on
   };
 
   const renderActivity = () => {
-    if (gameData.type === 'color-mixing') {
+    if (gameData.type === "color-mixing") {
       const mix = gameData.mixes[currentStep];
       return (
         <div className="space-y-8 text-center">
-          <h3 className="text-3xl font-bold text-neon-purple">Mix these colors:</h3>
+          <h3 className="text-3xl font-bold text-neon-purple">
+            Mix these colors:
+          </h3>
           <div className="flex justify-center gap-8 items-center">
-            <div className={`w-32 h-32 rounded-full bg-${mix.color1}-500 border-4 border-neon-purple shadow-neon-md`}></div>
+            <div
+              className={`w-32 h-32 rounded-full bg-${mix.color1}-500 border-4 border-neon-purple shadow-neon-md`}
+            />
             <span className="text-5xl">+</span>
-            <div className={`w-32 h-32 rounded-full bg-${mix.color2}-500 border-4 border-neon-purple shadow-neon-md`}></div>
+            <div
+              className={`w-32 h-32 rounded-full bg-${mix.color2}-500 border-4 border-neon-purple shadow-neon-md`}
+            />
             <span className="text-5xl">=</span>
             <span className="text-6xl">?</span>
           </div>
           <div className="flex justify-center gap-4">
-            {['purple', 'orange', 'green'].map((color) => (
+            {["purple", "orange", "green"].map((color) => (
               <Button
                 key={color}
                 onClick={() => handleColorMix(color)}
@@ -194,7 +240,9 @@ export default function ArtsMusicActivity({ lesson, voiceEnabled, onComplete, on
                 className={`w-32 h-32 rounded-full bg-${color}-500 border-4 border-neon-purple`}
                 disabled={showFeedback}
               >
-                <span className="text-4xl">{color === 'purple' ? '🟣' : color === 'orange' ? '🟠' : '🟢'}</span>
+                <span className="text-4xl">
+                  {color === "purple" ? "🟣" : color === "orange" ? "🟠" : "🟢"}
+                </span>
               </Button>
             ))}
           </div>
@@ -202,7 +250,7 @@ export default function ArtsMusicActivity({ lesson, voiceEnabled, onComplete, on
       );
     }
 
-    if (gameData.type === 'drawing') {
+    if (gameData.type === "drawing") {
       const shape = gameData.shapes[currentStep];
       return (
         <div className="space-y-8 text-center">
@@ -212,7 +260,9 @@ export default function ArtsMusicActivity({ lesson, voiceEnabled, onComplete, on
             {shape.steps.map((step, i) => (
               <Card key={i} className="border-2 border-neon-cyan">
                 <CardContent className="p-4">
-                  <p className="text-xl">Step {i + 1}: {step}</p>
+                  <p className="text-xl">
+                    Step {i + 1}: {step}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -223,24 +273,32 @@ export default function ArtsMusicActivity({ lesson, voiceEnabled, onComplete, on
             height={300}
             className="border-4 border-neon-purple rounded-lg mx-auto bg-white"
           />
-          <Button onClick={handleNext} size="lg" className="bg-gradient-to-r from-neon-pink to-neon-purple">
+          <Button
+            onClick={handleNext}
+            size="lg"
+            className="bg-gradient-to-r from-neon-pink to-neon-purple"
+          >
             I Drew It! Next Shape
           </Button>
         </div>
       );
     }
 
-    if (gameData.type === 'rhythm') {
+    if (gameData.type === "rhythm") {
       const pattern = gameData.patterns[currentStep];
       return (
         <div className="space-y-8 text-center">
-          <h2 className="text-4xl font-bold text-neon-purple">{pattern.name}</h2>
+          <h2 className="text-4xl font-bold text-neon-purple">
+            {pattern.name}
+          </h2>
           <div className="flex justify-center gap-4">
             {pattern.pattern.map((emoji, i) => (
               <div
                 key={i}
                 className={`w-24 h-24 flex items-center justify-center text-5xl border-4 rounded-lg transition-all ${
-                  isPlaying && i === rhythmIndex ? 'border-neon-pink bg-neon-pink/20 scale-125' : 'border-neon-cyan'
+                  isPlaying && i === rhythmIndex
+                    ? "border-neon-pink bg-neon-pink/20 scale-125"
+                    : "border-neon-cyan"
                 }`}
               >
                 {emoji}
@@ -248,10 +306,19 @@ export default function ArtsMusicActivity({ lesson, voiceEnabled, onComplete, on
             ))}
           </div>
           <div className="space-y-4">
-            <Button onClick={playRhythm} size="lg" className="bg-gradient-to-r from-neon-cyan to-neon-blue" disabled={isPlaying}>
-              {isPlaying ? 'Playing...' : 'Play Pattern'}
+            <Button
+              onClick={playRhythm}
+              size="lg"
+              className="bg-gradient-to-r from-neon-cyan to-neon-blue"
+              disabled={isPlaying}
+            >
+              {isPlaying ? "Playing..." : "Play Pattern"}
             </Button>
-            <Button onClick={handleNext} size="lg" className="bg-gradient-to-r from-neon-green to-neon-cyan">
+            <Button
+              onClick={handleNext}
+              size="lg"
+              className="bg-gradient-to-r from-neon-green to-neon-cyan"
+            >
               I Got It! Next Pattern
             </Button>
           </div>
@@ -259,27 +326,35 @@ export default function ArtsMusicActivity({ lesson, voiceEnabled, onComplete, on
       );
     }
 
-    if (gameData.type === 'instruments') {
+    if (gameData.type === "instruments") {
       const instrument = gameData.instruments[currentStep];
       return (
         <div className="space-y-8 text-center">
           <div className="text-9xl mb-4">{instrument.emoji}</div>
-          <h2 className="text-5xl font-bold text-neon-purple">{instrument.name}</h2>
+          <h2 className="text-5xl font-bold text-neon-purple">
+            {instrument.name}
+          </h2>
           <p className="text-3xl text-neon-cyan">Sound: {instrument.sound}</p>
           <p className="text-2xl text-gray-600">Family: {instrument.family}</p>
-          <Button onClick={handleNext} size="lg" className="bg-gradient-to-r from-neon-pink to-neon-purple">
+          <Button
+            onClick={handleNext}
+            size="lg"
+            className="bg-gradient-to-r from-neon-pink to-neon-purple"
+          >
             Next Instrument
           </Button>
         </div>
       );
     }
 
-    if (gameData.type === 'creative') {
+    if (gameData.type === "creative") {
       const prompt = gameData.prompts[currentStep];
       return (
         <div className="space-y-8 text-center">
           <div className="text-9xl mb-4">{prompt.emoji}</div>
-          <h2 className="text-5xl font-bold text-neon-purple">{prompt.title}</h2>
+          <h2 className="text-5xl font-bold text-neon-purple">
+            {prompt.title}
+          </h2>
           <p className="text-2xl text-neon-cyan">{prompt.description}</p>
           <canvas
             ref={canvasRef}
@@ -287,7 +362,11 @@ export default function ArtsMusicActivity({ lesson, voiceEnabled, onComplete, on
             height={400}
             className="border-4 border-neon-purple rounded-lg mx-auto bg-white"
           />
-          <Button onClick={handleNext} size="lg" className="bg-gradient-to-r from-neon-green to-neon-cyan">
+          <Button
+            onClick={handleNext}
+            size="lg"
+            className="bg-gradient-to-r from-neon-green to-neon-cyan"
+          >
             I'm Done! Next Prompt
           </Button>
         </div>
@@ -319,7 +398,9 @@ export default function ArtsMusicActivity({ lesson, voiceEnabled, onComplete, on
         </div>
 
         {showFeedback && (
-          <div className={`text-center p-6 rounded-xl ${isCorrect ? 'bg-green-100' : 'bg-orange-100'}`}>
+          <div
+            className={`text-center p-6 rounded-xl ${isCorrect ? "bg-green-100" : "bg-orange-100"}`}
+          >
             <div className="flex items-center justify-center gap-2 text-2xl font-bold">
               {isCorrect ? (
                 <>
@@ -339,7 +420,7 @@ export default function ArtsMusicActivity({ lesson, voiceEnabled, onComplete, on
           {[...Array(3)].map((_, i) => (
             <Star
               key={i}
-              className={`h-8 w-8 ${i < Math.floor((score / totalSteps) * 3) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
+              className={`h-8 w-8 ${i < Math.floor((score / totalSteps) * 3) ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`}
             />
           ))}
         </div>

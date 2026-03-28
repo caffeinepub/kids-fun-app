@@ -1,9 +1,15 @@
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Ghost, Skull, Sparkles, Volume2, VolumeX } from 'lucide-react';
-import { ModulePage } from '../App';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Ghost, Skull, Sparkles, Volume2, VolumeX } from "lucide-react";
+import { useState } from "react";
+import type { ModulePage } from "../App";
 
 interface ScaryGame {
   id: ModulePage;
@@ -16,28 +22,29 @@ interface ScaryGame {
 
 const scaryGames: ScaryGame[] = [
   {
-    id: 'game:monster-maze',
-    name: 'Monster Maze 👹',
-    description: 'Navigate through a maze full of goofy monsters and reach the exit!',
-    icon: '🏰',
-    difficulty: 'Medium',
-    theme: 'purple',
+    id: "game:monster-maze",
+    name: "Monster Maze 👹",
+    description:
+      "Navigate through a maze full of goofy monsters and reach the exit!",
+    icon: "🏰",
+    difficulty: "Medium",
+    theme: "purple",
   },
   {
-    id: 'game:spider-web-puzzle',
-    name: 'Spider Web Puzzle 🕷️',
-    description: 'Untangle webs to free trapped monster friends!',
-    icon: '🕸️',
-    difficulty: 'Easy',
-    theme: 'green',
+    id: "game:spider-web-puzzle",
+    name: "Spider Web Puzzle 🕷️",
+    description: "Untangle webs to free trapped monster friends!",
+    icon: "🕸️",
+    difficulty: "Easy",
+    theme: "green",
   },
   {
-    id: 'game:pumpkin-smash',
-    name: 'Pumpkin Smash 🎃',
-    description: 'Whack bouncing pumpkins for points before time runs out!',
-    icon: '🎃',
-    difficulty: 'Easy',
-    theme: 'orange',
+    id: "game:pumpkin-smash",
+    name: "Pumpkin Smash 🎃",
+    description: "Whack bouncing pumpkins for points before time runs out!",
+    icon: "🎃",
+    difficulty: "Easy",
+    theme: "orange",
   },
 ];
 
@@ -56,30 +63,38 @@ export default function ScaryHub({ onNavigate }: ScaryHubProps) {
 
   const getThemeColor = (theme: string) => {
     const colors: Record<string, string> = {
-      purple: 'from-purple-600 to-purple-800',
-      green: 'from-green-600 to-green-800',
-      orange: 'from-orange-600 to-orange-800',
-      red: 'from-red-600 to-red-800',
-      blue: 'from-blue-600 to-blue-800',
+      purple: "from-purple-600 to-purple-800",
+      green: "from-green-600 to-green-800",
+      orange: "from-orange-600 to-orange-800",
+      red: "from-red-600 to-red-800",
+      blue: "from-blue-600 to-blue-800",
     };
-    return colors[theme] || 'from-purple-600 to-purple-800';
+    return colors[theme] || "from-purple-600 to-purple-800";
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-orange-900 p-4 md:p-8 relative overflow-hidden">
       {/* Spooky Background Effects */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-10 left-10 text-6xl animate-bounce opacity-30">👻</div>
-        <div className="absolute top-20 right-20 text-5xl animate-pulse opacity-20">🦇</div>
-        <div className="absolute bottom-20 left-1/4 text-7xl animate-spin-slow opacity-25">🕷️</div>
-        <div className="absolute bottom-10 right-1/3 text-6xl animate-bounce opacity-30">🎃</div>
+        <div className="absolute top-10 left-10 text-6xl animate-bounce opacity-30">
+          👻
+        </div>
+        <div className="absolute top-20 right-20 text-5xl animate-pulse opacity-20">
+          🦇
+        </div>
+        <div className="absolute bottom-20 left-1/4 text-7xl animate-spin-slow opacity-25">
+          🕷️
+        </div>
+        <div className="absolute bottom-10 right-1/3 text-6xl animate-bounce opacity-30">
+          🎃
+        </div>
       </div>
 
       {/* Surprise Pop-up */}
       {surpriseTriggered && (
         <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
           <div className="text-9xl animate-bounce">
-            {['👻', '🧟', '🧛', '🎃', '💀'][Math.floor(Math.random() * 5)]}
+            {["👻", "🧟", "🧛", "🎃", "💀"][Math.floor(Math.random() * 5)]}
           </div>
         </div>
       )}
@@ -133,7 +148,7 @@ export default function ScaryHub({ onNavigate }: ScaryHubProps) {
 
         {/* Games Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {scaryGames.map((game, index) => (
+          {scaryGames.map((game, _index) => (
             <Card
               key={game.id}
               className="border-4 border-neon-purple hover:border-neon-orange hover:shadow-neon-lg transition-all duration-300 hover:scale-105 cursor-pointer bg-gradient-to-br from-black/80 to-purple-900/80 backdrop-blur-sm group"
@@ -147,7 +162,9 @@ export default function ScaryHub({ onNavigate }: ScaryHubProps) {
                   <div className="w-full h-40 flex items-center justify-center text-8xl bg-gradient-to-br from-purple-800/50 to-black/50 rounded-lg border-4 border-neon-green group-hover:animate-pulse">
                     {game.icon}
                   </div>
-                  <Badge className={`absolute top-2 right-2 text-xs font-bold bg-gradient-to-r ${getThemeColor(game.theme)} border-2 border-white`}>
+                  <Badge
+                    className={`absolute top-2 right-2 text-xs font-bold bg-gradient-to-r ${getThemeColor(game.theme)} border-2 border-white`}
+                  >
                     {game.difficulty}
                   </Badge>
                 </div>
@@ -179,20 +196,36 @@ export default function ScaryHub({ onNavigate }: ScaryHubProps) {
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <div>
-                <div className="text-5xl font-bold text-neon-purple text-shadow-neon-md">3</div>
-                <div className="text-neon-cyan text-shadow-neon-sm">Scary Games</div>
+                <div className="text-5xl font-bold text-neon-purple text-shadow-neon-md">
+                  3
+                </div>
+                <div className="text-neon-cyan text-shadow-neon-sm">
+                  Scary Games
+                </div>
               </div>
               <div>
-                <div className="text-5xl font-bold text-neon-green text-shadow-neon-md">0</div>
-                <div className="text-neon-cyan text-shadow-neon-sm">Monsters Met</div>
+                <div className="text-5xl font-bold text-neon-green text-shadow-neon-md">
+                  0
+                </div>
+                <div className="text-neon-cyan text-shadow-neon-sm">
+                  Monsters Met
+                </div>
               </div>
               <div>
-                <div className="text-5xl font-bold text-neon-orange text-shadow-neon-md">0</div>
-                <div className="text-neon-cyan text-shadow-neon-sm">Pumpkins Smashed</div>
+                <div className="text-5xl font-bold text-neon-orange text-shadow-neon-md">
+                  0
+                </div>
+                <div className="text-neon-cyan text-shadow-neon-sm">
+                  Pumpkins Smashed
+                </div>
               </div>
               <div>
-                <div className="text-5xl font-bold text-neon-pink text-shadow-neon-md">0</div>
-                <div className="text-neon-cyan text-shadow-neon-sm">Potions Mixed</div>
+                <div className="text-5xl font-bold text-neon-pink text-shadow-neon-md">
+                  0
+                </div>
+                <div className="text-neon-cyan text-shadow-neon-sm">
+                  Potions Mixed
+                </div>
               </div>
             </div>
           </CardContent>

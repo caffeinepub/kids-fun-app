@@ -1,30 +1,36 @@
-import { useState } from 'react';
-import { useSaveCallerUserProfile } from '../hooks/useQueries';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { toast } from 'sonner';
-import { Principal } from '@icp-sdk/core/principal';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Principal } from "@icp-sdk/core/principal";
+import { useState } from "react";
+import { toast } from "sonner";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
+import { useSaveCallerUserProfile } from "../hooks/useQueries";
 
 export default function ProfileSetup() {
   const { identity } = useInternetIdentity();
-  const [name, setName] = useState('');
-  const [age, setAge] = useState('');
+  const [name, setName] = useState("");
+  const [age, setAge] = useState("");
   const saveProfile = useSaveCallerUserProfile();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!name.trim()) {
-      toast.error('Please enter your name');
+      toast.error("Please enter your name");
       return;
     }
 
-    const ageNum = parseInt(age);
+    const ageNum = Number.parseInt(age);
     if (!age || ageNum < 5 || ageNum > 12) {
-      toast.error('Age must be between 5 and 12');
+      toast.error("Age must be between 5 and 12");
       return;
     }
 
@@ -35,19 +41,19 @@ export default function ProfileSetup() {
         parentPrincipal: identity?.getPrincipal() || Principal.anonymous(),
         approvedContacts: [],
         screenTimeLimit: BigInt(120),
-        contentFilterLevel: 'medium',
-        avatarUrl: '😊',
-        theme: 'purple',
-        mascotPreference: 'friendly',
+        contentFilterLevel: "medium",
+        avatarUrl: "😊",
+        theme: "purple",
+        mascotPreference: "friendly",
         accessibilitySettings: {
           readAloudEnabled: false,
           highContrastMode: false,
           largeText: false,
         },
       });
-      toast.success('Profile created! Welcome to Kids Fun App! 🎉');
+      toast.success("Profile created! Welcome to Kids Fun App! 🎉");
     } catch (error) {
-      toast.error('Failed to create profile. Please try again.');
+      toast.error("Failed to create profile. Please try again.");
       console.error(error);
     }
   };
@@ -101,7 +107,7 @@ export default function ProfileSetup() {
               className="w-full text-lg h-12 font-bold"
               disabled={saveProfile.isPending}
             >
-              {saveProfile.isPending ? 'Creating Profile...' : "Let's Go! 🚀"}
+              {saveProfile.isPending ? "Creating Profile..." : "Let's Go! 🚀"}
             </Button>
           </form>
         </CardContent>

@@ -1,8 +1,14 @@
-import { useState, useRef, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX, Shuffle, Sparkles, Home } from 'lucide-react';
-import { ModulePage } from '../App';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Home, Shuffle, Sparkles, Volume2, VolumeX } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import type { ModulePage } from "../App";
 
 interface FunnyFartHubProps {
   onNavigate: (page: ModulePage) => void;
@@ -12,60 +18,289 @@ interface FartSound {
   id: string;
   name: string;
   color: string;
-  type: 'short' | 'long' | 'reverb' | 'echo' | 'wet' | 'squeaky' | 'meme' | 'bassy' | 'rhythmic';
+  type:
+    | "short"
+    | "long"
+    | "reverb"
+    | "echo"
+    | "wet"
+    | "squeaky"
+    | "meme"
+    | "bassy"
+    | "rhythmic";
   emoji: string;
 }
 
 const fartSounds: FartSound[] = [
-  { id: 'classic-toot', name: 'Classic Toot', color: 'from-yellow-400 to-orange-400', type: 'short', emoji: '💨' },
-  { id: 'squeaky-door', name: 'Squeaky Door', color: 'from-pink-400 to-red-400', type: 'squeaky', emoji: '🚪' },
-  { id: 'thunder-rumble', name: 'Thunder Rumble', color: 'from-purple-400 to-indigo-400', type: 'long', emoji: '⚡' },
-  { id: 'bubble-pop', name: 'Bubble Pop', color: 'from-cyan-400 to-blue-400', type: 'wet', emoji: '🫧' },
-  { id: 'trumpet-blast', name: 'Trumpet Blast', color: 'from-red-500 to-orange-500', type: 'bassy', emoji: '🎺' },
-  { id: 'echo-canyon', name: 'Echo Canyon', color: 'from-teal-400 to-green-400', type: 'echo', emoji: '🏔️' },
-  { id: 'reverb-chamber', name: 'Reverb Chamber', color: 'from-indigo-500 to-purple-500', type: 'reverb', emoji: '🎵' },
-  { id: 'rapid-fire', name: 'Rapid Fire', color: 'from-orange-500 to-red-600', type: 'rhythmic', emoji: '💥' },
-  { id: 'whoopee-cushion', name: 'Whoopee Cushion', color: 'from-pink-500 to-purple-500', type: 'meme', emoji: '🎈' },
-  { id: 'bass-drop', name: 'Bass Drop', color: 'from-blue-600 to-purple-600', type: 'bassy', emoji: '🔊' },
-  { id: 'tiny-squeak', name: 'Tiny Squeak', color: 'from-yellow-300 to-pink-300', type: 'squeaky', emoji: '🐭' },
-  { id: 'long-whistle', name: 'Long Whistle', color: 'from-green-400 to-cyan-400', type: 'long', emoji: '🎶' },
-  { id: 'wet-splat', name: 'Wet Splat', color: 'from-teal-500 to-blue-500', type: 'wet', emoji: '💦' },
-  { id: 'double-trouble', name: 'Double Trouble', color: 'from-red-400 to-pink-400', type: 'rhythmic', emoji: '👯' },
-  { id: 'mega-reverb', name: 'Mega Reverb', color: 'from-purple-600 to-indigo-600', type: 'reverb', emoji: '🌊' },
-  { id: 'quick-puff', name: 'Quick Puff', color: 'from-orange-300 to-yellow-300', type: 'short', emoji: '☁️' },
-  { id: 'echo-valley', name: 'Echo Valley', color: 'from-cyan-500 to-teal-500', type: 'echo', emoji: '🗻' },
-  { id: 'squeaky-toy', name: 'Squeaky Toy', color: 'from-pink-600 to-red-600', type: 'squeaky', emoji: '🧸' },
-  { id: 'deep-rumble', name: 'Deep Rumble', color: 'from-gray-700 to-gray-900', type: 'bassy', emoji: '🌋' },
-  { id: 'bubbly-bath', name: 'Bubbly Bath', color: 'from-blue-300 to-cyan-300', type: 'wet', emoji: '🛁' },
-  { id: 'meme-horn', name: 'Meme Horn', color: 'from-yellow-500 to-orange-500', type: 'meme', emoji: '📯' },
-  { id: 'long-drone', name: 'Long Drone', color: 'from-indigo-400 to-blue-400', type: 'long', emoji: '🎹' },
-  { id: 'triple-beat', name: 'Triple Beat', color: 'from-green-500 to-teal-500', type: 'rhythmic', emoji: '🥁' },
-  { id: 'super-reverb', name: 'Super Reverb', color: 'from-purple-700 to-pink-700', type: 'reverb', emoji: '🎤' },
-  { id: 'tiny-toot', name: 'Tiny Toot', color: 'from-yellow-400 to-green-400', type: 'short', emoji: '🌟' },
-  { id: 'mountain-echo', name: 'Mountain Echo', color: 'from-blue-600 to-cyan-600', type: 'echo', emoji: '⛰️' },
-  { id: 'rubber-duck', name: 'Rubber Duck', color: 'from-yellow-500 to-orange-400', type: 'squeaky', emoji: '🦆' },
-  { id: 'bass-boom', name: 'Bass Boom', color: 'from-red-700 to-orange-700', type: 'bassy', emoji: '💣' },
-  { id: 'splash-zone', name: 'Splash Zone', color: 'from-cyan-600 to-blue-600', type: 'wet', emoji: '🌊' },
-  { id: 'comedy-horn', name: 'Comedy Horn', color: 'from-pink-500 to-red-500', type: 'meme', emoji: '🤡' },
-  { id: 'endless-wind', name: 'Endless Wind', color: 'from-teal-600 to-green-600', type: 'long', emoji: '🌬️' },
-  { id: 'drum-roll', name: 'Drum Roll', color: 'from-orange-600 to-red-600', type: 'rhythmic', emoji: '🥁' },
-  { id: 'cave-reverb', name: 'Cave Reverb', color: 'from-indigo-700 to-purple-700', type: 'reverb', emoji: '🦇' },
-  { id: 'pop-fizz', name: 'Pop Fizz', color: 'from-yellow-600 to-pink-600', type: 'short', emoji: '🥤' },
-  { id: 'canyon-echo', name: 'Canyon Echo', color: 'from-orange-700 to-red-700', type: 'echo', emoji: '🏜️' },
-  { id: 'balloon-squeak', name: 'Balloon Squeak', color: 'from-pink-700 to-purple-700', type: 'squeaky', emoji: '🎈' },
+  {
+    id: "classic-toot",
+    name: "Classic Toot",
+    color: "from-yellow-400 to-orange-400",
+    type: "short",
+    emoji: "💨",
+  },
+  {
+    id: "squeaky-door",
+    name: "Squeaky Door",
+    color: "from-pink-400 to-red-400",
+    type: "squeaky",
+    emoji: "🚪",
+  },
+  {
+    id: "thunder-rumble",
+    name: "Thunder Rumble",
+    color: "from-purple-400 to-indigo-400",
+    type: "long",
+    emoji: "⚡",
+  },
+  {
+    id: "bubble-pop",
+    name: "Bubble Pop",
+    color: "from-cyan-400 to-blue-400",
+    type: "wet",
+    emoji: "🫧",
+  },
+  {
+    id: "trumpet-blast",
+    name: "Trumpet Blast",
+    color: "from-red-500 to-orange-500",
+    type: "bassy",
+    emoji: "🎺",
+  },
+  {
+    id: "echo-canyon",
+    name: "Echo Canyon",
+    color: "from-teal-400 to-green-400",
+    type: "echo",
+    emoji: "🏔️",
+  },
+  {
+    id: "reverb-chamber",
+    name: "Reverb Chamber",
+    color: "from-indigo-500 to-purple-500",
+    type: "reverb",
+    emoji: "🎵",
+  },
+  {
+    id: "rapid-fire",
+    name: "Rapid Fire",
+    color: "from-orange-500 to-red-600",
+    type: "rhythmic",
+    emoji: "💥",
+  },
+  {
+    id: "whoopee-cushion",
+    name: "Whoopee Cushion",
+    color: "from-pink-500 to-purple-500",
+    type: "meme",
+    emoji: "🎈",
+  },
+  {
+    id: "bass-drop",
+    name: "Bass Drop",
+    color: "from-blue-600 to-purple-600",
+    type: "bassy",
+    emoji: "🔊",
+  },
+  {
+    id: "tiny-squeak",
+    name: "Tiny Squeak",
+    color: "from-yellow-300 to-pink-300",
+    type: "squeaky",
+    emoji: "🐭",
+  },
+  {
+    id: "long-whistle",
+    name: "Long Whistle",
+    color: "from-green-400 to-cyan-400",
+    type: "long",
+    emoji: "🎶",
+  },
+  {
+    id: "wet-splat",
+    name: "Wet Splat",
+    color: "from-teal-500 to-blue-500",
+    type: "wet",
+    emoji: "💦",
+  },
+  {
+    id: "double-trouble",
+    name: "Double Trouble",
+    color: "from-red-400 to-pink-400",
+    type: "rhythmic",
+    emoji: "👯",
+  },
+  {
+    id: "mega-reverb",
+    name: "Mega Reverb",
+    color: "from-purple-600 to-indigo-600",
+    type: "reverb",
+    emoji: "🌊",
+  },
+  {
+    id: "quick-puff",
+    name: "Quick Puff",
+    color: "from-orange-300 to-yellow-300",
+    type: "short",
+    emoji: "☁️",
+  },
+  {
+    id: "echo-valley",
+    name: "Echo Valley",
+    color: "from-cyan-500 to-teal-500",
+    type: "echo",
+    emoji: "🗻",
+  },
+  {
+    id: "squeaky-toy",
+    name: "Squeaky Toy",
+    color: "from-pink-600 to-red-600",
+    type: "squeaky",
+    emoji: "🧸",
+  },
+  {
+    id: "deep-rumble",
+    name: "Deep Rumble",
+    color: "from-gray-700 to-gray-900",
+    type: "bassy",
+    emoji: "🌋",
+  },
+  {
+    id: "bubbly-bath",
+    name: "Bubbly Bath",
+    color: "from-blue-300 to-cyan-300",
+    type: "wet",
+    emoji: "🛁",
+  },
+  {
+    id: "meme-horn",
+    name: "Meme Horn",
+    color: "from-yellow-500 to-orange-500",
+    type: "meme",
+    emoji: "📯",
+  },
+  {
+    id: "long-drone",
+    name: "Long Drone",
+    color: "from-indigo-400 to-blue-400",
+    type: "long",
+    emoji: "🎹",
+  },
+  {
+    id: "triple-beat",
+    name: "Triple Beat",
+    color: "from-green-500 to-teal-500",
+    type: "rhythmic",
+    emoji: "🥁",
+  },
+  {
+    id: "super-reverb",
+    name: "Super Reverb",
+    color: "from-purple-700 to-pink-700",
+    type: "reverb",
+    emoji: "🎤",
+  },
+  {
+    id: "tiny-toot",
+    name: "Tiny Toot",
+    color: "from-yellow-400 to-green-400",
+    type: "short",
+    emoji: "🌟",
+  },
+  {
+    id: "mountain-echo",
+    name: "Mountain Echo",
+    color: "from-blue-600 to-cyan-600",
+    type: "echo",
+    emoji: "⛰️",
+  },
+  {
+    id: "rubber-duck",
+    name: "Rubber Duck",
+    color: "from-yellow-500 to-orange-400",
+    type: "squeaky",
+    emoji: "🦆",
+  },
+  {
+    id: "bass-boom",
+    name: "Bass Boom",
+    color: "from-red-700 to-orange-700",
+    type: "bassy",
+    emoji: "💣",
+  },
+  {
+    id: "splash-zone",
+    name: "Splash Zone",
+    color: "from-cyan-600 to-blue-600",
+    type: "wet",
+    emoji: "🌊",
+  },
+  {
+    id: "comedy-horn",
+    name: "Comedy Horn",
+    color: "from-pink-500 to-red-500",
+    type: "meme",
+    emoji: "🤡",
+  },
+  {
+    id: "endless-wind",
+    name: "Endless Wind",
+    color: "from-teal-600 to-green-600",
+    type: "long",
+    emoji: "🌬️",
+  },
+  {
+    id: "drum-roll",
+    name: "Drum Roll",
+    color: "from-orange-600 to-red-600",
+    type: "rhythmic",
+    emoji: "🥁",
+  },
+  {
+    id: "cave-reverb",
+    name: "Cave Reverb",
+    color: "from-indigo-700 to-purple-700",
+    type: "reverb",
+    emoji: "🦇",
+  },
+  {
+    id: "pop-fizz",
+    name: "Pop Fizz",
+    color: "from-yellow-600 to-pink-600",
+    type: "short",
+    emoji: "🥤",
+  },
+  {
+    id: "canyon-echo",
+    name: "Canyon Echo",
+    color: "from-orange-700 to-red-700",
+    type: "echo",
+    emoji: "🏜️",
+  },
+  {
+    id: "balloon-squeak",
+    name: "Balloon Squeak",
+    color: "from-pink-700 to-purple-700",
+    type: "squeaky",
+    emoji: "🎈",
+  },
 ];
 
 export default function FunnyFartHub({ onNavigate }: FunnyFartHubProps) {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [playingSound, setPlayingSound] = useState<string | null>(null);
-  const [puffAnimations, setPuffAnimations] = useState<Array<{ id: number; x: number; y: number; emoji: string }>>([]);
+  const [puffAnimations, setPuffAnimations] = useState<
+    Array<{ id: number; x: number; y: number; emoji: string }>
+  >([]);
   const audioContextRef = useRef<AudioContext | null>(null);
   const puffIdCounter = useRef(0);
 
   // Initialize Web Audio API context
   const getAudioContext = () => {
     if (!audioContextRef.current) {
-      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      audioContextRef.current = new (
+        window.AudioContext || (window as any).webkitAudioContext
+      )();
     }
     return audioContextRef.current;
   };
@@ -95,46 +330,46 @@ export default function FunnyFartHub({ onNavigate }: FunnyFartHubProps) {
     let endFreq1 = 40;
     let startFreq2 = 120;
     let endFreq2 = 60;
-    let waveType1: OscillatorType = 'sawtooth';
-    let waveType2: OscillatorType = 'square';
+    let waveType1: OscillatorType = "sawtooth";
+    let waveType2: OscillatorType = "square";
     let filterFreq = 800;
     let filterQ = 5;
 
     switch (sound.type) {
-      case 'short':
+      case "short":
         duration = 0.15;
         startFreq1 = 100;
         endFreq1 = 50;
-        waveType1 = 'square';
-        waveType2 = 'sawtooth';
+        waveType1 = "square";
+        waveType2 = "sawtooth";
         break;
-      case 'long':
+      case "long":
         duration = 0.8;
         startFreq1 = 70;
         endFreq1 = 30;
         startFreq2 = 140;
         endFreq2 = 50;
-        waveType1 = 'sawtooth';
-        waveType2 = 'triangle';
+        waveType1 = "sawtooth";
+        waveType2 = "triangle";
         break;
-      case 'reverb':
+      case "reverb":
         duration = 0.6;
         startFreq1 = 60;
         endFreq1 = 25;
         filterFreq = 1200;
         filterQ = 10;
-        waveType1 = 'sawtooth';
-        waveType2 = 'sine';
+        waveType1 = "sawtooth";
+        waveType2 = "sine";
         break;
-      case 'echo':
+      case "echo":
         duration = 0.5;
         startFreq1 = 90;
         endFreq1 = 40;
         filterFreq = 600;
-        waveType1 = 'triangle';
-        waveType2 = 'sawtooth';
+        waveType1 = "triangle";
+        waveType2 = "sawtooth";
         break;
-      case 'wet':
+      case "wet":
         duration = 0.4;
         startFreq1 = 50;
         endFreq1 = 20;
@@ -142,30 +377,30 @@ export default function FunnyFartHub({ onNavigate }: FunnyFartHubProps) {
         endFreq2 = 80;
         filterFreq = 400;
         filterQ = 15;
-        waveType1 = 'sawtooth';
-        waveType2 = 'square';
+        waveType1 = "sawtooth";
+        waveType2 = "square";
         break;
-      case 'squeaky':
+      case "squeaky":
         duration = 0.25;
         startFreq1 = 300;
         endFreq1 = 150;
         startFreq2 = 600;
         endFreq2 = 300;
         filterFreq = 2000;
-        waveType1 = 'sine';
-        waveType2 = 'triangle';
+        waveType1 = "sine";
+        waveType2 = "triangle";
         break;
-      case 'meme':
+      case "meme":
         duration = 0.35;
         startFreq1 = 150;
         endFreq1 = 60;
         startFreq2 = 300;
         endFreq2 = 120;
         filterFreq = 1000;
-        waveType1 = 'square';
-        waveType2 = 'sawtooth';
+        waveType1 = "square";
+        waveType2 = "sawtooth";
         break;
-      case 'bassy':
+      case "bassy":
         duration = 0.5;
         startFreq1 = 40;
         endFreq1 = 20;
@@ -173,16 +408,16 @@ export default function FunnyFartHub({ onNavigate }: FunnyFartHubProps) {
         endFreq2 = 40;
         filterFreq = 300;
         filterQ = 20;
-        waveType1 = 'sawtooth';
-        waveType2 = 'sine';
+        waveType1 = "sawtooth";
+        waveType2 = "sine";
         break;
-      case 'rhythmic':
+      case "rhythmic":
         duration = 0.6;
         startFreq1 = 110;
         endFreq1 = 55;
         filterFreq = 700;
-        waveType1 = 'square';
-        waveType2 = 'triangle';
+        waveType1 = "square";
+        waveType2 = "triangle";
         break;
     }
 
@@ -191,16 +426,22 @@ export default function FunnyFartHub({ onNavigate }: FunnyFartHubProps) {
     oscillator2.type = waveType2;
 
     // Set filter
-    filterNode.type = 'lowpass';
+    filterNode.type = "lowpass";
     filterNode.frequency.setValueAtTime(filterFreq, now);
     filterNode.Q.setValueAtTime(filterQ, now);
 
     // Frequency modulation for variation
     oscillator1.frequency.setValueAtTime(startFreq1, now);
-    oscillator1.frequency.exponentialRampToValueAtTime(endFreq1, now + duration);
-    
+    oscillator1.frequency.exponentialRampToValueAtTime(
+      endFreq1,
+      now + duration,
+    );
+
     oscillator2.frequency.setValueAtTime(startFreq2, now);
-    oscillator2.frequency.exponentialRampToValueAtTime(endFreq2, now + duration);
+    oscillator2.frequency.exponentialRampToValueAtTime(
+      endFreq2,
+      now + duration,
+    );
 
     // Volume envelope
     gainNode.gain.setValueAtTime(0, now);
@@ -208,11 +449,14 @@ export default function FunnyFartHub({ onNavigate }: FunnyFartHubProps) {
     gainNode.gain.exponentialRampToValueAtTime(0.01, now + duration);
 
     // Add rhythmic variation for rhythmic type
-    if (sound.type === 'rhythmic') {
+    if (sound.type === "rhythmic") {
       for (let i = 0; i < 3; i++) {
-        const pulseTime = now + (i * duration / 3);
+        const pulseTime = now + (i * duration) / 3;
         gainNode.gain.setValueAtTime(0.3, pulseTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.05, pulseTime + duration / 6);
+        gainNode.gain.exponentialRampToValueAtTime(
+          0.05,
+          pulseTime + duration / 6,
+        );
       }
     }
 
@@ -226,7 +470,10 @@ export default function FunnyFartHub({ onNavigate }: FunnyFartHubProps) {
     setTimeout(() => setPlayingSound(null), duration * 1000);
   };
 
-  const playSound = (sound: FartSound, event: React.MouseEvent<HTMLButtonElement>) => {
+  const playSound = (
+    sound: FartSound,
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
     generateFartSound(sound);
 
     // Show puff animation at click position
@@ -239,15 +486,16 @@ export default function FunnyFartHub({ onNavigate }: FunnyFartHubProps) {
       emoji: sound.emoji,
     };
 
-    setPuffAnimations(prev => [...prev, newPuff]);
+    setPuffAnimations((prev) => [...prev, newPuff]);
 
     setTimeout(() => {
-      setPuffAnimations(prev => prev.filter(p => p.id !== puffId));
+      setPuffAnimations((prev) => prev.filter((p) => p.id !== puffId));
     }, 1000);
   };
 
   const playRandomSound = () => {
-    const randomSound = fartSounds[Math.floor(Math.random() * fartSounds.length)];
+    const randomSound =
+      fartSounds[Math.floor(Math.random() * fartSounds.length)];
     generateFartSound(randomSound);
 
     // Show random puff in center
@@ -259,10 +507,10 @@ export default function FunnyFartHub({ onNavigate }: FunnyFartHubProps) {
       emoji: randomSound.emoji,
     };
 
-    setPuffAnimations(prev => [...prev, newPuff]);
+    setPuffAnimations((prev) => [...prev, newPuff]);
 
     setTimeout(() => {
-      setPuffAnimations(prev => prev.filter(p => p.id !== puffId));
+      setPuffAnimations((prev) => prev.filter((p) => p.id !== puffId));
     }, 1000);
   };
 
@@ -313,7 +561,7 @@ export default function FunnyFartHub({ onNavigate }: FunnyFartHubProps) {
             <Button
               variant="outline"
               size="lg"
-              onClick={() => onNavigate('dashboard')}
+              onClick={() => onNavigate("dashboard")}
               className="border-4 border-neon-green hover:border-neon-cyan bg-white text-purple-900 font-bold text-lg h-14 px-6 shadow-neon-md"
             >
               <Home className="w-6 h-6 mr-2" />
@@ -329,8 +577,8 @@ export default function FunnyFartHub({ onNavigate }: FunnyFartHubProps) {
               key={sound.id}
               className={`border-4 transition-all duration-300 cursor-pointer bg-white ${
                 playingSound === sound.id
-                  ? 'border-neon-pink shadow-neon-lg scale-105 animate-neon-pulse'
-                  : 'border-neon-purple hover:border-neon-cyan hover:shadow-neon-md hover:scale-105'
+                  ? "border-neon-pink shadow-neon-lg scale-105 animate-neon-pulse"
+                  : "border-neon-purple hover:border-neon-cyan hover:shadow-neon-md hover:scale-105"
               }`}
             >
               <CardHeader className="pb-3">
@@ -339,7 +587,9 @@ export default function FunnyFartHub({ onNavigate }: FunnyFartHubProps) {
                 >
                   <span className="text-3xl">{sound.emoji}</span>
                 </div>
-                <CardTitle className="text-lg text-center text-purple-900">{sound.name}</CardTitle>
+                <CardTitle className="text-lg text-center text-purple-900">
+                  {sound.name}
+                </CardTitle>
                 <CardDescription className="text-center text-purple-600 text-sm capitalize">
                   {sound.type} sound
                 </CardDescription>
@@ -375,19 +625,24 @@ export default function FunnyFartHub({ onNavigate }: FunnyFartHubProps) {
           <CardContent>
             <div className="space-y-3 text-purple-800">
               <p className="text-lg">
-                <strong>Did you know?</strong> Everyone farts about 14 times a day on average! It's totally normal! 💨
+                <strong>Did you know?</strong> Everyone farts about 14 times a
+                day on average! It's totally normal! 💨
               </p>
               <p className="text-lg">
-                <strong>Science fact:</strong> Farts are made of gases like nitrogen, oxygen, carbon dioxide, and methane! 🧪
+                <strong>Science fact:</strong> Farts are made of gases like
+                nitrogen, oxygen, carbon dioxide, and methane! 🧪
               </p>
               <p className="text-lg">
-                <strong>Silly fact:</strong> The word "fart" comes from an Old English word meaning "to break wind"! 🌬️
+                <strong>Silly fact:</strong> The word "fart" comes from an Old
+                English word meaning "to break wind"! 🌬️
               </p>
               <p className="text-lg">
-                <strong>Fun fact:</strong> Farts can travel at about 10 feet per second! That's super fast! 🚀
+                <strong>Fun fact:</strong> Farts can travel at about 10 feet per
+                second! That's super fast! 🚀
               </p>
               <p className="text-lg">
-                <strong>Giggle fact:</strong> Holding in farts can make them come out as burps instead! 😂
+                <strong>Giggle fact:</strong> Holding in farts can make them
+                come out as burps instead! 😂
               </p>
             </div>
           </CardContent>
@@ -401,12 +656,16 @@ export default function FunnyFartHub({ onNavigate }: FunnyFartHubProps) {
             style={{
               left: puff.x,
               top: puff.y,
-              transform: 'translate(-50%, -50%)',
+              transform: "translate(-50%, -50%)",
             }}
           >
             <div className="relative">
-              <div className="text-6xl animate-ping opacity-75">{puff.emoji}</div>
-              <div className="absolute inset-0 text-6xl animate-bounce">{puff.emoji}</div>
+              <div className="text-6xl animate-ping opacity-75">
+                {puff.emoji}
+              </div>
+              <div className="absolute inset-0 text-6xl animate-bounce">
+                {puff.emoji}
+              </div>
             </div>
           </div>
         ))}

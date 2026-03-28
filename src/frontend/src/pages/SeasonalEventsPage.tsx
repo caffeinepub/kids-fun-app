@@ -1,83 +1,123 @@
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar, Sparkles, Gift, Check, BookOpen } from 'lucide-react';
-import { useGetActiveSeasonalEvents } from '../hooks/useQueries';
-import { toast } from 'sonner';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { seasonalEventStories, type Story } from '../content/seasonalEventStories';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BookOpen, Calendar, Check, Gift, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import {
+  type Story,
+  seasonalEventStories,
+} from "../content/seasonalEventStories";
+import { useGetActiveSeasonalEvents } from "../hooks/useQueries";
 
 export default function SeasonalEventsPage() {
   const { data: activeEvents = [] } = useGetActiveSeasonalEvents();
-  const [currentSeason, setCurrentSeason] = useState<string>('');
+  const [currentSeason, setCurrentSeason] = useState<string>("");
   const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
-  const [selectedDecoration, setSelectedDecoration] = useState<string | null>(null);
+  const [selectedDecoration, setSelectedDecoration] = useState<string | null>(
+    null,
+  );
   const [selectedStory, setSelectedStory] = useState<Story | null>(null);
   const [completedActivities, setCompletedActivities] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState<string>('activities');
-  const [showNarrationScript, setShowNarrationScript] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<string>("activities");
+  const [showNarrationScript, setShowNarrationScript] =
+    useState<boolean>(false);
 
   useEffect(() => {
     const month = new Date().getMonth();
-    if (month === 11 || month === 0) setCurrentSeason('christmas');
-    else if (month === 9) setCurrentSeason('halloween');
-    else if (month === 2 || month === 3) setCurrentSeason('easter');
-    else if (month === 10) setCurrentSeason('diwali');
-    else setCurrentSeason('general');
+    if (month === 11 || month === 0) setCurrentSeason("christmas");
+    else if (month === 9) setCurrentSeason("halloween");
+    else if (month === 2 || month === 3) setCurrentSeason("easter");
+    else if (month === 10) setCurrentSeason("diwali");
+    else setCurrentSeason("general");
   }, []);
 
   const seasonalThemes = {
     christmas: {
-      name: 'Christmas',
-      icon: '🎄',
-      color: 'from-red-500 to-green-500',
-      border: '/assets/generated/christmas-border.dim_400x100.png',
-      activities: ['Decorate the tree', 'Write to Santa', 'Make snowflakes', 'Sing carols'],
+      name: "Christmas",
+      icon: "🎄",
+      color: "from-red-500 to-green-500",
+      border: "/assets/generated/christmas-border.dim_400x100.png",
+      activities: [
+        "Decorate the tree",
+        "Write to Santa",
+        "Make snowflakes",
+        "Sing carols",
+      ],
     },
     halloween: {
-      name: 'Halloween',
-      icon: '🎃',
-      color: 'from-orange-500 to-purple-500',
-      border: '/assets/generated/halloween-border.dim_400x100.png',
-      activities: ['Trick or treat', 'Carve pumpkins', 'Costume contest', 'Spooky stories'],
+      name: "Halloween",
+      icon: "🎃",
+      color: "from-orange-500 to-purple-500",
+      border: "/assets/generated/halloween-border.dim_400x100.png",
+      activities: [
+        "Trick or treat",
+        "Carve pumpkins",
+        "Costume contest",
+        "Spooky stories",
+      ],
     },
     diwali: {
-      name: 'Diwali',
-      icon: '🪔',
-      color: 'from-yellow-500 to-orange-500',
-      border: '/assets/generated/diwali-border.dim_400x100.png',
-      activities: ['Light diyas', 'Make rangoli', 'Share sweets', 'Fireworks show'],
+      name: "Diwali",
+      icon: "🪔",
+      color: "from-yellow-500 to-orange-500",
+      border: "/assets/generated/diwali-border.dim_400x100.png",
+      activities: [
+        "Light diyas",
+        "Make rangoli",
+        "Share sweets",
+        "Fireworks show",
+      ],
     },
     easter: {
-      name: 'Easter',
-      icon: '🐰',
-      color: 'from-pink-500 to-blue-500',
-      border: '/assets/generated/easter-border.dim_400x100.png',
-      activities: ['Egg hunt', 'Decorate eggs', 'Bunny crafts', 'Spring picnic'],
+      name: "Easter",
+      icon: "🐰",
+      color: "from-pink-500 to-blue-500",
+      border: "/assets/generated/easter-border.dim_400x100.png",
+      activities: [
+        "Egg hunt",
+        "Decorate eggs",
+        "Bunny crafts",
+        "Spring picnic",
+      ],
     },
   };
 
-  const theme = seasonalThemes[currentSeason as keyof typeof seasonalThemes] || {
-    name: 'All Year Round',
-    icon: '🌟',
-    color: 'from-purple-500 to-pink-500',
-    border: '',
-    activities: ['Play games', 'Create art', 'Learn new things', 'Have fun'],
+  const theme = seasonalThemes[
+    currentSeason as keyof typeof seasonalThemes
+  ] || {
+    name: "All Year Round",
+    icon: "🌟",
+    color: "from-purple-500 to-pink-500",
+    border: "",
+    activities: ["Play games", "Create art", "Learn new things", "Have fun"],
   };
 
   const handleActivityStart = (activity: string) => {
     setSelectedActivity(activity);
     toast.success(`Starting activity: ${activity}! 🎉`, {
-      description: 'Have fun and enjoy!',
+      description: "Have fun and enjoy!",
     });
-    
+
     // Simulate activity completion after 2 seconds
     setTimeout(() => {
-      setCompletedActivities(prev => [...prev, activity]);
+      setCompletedActivities((prev) => [...prev, activity]);
       toast.success(`Activity completed: ${activity}! ⭐`, {
-        description: 'Great job!',
+        description: "Great job!",
       });
       setSelectedActivity(null);
     }, 2000);
@@ -86,7 +126,7 @@ export default function SeasonalEventsPage() {
   const handleDecorationApply = (decoration: string) => {
     setSelectedDecoration(decoration);
     toast.success(`Applied decoration: ${decoration}! ✨`, {
-      description: 'Your app looks festive!',
+      description: "Your app looks festive!",
     });
   };
 
@@ -98,7 +138,7 @@ export default function SeasonalEventsPage() {
   const handleCloseStory = () => {
     setSelectedStory(null);
     setShowNarrationScript(false);
-    setActiveTab('stories');
+    setActiveTab("stories");
   };
 
   return (
@@ -107,7 +147,9 @@ export default function SeasonalEventsPage() {
         <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 via-pink-600 to-yellow-600 bg-clip-text text-transparent">
           Seasonal Events {theme.icon}
         </h1>
-        <p className="text-xl text-gray-700">Celebrate special occasions with themed activities!</p>
+        <p className="text-xl text-gray-700">
+          Celebrate special occasions with themed activities!
+        </p>
       </div>
 
       <Card className={`border-4 bg-gradient-to-r ${theme.color} text-white`}>
@@ -120,7 +162,11 @@ export default function SeasonalEventsPage() {
         </CardHeader>
         {theme.border && (
           <div className="px-6 pb-6">
-            <img src={theme.border} alt="Seasonal border" className="w-full rounded-lg" />
+            <img
+              src={theme.border}
+              alt="Seasonal border"
+              className="w-full rounded-lg"
+            />
           </div>
         )}
       </Card>
@@ -137,9 +183,12 @@ export default function SeasonalEventsPage() {
             {theme.activities.map((activity, index) => {
               const isCompleted = completedActivities.includes(activity);
               const isActive = selectedActivity === activity;
-              
+
               return (
-                <Card key={index} className="border-4 hover:shadow-xl transition-all cursor-pointer hover:scale-105">
+                <Card
+                  key={index}
+                  className="border-4 hover:shadow-xl transition-all cursor-pointer hover:scale-105"
+                >
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       {isCompleted ? (
@@ -151,13 +200,17 @@ export default function SeasonalEventsPage() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <Button 
-                      className="w-full" 
+                    <Button
+                      className="w-full"
                       onClick={() => handleActivityStart(activity)}
                       disabled={isActive}
                       variant={isCompleted ? "outline" : "default"}
                     >
-                      {isActive ? 'In Progress...' : isCompleted ? 'Completed ✓' : 'Start Activity'}
+                      {isActive
+                        ? "In Progress..."
+                        : isCompleted
+                          ? "Completed ✓"
+                          : "Start Activity"}
                     </Button>
                   </CardContent>
                 </Card>
@@ -173,28 +226,36 @@ export default function SeasonalEventsPage() {
                 <Gift className="w-6 h-6" />
                 Seasonal Decorations
               </CardTitle>
-              <CardDescription>Customize your app with festive themes!</CardDescription>
+              <CardDescription>
+                Customize your app with festive themes!
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {['🎁', '⭐', '🎈', '🎊', '🎀', '✨', '🌟', '💫'].map((emoji, index) => (
-                  <Card 
-                    key={index} 
-                    className={`p-6 text-center hover:shadow-lg transition-all cursor-pointer border-2 ${
-                      selectedDecoration === emoji ? 'border-primary ring-2 ring-primary' : ''
-                    }`}
-                  >
-                    <div className="text-5xl mb-2">{emoji}</div>
-                    <Button 
-                      variant={selectedDecoration === emoji ? "default" : "outline"} 
-                      size="sm" 
-                      className="w-full"
-                      onClick={() => handleDecorationApply(emoji)}
+                {["🎁", "⭐", "🎈", "🎊", "🎀", "✨", "🌟", "💫"].map(
+                  (emoji, index) => (
+                    <Card
+                      key={index}
+                      className={`p-6 text-center hover:shadow-lg transition-all cursor-pointer border-2 ${
+                        selectedDecoration === emoji
+                          ? "border-primary ring-2 ring-primary"
+                          : ""
+                      }`}
                     >
-                      {selectedDecoration === emoji ? 'Applied ✓' : 'Apply'}
-                    </Button>
-                  </Card>
-                ))}
+                      <div className="text-5xl mb-2">{emoji}</div>
+                      <Button
+                        variant={
+                          selectedDecoration === emoji ? "default" : "outline"
+                        }
+                        size="sm"
+                        className="w-full"
+                        onClick={() => handleDecorationApply(emoji)}
+                      >
+                        {selectedDecoration === emoji ? "Applied ✓" : "Apply"}
+                      </Button>
+                    </Card>
+                  ),
+                )}
               </div>
             </CardContent>
           </Card>
@@ -213,22 +274,33 @@ export default function SeasonalEventsPage() {
               {seasonalEventStories.length === 0 ? (
                 <div className="text-center py-12">
                   <Calendar className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                  <p className="text-lg text-gray-600">No seasonal stories are available right now.</p>
-                  <p className="text-sm text-gray-500 mt-2">Check back later for new stories!</p>
+                  <p className="text-lg text-gray-600">
+                    No seasonal stories are available right now.
+                  </p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    Check back later for new stories!
+                  </p>
                 </div>
               ) : (
                 seasonalEventStories.map((story) => (
-                  <Card key={story.id} className="p-4 border-2 hover:shadow-lg transition-all">
+                  <Card
+                    key={story.id}
+                    className="p-4 border-2 hover:shadow-lg transition-all"
+                  >
                     <div className="flex items-start gap-3">
-                      <BookOpen className="w-6 h-6 text-primary mt-1 shrink-0" />
+                      <BookOpen className="w-6 h-6 text-purple-600 flex-shrink-0" />
                       <div className="flex-1">
-                        <h3 className="font-bold text-lg mb-1">{story.title}</h3>
-                        <Badge variant="outline" className="mb-2">{story.genre}</Badge>
-                        <p className="text-gray-700 mb-3 line-clamp-3">
-                          {story.kidSafeText}
+                        <h3 className="font-bold text-lg mb-1">
+                          {story.title}
+                        </h3>
+                        <p className="text-sm text-gray-600 mb-3">
+                          {story.genre}
                         </p>
-                        <Button variant="outline" onClick={() => handleStoryRead(story)}>
-                          Read Full Story
+                        <Button
+                          onClick={() => handleStoryRead(story)}
+                          size="sm"
+                        >
+                          Read Story
                         </Button>
                       </div>
                     </div>
@@ -241,72 +313,82 @@ export default function SeasonalEventsPage() {
       </Tabs>
 
       {activeEvents.length > 0 && (
-        <Card className="border-4">
+        <Card className="border-4 border-purple-400">
           <CardHeader>
-            <CardTitle>Active Events</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="w-6 h-6" />
+              Active Events
+            </CardTitle>
+            <CardDescription>Special events happening now!</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {activeEvents.map((event) => (
-                <div key={event.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div>
-                    <p className="font-semibold">{event.name}</p>
-                    <p className="text-sm text-gray-600">{event.theme}</p>
+                <Card key={event.id} className="p-4 border-2">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold">{event.title}</p>
+                      <p className="text-sm text-gray-600">{event.eventType}</p>
+                    </div>
+                    <Badge>{new Date(event.date).toLocaleDateString()}</Badge>
                   </div>
-                  <Badge>Active</Badge>
-                </div>
+                </Card>
               ))}
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Story Dialog */}
-      <Dialog open={!!selectedStory} onOpenChange={handleCloseStory}>
-        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+      <Dialog
+        open={!!selectedStory}
+        onOpenChange={(open) => !open && handleCloseStory()}
+      >
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl flex items-center gap-2">
-              <BookOpen className="w-6 h-6" />
+            <DialogTitle className="text-2xl">
               {selectedStory?.title}
             </DialogTitle>
-            <DialogDescription>
-              <Badge variant="outline">{selectedStory?.genre}</Badge>
-            </DialogDescription>
+            <DialogDescription>{selectedStory?.genre}</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="flex gap-2 border-b pb-3">
-              <Button
-                variant={!showNarrationScript ? "default" : "outline"}
-                size="sm"
-                onClick={() => setShowNarrationScript(false)}
-              >
-                Story
-              </Button>
-              <Button
-                variant={showNarrationScript ? "default" : "outline"}
-                size="sm"
-                onClick={() => setShowNarrationScript(true)}
-              >
-                Read-along Script
-              </Button>
+
+          {selectedStory && (
+            <div className="space-y-4">
+              <div className="flex gap-2">
+                <Button
+                  variant={!showNarrationScript ? "default" : "outline"}
+                  onClick={() => setShowNarrationScript(false)}
+                  size="sm"
+                >
+                  Kid-Safe Text
+                </Button>
+                <Button
+                  variant={showNarrationScript ? "default" : "outline"}
+                  onClick={() => setShowNarrationScript(true)}
+                  size="sm"
+                >
+                  Read-Along Script
+                </Button>
+              </div>
+
+              <div className="prose prose-sm max-w-none">
+                {showNarrationScript ? (
+                  <div className="whitespace-pre-wrap text-base leading-relaxed">
+                    {selectedStory.narrationScript}
+                  </div>
+                ) : (
+                  <div className="whitespace-pre-wrap text-base leading-relaxed">
+                    {selectedStory.kidSafeText}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end gap-2 pt-4 border-t">
+                <Button onClick={handleCloseStory} variant="outline">
+                  Close
+                </Button>
+              </div>
             </div>
-            
-            <div className="prose prose-lg max-w-none">
-              {!showNarrationScript ? (
-                <div className="whitespace-pre-wrap text-base leading-relaxed">
-                  {selectedStory?.kidSafeText}
-                </div>
-              ) : (
-                <div className="whitespace-pre-wrap leading-relaxed bg-gray-50 p-4 rounded-lg font-mono text-sm">
-                  {selectedStory?.narrationScript}
-                </div>
-              )}
-            </div>
-            
-            <div className="flex justify-center pt-4 border-t">
-              <Button onClick={handleCloseStory}>Close</Button>
-            </div>
-          </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

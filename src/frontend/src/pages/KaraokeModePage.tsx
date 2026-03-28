@@ -1,9 +1,9 @@
-import { useState, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
-import { ArrowLeft, Play, Pause, Volume2, Mic } from 'lucide-react';
-import { ModulePage } from '../App';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Slider } from "@/components/ui/slider";
+import { ArrowLeft, Mic, Pause, Play, Volume2 } from "lucide-react";
+import { useRef, useState } from "react";
+import type { ModulePage } from "../App";
 
 interface KaraokeModePageProps {
   onNavigate: (page: ModulePage) => void;
@@ -19,41 +19,41 @@ interface Song {
 
 const songs: Song[] = [
   {
-    id: 'twinkle',
-    title: 'Twinkle Twinkle Little Star',
-    artist: 'Traditional',
+    id: "twinkle",
+    title: "Twinkle Twinkle Little Star",
+    artist: "Traditional",
     lyrics: [
-      'Twinkle, twinkle, little star',
-      'How I wonder what you are',
-      'Up above the world so high',
-      'Like a diamond in the sky',
-      'Twinkle, twinkle, little star',
-      'How I wonder what you are',
+      "Twinkle, twinkle, little star",
+      "How I wonder what you are",
+      "Up above the world so high",
+      "Like a diamond in the sky",
+      "Twinkle, twinkle, little star",
+      "How I wonder what you are",
     ],
     duration: 30,
   },
   {
-    id: 'happy',
-    title: 'If You\'re Happy',
-    artist: 'Traditional',
+    id: "happy",
+    title: "If You're Happy",
+    artist: "Traditional",
     lyrics: [
-      'If you\'re happy and you know it, clap your hands',
-      'If you\'re happy and you know it, clap your hands',
-      'If you\'re happy and you know it',
-      'Then your face will surely show it',
-      'If you\'re happy and you know it, clap your hands',
+      "If you're happy and you know it, clap your hands",
+      "If you're happy and you know it, clap your hands",
+      "If you're happy and you know it",
+      "Then your face will surely show it",
+      "If you're happy and you know it, clap your hands",
     ],
     duration: 25,
   },
   {
-    id: 'wheels',
-    title: 'The Wheels on the Bus',
-    artist: 'Traditional',
+    id: "wheels",
+    title: "The Wheels on the Bus",
+    artist: "Traditional",
     lyrics: [
-      'The wheels on the bus go round and round',
-      'Round and round, round and round',
-      'The wheels on the bus go round and round',
-      'All through the town',
+      "The wheels on the bus go round and round",
+      "Round and round, round and round",
+      "The wheels on the bus go round and round",
+      "All through the town",
     ],
     duration: 20,
   },
@@ -86,7 +86,8 @@ export default function KaraokeModePage({ onNavigate }: KaraokeModePageProps) {
       }
     } else {
       setIsPlaying(true);
-      const lineInterval = (selectedSong.duration * 1000) / selectedSong.lyrics.length;
+      const lineInterval =
+        (selectedSong.duration * 1000) / selectedSong.lyrics.length;
       intervalRef.current = setInterval(() => {
         setCurrentLine((prev) => {
           if (prev >= selectedSong.lyrics.length - 1) {
@@ -108,7 +109,10 @@ export default function KaraokeModePage({ onNavigate }: KaraokeModePageProps) {
         <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-600 to-red-600 bg-clip-text text-transparent">
           Karaoke Mode
         </h1>
-        <Button variant="outline" onClick={() => onNavigate('creative-fun-hub')}>
+        <Button
+          variant="outline"
+          onClick={() => onNavigate("creative-fun-hub")}
+        >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Hub
         </Button>
@@ -127,7 +131,7 @@ export default function KaraokeModePage({ onNavigate }: KaraokeModePageProps) {
             {songs.map((song) => (
               <Button
                 key={song.id}
-                variant={selectedSong?.id === song.id ? 'default' : 'outline'}
+                variant={selectedSong?.id === song.id ? "default" : "outline"}
                 className="w-full justify-start"
                 onClick={() => handleSongSelect(song)}
               >
@@ -158,8 +162,8 @@ export default function KaraokeModePage({ onNavigate }: KaraokeModePageProps) {
                         key={index}
                         className={`text-2xl text-center transition-all duration-300 ${
                           index === currentLine && isPlaying
-                            ? 'text-pink-600 font-bold scale-110'
-                            : 'text-gray-600'
+                            ? "text-pink-600 font-bold scale-110"
+                            : "text-gray-600"
                         }`}
                       >
                         {line}
@@ -196,7 +200,9 @@ export default function KaraokeModePage({ onNavigate }: KaraokeModePageProps) {
                           <Mic className="h-4 w-4" />
                           Vocal Volume
                         </label>
-                        <span className="text-sm text-gray-600">{vocalVolume[0]}%</span>
+                        <span className="text-sm text-gray-600">
+                          {vocalVolume[0]}%
+                        </span>
                       </div>
                       <Slider
                         value={vocalVolume}
@@ -212,7 +218,9 @@ export default function KaraokeModePage({ onNavigate }: KaraokeModePageProps) {
                           <Volume2 className="h-4 w-4" />
                           Music Volume
                         </label>
-                        <span className="text-sm text-gray-600">{musicVolume[0]}%</span>
+                        <span className="text-sm text-gray-600">
+                          {musicVolume[0]}%
+                        </span>
                       </div>
                       <Slider
                         value={musicVolume}
@@ -232,7 +240,9 @@ export default function KaraokeModePage({ onNavigate }: KaraokeModePageProps) {
 
                 {!isPlaying && currentLine > 0 && (
                   <div className="text-center py-4">
-                    <p className="text-2xl font-bold text-purple-600 mb-2">🎉 Great job! 🎉</p>
+                    <p className="text-2xl font-bold text-purple-600 mb-2">
+                      🎉 Great job! 🎉
+                    </p>
                     <p className="text-gray-600">You finished the song!</p>
                   </div>
                 )}

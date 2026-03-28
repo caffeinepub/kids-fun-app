@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import GameLayout from '../../components/GameLayout';
-import { ModulePage } from '../../App';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import type { ModulePage } from "../../App";
+import GameLayout from "../../components/GameLayout";
 
 interface SpiderWebPuzzleProps {
   onNavigate: (page: ModulePage) => void;
@@ -64,33 +64,36 @@ export default function SpiderWebPuzzle({ onNavigate }: SpiderWebPuzzleProps) {
       setSelectedNode(nodeId);
     } else {
       // Try to disconnect
-      const node1 = nodes.find(n => n.id === selectedNode);
-      const node2 = nodes.find(n => n.id === nodeId);
+      const node1 = nodes.find((n) => n.id === selectedNode);
+      const node2 = nodes.find((n) => n.id === nodeId);
 
       if (node1 && node2 && node1.connected.includes(nodeId)) {
-        const newNodes = nodes.map(n => {
+        const newNodes = nodes.map((n) => {
           if (n.id === selectedNode) {
-            return { ...n, connected: n.connected.filter(c => c !== nodeId) };
+            return { ...n, connected: n.connected.filter((c) => c !== nodeId) };
           }
           if (n.id === nodeId) {
-            return { ...n, connected: n.connected.filter(c => c !== selectedNode) };
+            return {
+              ...n,
+              connected: n.connected.filter((c) => c !== selectedNode),
+            };
           }
           return n;
         });
 
         setNodes(newNodes);
-        setScore(prev => prev + 10);
+        setScore((prev) => prev + 10);
 
         // Check if all nodes are freed
-        const allFreed = newNodes.every(n => n.connected.length === 0);
+        const allFreed = newNodes.every((n) => n.connected.length === 0);
         if (allFreed) {
           const newScore = score + 110;
           setScore(newScore);
-          setHighScore(h => Math.max(h, newScore));
+          setHighScore((h) => Math.max(h, newScore));
           if (level >= 3) {
             setGameWon(true);
           } else {
-            setTimeout(() => setLevel(prev => prev + 1), 1000);
+            setTimeout(() => setLevel((prev) => prev + 1), 1000);
           }
         }
       }
@@ -120,16 +123,20 @@ export default function SpiderWebPuzzle({ onNavigate }: SpiderWebPuzzleProps) {
       <div className="flex flex-col items-center gap-4 p-6">
         <div className="text-center space-y-2">
           <p className="text-2xl text-neon-orange">Level {level}</p>
-          <p className="text-lg text-neon-cyan">Click two connected nodes to untangle the web!</p>
-          <p className="text-md text-neon-green">Free all monster friends to win!</p>
+          <p className="text-lg text-neon-cyan">
+            Click two connected nodes to untangle the web!
+          </p>
+          <p className="text-md text-neon-green">
+            Free all monster friends to win!
+          </p>
         </div>
 
         <div className="relative w-full max-w-2xl h-96 bg-gradient-to-br from-purple-900/50 to-black/50 border-4 border-neon-green rounded-lg">
           {/* Draw connections */}
           <svg className="absolute inset-0 w-full h-full pointer-events-none">
-            {nodes.map(node =>
-              node.connected.map(targetId => {
-                const target = nodes.find(n => n.id === targetId);
+            {nodes.map((node) =>
+              node.connected.map((targetId) => {
+                const target = nodes.find((n) => n.id === targetId);
                 if (!target || targetId < node.id) return null;
                 return (
                   <line
@@ -143,28 +150,28 @@ export default function SpiderWebPuzzle({ onNavigate }: SpiderWebPuzzleProps) {
                     opacity="0.6"
                   />
                 );
-              })
+              }),
             )}
           </svg>
 
           {/* Draw nodes */}
-          {nodes.map(node => (
+          {nodes.map((node) => (
             <Button
               key={node.id}
               onClick={() => handleNodeClick(node.id)}
               className={`absolute w-12 h-12 rounded-full text-2xl ${
                 selectedNode === node.id
-                  ? 'bg-neon-orange border-4 border-neon-cyan'
+                  ? "bg-neon-orange border-4 border-neon-cyan"
                   : node.connected.length === 0
-                  ? 'bg-neon-green border-2 border-white'
-                  : 'bg-neon-purple border-2 border-neon-pink'
+                    ? "bg-neon-green border-2 border-white"
+                    : "bg-neon-purple border-2 border-neon-pink"
               }`}
               style={{
                 left: `${node.x - 24}px`,
                 top: `${node.y - 24}px`,
               }}
             >
-              {node.connected.length === 0 ? '😊' : '😰'}
+              {node.connected.length === 0 ? "😊" : "😰"}
             </Button>
           ))}
         </div>

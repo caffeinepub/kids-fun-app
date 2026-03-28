@@ -1,25 +1,28 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { Sparkles, Gamepad2, Lock, AlertCircle } from 'lucide-react';
-import HomepageFeatures from '../components/HomepageFeatures';
-import { ModulePage } from '../App';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { AlertCircle, Gamepad2, Lock, Sparkles } from "lucide-react";
+import type { ModulePage } from "../App";
+import HomepageFeatures from "../components/HomepageFeatures";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
 
 interface PreLoginExperiencePageProps {
   onNavigate: (page: ModulePage) => void;
   redirectMessage?: string;
 }
 
-export default function PreLoginExperiencePage({ onNavigate, redirectMessage }: PreLoginExperiencePageProps) {
+export default function PreLoginExperiencePage({
+  onNavigate,
+  redirectMessage,
+}: PreLoginExperiencePageProps) {
   const { login, loginStatus } = useInternetIdentity();
 
-  const isLoggingIn = loginStatus === 'logging-in';
+  const isLoggingIn = loginStatus === "logging-in";
 
   const handleLogin = async () => {
     try {
       await login();
     } catch (error: any) {
-      console.error('Login error:', error);
+      console.error("Login error:", error);
     }
   };
 
@@ -31,11 +34,11 @@ export default function PreLoginExperiencePage({ onNavigate, redirectMessage }: 
           <div className="flex justify-center">
             <Sparkles className="w-20 h-20 text-neon-pink animate-neon-pulse" />
           </div>
-          
+
           <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
             Welcome to Kids Fun App! 🎉
           </h1>
-          
+
           <p className="text-2xl md:text-3xl text-gray-700 max-w-3xl mx-auto">
             A magical world of games, learning, and creativity awaits you!
           </p>
@@ -61,7 +64,8 @@ export default function PreLoginExperiencePage({ onNavigate, redirectMessage }: 
               Login to Unlock Everything!
             </h2>
             <p className="text-lg text-gray-700 mb-6">
-              Sign in with Internet Identity to access all features, save your progress, and join the fun!
+              Sign in with Internet Identity to access all features, save your
+              progress, and join the fun!
             </p>
             <Button
               onClick={handleLogin}
@@ -92,10 +96,11 @@ export default function PreLoginExperiencePage({ onNavigate, redirectMessage }: 
               Try Some Games First!
             </h2>
             <p className="text-lg text-gray-700 mb-6">
-              Play a selection of trial games without logging in. Experience the fun before you join!
+              Play a selection of trial games without logging in. Experience the
+              fun before you join!
             </p>
             <Button
-              onClick={() => onNavigate('games')}
+              onClick={() => onNavigate("games")}
               size="lg"
               variant="outline"
               className="text-xl px-10 py-6 font-bold border-4 border-green-600 hover:bg-green-600 hover:text-white transition-all duration-300 hover:scale-105"
@@ -114,7 +119,7 @@ export default function PreLoginExperiencePage({ onNavigate, redirectMessage }: 
       <footer className="py-8 px-4 bg-white/50 backdrop-blur-md border-t-4 border-purple-300">
         <div className="container mx-auto text-center space-y-4">
           <p className="text-gray-600">
-            Built with ❤️ using{' '}
+            Built with ❤️ using{" "}
             <a
               href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname)}`}
               target="_blank"
@@ -124,7 +129,9 @@ export default function PreLoginExperiencePage({ onNavigate, redirectMessage }: 
               caffeine.ai
             </a>
           </p>
-          <p className="text-sm text-gray-500">© {new Date().getFullYear()} Kids Fun App. All rights reserved.</p>
+          <p className="text-sm text-gray-500">
+            © {new Date().getFullYear()} Kids Fun App. All rights reserved.
+          </p>
         </div>
       </footer>
     </div>

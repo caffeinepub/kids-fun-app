@@ -1,230 +1,546 @@
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { useSpinWheel, useGetSpinRewardHistory } from '../hooks/useQueries';
-import { toast } from 'sonner';
-import { Gift, Clock, Sparkles } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
+import { ArrowLeft, Clock, Sparkles, Star, Trophy } from "lucide-react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
+import { useActor } from "../hooks/useActor";
+
+// Wheel segments: only trophies and points
+const SEGMENTS = [
+  { label: "🏆 3 Trophies", type: "trophy", value: 3, color: "#FFD700" },
+  { label: "⭐ 20 Points", type: "points", value: 20, color: "#7C3AED" },
+  { label: "🏆 5 Trophies", type: "trophy", value: 5, color: "#F59E0B" },
+  { label: "⭐ 50 Points", type: "points", value: 50, color: "#6D28D9" },
+  { label: "🏆 2 Trophies", type: "trophy", value: 2, color: "#EAB308" },
+  { label: "⭐ 10 Points", type: "points", value: 10, color: "#8B5CF6" },
+  { label: "🏆 10 Trophies", type: "trophy", value: 10, color: "#D97706" },
+  { label: "⭐ 100 Points", type: "points", value: 100, color: "#5B21B6" },
+];
+
+const SEGMENT_COUNT = SEGMENTS.length;
+const SEGMENT_ANGLE = (2 * Math.PI) / SEGMENT_COUNT;
+
+function drawWheel(canvas: HTMLCanvasElement, rotation: number) {
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  const size = canvas.width;
+  const cx = size / 2;
+  const cy = size / 2;
+  const radius = size / 2 - 10;
+
+  ctx.clearRect(0, 0, size, size);
+
+  // Draw segments
+  for (let i = 0; i < SEGMENT_COUNT; i++) {
+    const startAngle = rotation + i * SEGMENT_ANGLE;
+    const endAngle = startAngle + SEGMENT_ANGLE;
+    const seg = SEGMENTS[i];
+
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, radius, startAngle, endAngle);
+    ctx.closePath();
+    ctx.fillStyle = seg.color;
+    ctx.fill();
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Draw label
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(startAngle + SEGMENT_ANGLE / 2);
+    ctx.textAlign = "right";
+    ctx.fillStyle = "#fff";
+    ctx.font = `bold ${size * 0.045}px sans-serif`;
+    ctx.shadowColor = "rgba(0,0,0,0.5)";
+    ctx.shadowBlur = 4;
+    ctx.fillText(seg.label, radius - 12, 5);
+    ctx.restore();
+  }
+
+  // Center circle
+  ctx.beginPath();
+  ctx.arc(cx, cy, 28, 0, 2 * Math.PI);
+  ctx.fillStyle = "#1e1b4b";
+  ctx.fill();
+  ctx.strokeStyle = "#fff";
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  // Center star
+  ctx.fillStyle = "#FFD700";
+  ctx.font = `bold ${size * 0.06}px sans-serif`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("⭐", cx, cy);
+}
+
+function formatCountdown(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
 
 export default function SpinWheelPage() {
+  const navigate = useNavigate();
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animFrameRef = useRef<number | null>(null);
+  const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
+    null,
+  );
+  const { actor, isFetching: actorFetching } = useActor();
+  const queryClient = useQueryClient();
+
   const [isSpinning, setIsSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
-  const [timeRemaining, setTimeRemaining] = useState(0);
-  const [canSpin, setCanSpin] = useState(true);
+  const [result, setResult] = useState<{
+    type: string;
+    value: number;
+    label: string;
+  } | null>(null);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [cooldownSeconds, setCooldownSeconds] = useState<number>(0);
+  const [spinHistory, setSpinHistory] = useState<
+    Array<{ label: string; type: string; value: number; timestamp: number }>
+  >(() => {
+    try {
+      return JSON.parse(localStorage.getItem("spinHistory") || "[]");
+    } catch {
+      return [];
+    }
+  });
 
-  const spinWheelMutation = useSpinWheel();
-  const { data: rewardHistory = [] } = useGetSpinRewardHistory();
+  // Fetch remaining cooldown on mount
+  const { data: remainingCooldownData, refetch: refetchCooldown } = useQuery({
+    queryKey: ["spinCooldown"],
+    queryFn: async () => {
+      if (!actor) return 0n;
+      return actor.getRemainingSpinCooldown();
+    },
+    enabled: !!actor && !actorFetching,
+  });
+
+  // Fetch virtual pet hub
+  const { data: virtualPetHub, refetch: refetchVirtualPet } = useQuery({
+    queryKey: ["virtualPetHub"],
+    queryFn: async () => {
+      if (!actor) return null;
+      return actor.getVirtualPetHub();
+    },
+    enabled: !!actor && !actorFetching,
+  });
+
+  // Start countdown when cooldown data arrives
+  useEffect(() => {
+    if (remainingCooldownData === undefined || remainingCooldownData === null)
+      return;
+    const secs = Number(remainingCooldownData);
+    if (secs <= 0) {
+      setCooldownSeconds(0);
+      return;
+    }
+    setCooldownSeconds(secs);
+  }, [remainingCooldownData]);
+
+  // Tick the countdown every second
+  useEffect(() => {
+    if (cooldownSeconds <= 0) {
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+        countdownIntervalRef.current = null;
+      }
+      return;
+    }
+
+    if (countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current);
+    }
+
+    countdownIntervalRef.current = setInterval(() => {
+      setCooldownSeconds((prev) => {
+        if (prev <= 1) {
+          if (countdownIntervalRef.current) {
+            clearInterval(countdownIntervalRef.current);
+            countdownIntervalRef.current = null;
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+        countdownIntervalRef.current = null;
+      }
+    };
+  }, [cooldownSeconds > 0 ? "active" : "inactive"]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Claim spin reward mutation (adds points to Virtual Pet)
+  const claimSpinRewardMutation = useMutation({
+    mutationFn: async (points: number) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.claimSpinReward(BigInt(points));
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["virtualPetHub"] });
+      refetchVirtualPet();
+      // If backend returned a remaining cooldown, start it
+      if (data && data.remainingCooldown > 0n) {
+        setCooldownSeconds(Number(data.remainingCooldown));
+      } else {
+        // Start 20-minute cooldown after successful spin
+        setCooldownSeconds(1200);
+      }
+    },
+  });
+
+  // Record spin reward mutation (for history/logging only)
+  const recordSpinMutation = useMutation({
+    mutationFn: async (reward: {
+      rewardType: string;
+      value: string;
+      timestamp: bigint;
+    }) => {
+      if (!actor) throw new Error("Actor not available");
+      await actor.recordSpinReward(reward);
+    },
+  });
 
   useEffect(() => {
-    const lastSpinTime = localStorage.getItem('lastSpinTime');
-    if (lastSpinTime) {
-      const elapsed = Date.now() - parseInt(lastSpinTime);
-      const cooldown = 20 * 60 * 1000; // 20 minutes
-      if (elapsed < cooldown) {
-        setCanSpin(false);
-        setTimeRemaining(Math.ceil((cooldown - elapsed) / 1000));
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    drawWheel(canvas, rotation);
+  }, [rotation]);
+
+  const spin = useCallback(() => {
+    if (isSpinning || cooldownSeconds > 0) return;
+    setIsSpinning(true);
+    setResult(null);
+    setShowCelebration(false);
+
+    // Random number of full rotations (5-10) plus random segment offset
+    const extraSpins = 5 + Math.floor(Math.random() * 5);
+    const randomSegment = Math.floor(Math.random() * SEGMENT_COUNT);
+    const targetAngle =
+      extraSpins * 2 * Math.PI + randomSegment * SEGMENT_ANGLE;
+
+    const startRotation = rotation;
+    const totalRotation = targetAngle;
+    const duration = 4000; // 4 seconds
+    const startTime = performance.now();
+
+    const easeOut = (t: number) => 1 - (1 - t) ** 4;
+
+    const animate = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easedProgress = easeOut(progress);
+      const currentRotation = startRotation + totalRotation * easedProgress;
+
+      setRotation(currentRotation);
+
+      if (canvasRef.current) {
+        drawWheel(canvasRef.current, currentRotation);
       }
-    }
+
+      if (progress < 1) {
+        animFrameRef.current = requestAnimationFrame(animate);
+      } else {
+        // Determine winning segment
+        const normalizedAngle =
+          ((currentRotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+        const pointerAngle = (3 * Math.PI) / 2;
+        const relativeAngle =
+          (pointerAngle - normalizedAngle + 2 * Math.PI) % (2 * Math.PI);
+        const winningIndex =
+          Math.floor(relativeAngle / SEGMENT_ANGLE) % SEGMENT_COUNT;
+        const winningSegment = SEGMENTS[winningIndex];
+
+        setResult({
+          type: winningSegment.type,
+          value: winningSegment.value,
+          label: winningSegment.label,
+        });
+        setShowCelebration(true);
+        setIsSpinning(false);
+
+        // Save to history
+        const historyEntry = {
+          label: winningSegment.label,
+          type: winningSegment.type,
+          value: winningSegment.value,
+          timestamp: Date.now(),
+        };
+        const newHistory = [historyEntry, ...spinHistory].slice(0, 10);
+        setSpinHistory(newHistory);
+        localStorage.setItem("spinHistory", JSON.stringify(newHistory));
+
+        // Apply rewards:
+        // Points → add to Virtual Pet via claimSpinReward (backend enforces cooldown & updates pet)
+        // Trophies → record only (no separate backend method for trophies)
+        if (winningSegment.type === "points") {
+          claimSpinRewardMutation.mutate(winningSegment.value);
+        } else {
+          // For trophies: record the spin and start cooldown locally
+          recordSpinMutation.mutate({
+            rewardType: winningSegment.type,
+            value: String(winningSegment.value),
+            timestamp: BigInt(Date.now()),
+          });
+          // Start 20-minute cooldown
+          setCooldownSeconds(1200);
+        }
+      }
+    };
+
+    animFrameRef.current = requestAnimationFrame(animate);
+  }, [
+    isSpinning,
+    cooldownSeconds,
+    rotation,
+    spinHistory,
+    claimSpinRewardMutation,
+    recordSpinMutation,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+      if (countdownIntervalRef.current)
+        clearInterval(countdownIntervalRef.current);
+    };
   }, []);
 
-  useEffect(() => {
-    if (!canSpin && timeRemaining > 0) {
-      const timer = setInterval(() => {
-        setTimeRemaining((prev) => {
-          if (prev <= 1) {
-            setCanSpin(true);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-      return () => clearInterval(timer);
-    }
-  }, [canSpin, timeRemaining]);
-
-  const handleSpin = async () => {
-    if (!canSpin || isSpinning) return;
-
-    setIsSpinning(true);
-    const spins = 5 + Math.random() * 3;
-    const newRotation = rotation + 360 * spins + Math.random() * 360;
-    setRotation(newRotation);
-
-    setTimeout(async () => {
-      try {
-        const result = await spinWheelMutation.mutateAsync();
-        
-        let message = '';
-        let description = '';
-        
-        if (result.extraSpin) {
-          message = '🎁 Mystery Box! You won an extra spin!';
-          description = 'Spin again immediately!';
-          toast.success(message, { description });
-          setIsSpinning(false);
-          return; // Don't set cooldown for mystery box
-        }
-        
-        if (result.pointsAwarded > 0) {
-          message = `🎉 You won ${result.pointsAwarded} points!`;
-          description = 'Your virtual pet is growing!';
-        }
-        
-        if (result.badgesEarned.length > 0) {
-          const badgeNames = result.badgesEarned.map(b => b.badge.name).join(', ');
-          if (message) {
-            message += ` Plus ${result.badgesEarned.length} badge(s): ${badgeNames}!`;
-          } else {
-            message = `🏆 You won ${result.badgesEarned.length} badge(s): ${badgeNames}!`;
-          }
-        }
-        
-        toast.success(message, { description });
-        
-        localStorage.setItem('lastSpinTime', Date.now().toString());
-        setCanSpin(false);
-        setTimeRemaining(20 * 60);
-      } catch (error: any) {
-        if (error.message && error.message.includes('cannot be spun yet')) {
-          toast.error('Please wait for the cooldown to finish!');
-        } else {
-          toast.error('Unable to spin the wheel. Please try again later.');
-        }
-      } finally {
-        setIsSpinning(false);
-      }
-    }, 3000);
-  };
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const prizes = [
-    { label: 'Points 100', color: 'from-blue-400 to-blue-600' },
-    { label: 'Badge', color: 'from-yellow-400 to-yellow-600' },
-    { label: 'Points 250', color: 'from-green-400 to-green-600' },
-    { label: 'Mystery Box', color: 'from-purple-400 to-purple-600' },
-    { label: 'Points 500', color: 'from-orange-400 to-orange-600' },
-    { label: 'Badge', color: 'from-pink-400 to-pink-600' },
-    { label: 'Points 100', color: 'from-teal-400 to-teal-600' },
-    { label: 'Mystery Box', color: 'from-red-400 to-red-600' },
-  ];
+  const isMutating =
+    claimSpinRewardMutation.isPending || recordSpinMutation.isPending;
+  const isOnCooldown = cooldownSeconds > 0;
+  const isDisabled = isSpinning || isMutating || isOnCooldown;
 
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-          Spin the Wheel! 🎡
+    <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-950 to-violet-950 text-white">
+      {/* Header */}
+      <header className="flex items-center gap-4 px-6 py-4 border-b border-white/10">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => navigate({ to: "/dashboard" })}
+          className="text-white hover:bg-white/10"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </Button>
+        <h1 className="text-2xl font-bold text-yellow-300 font-hero">
+          🎡 Spin the Wheel
         </h1>
-        <p className="text-lg text-black">Spin every 20 minutes for points and badges!</p>
-        <p className="text-sm text-black mt-1">Points you earn help your virtual pet grow! 🐶</p>
-        <p className="text-xs text-black mt-1">Land on Mystery Box for an extra spin!</p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="border-4 bg-gradient-to-br from-purple-50 to-pink-50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-black">
-              <Sparkles className="w-6 h-6 text-purple-600" />
-              Prize Wheel
-            </CardTitle>
-            <CardDescription className="text-black">Click the button to spin and win!</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="relative w-full max-w-md mx-auto aspect-square">
-              <div
-                className="absolute inset-0 rounded-full border-8 border-yellow-400 shadow-2xl overflow-hidden"
-                style={{
-                  transform: `rotate(${rotation}deg)`,
-                  transition: isSpinning ? 'transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99)' : 'none',
-                }}
-              >
-                {prizes.map((prize, index) => {
-                  const angle = (360 / prizes.length) * index;
-                  return (
-                    <div
-                      key={index}
-                      className={`absolute inset-0 bg-gradient-to-br ${prize.color}`}
-                      style={{
-                        clipPath: `polygon(50% 50%, ${50 + 50 * Math.cos((angle - 22.5) * Math.PI / 180)}% ${50 + 50 * Math.sin((angle - 22.5) * Math.PI / 180)}%, ${50 + 50 * Math.cos((angle + 22.5) * Math.PI / 180)}% ${50 + 50 * Math.sin((angle + 22.5) * Math.PI / 180)}%)`,
-                      }}
-                    >
-                      <div
-                        className="absolute top-1/4 left-1/2 -translate-x-1/2 text-white font-bold text-xs md:text-sm"
-                        style={{
-                          transform: `rotate(${angle}deg) translateY(-20px)`,
-                        }}
-                      >
-                        {prize.label}
-                      </div>
-                    </div>
-                  );
-                })}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-16 h-16 bg-white rounded-full border-4 border-yellow-400 shadow-lg"></div>
-                </div>
+        <div className="ml-auto flex items-center gap-4">
+          {/* Virtual Pet Points */}
+          <div className="flex items-center gap-2 bg-purple-500/20 border border-purple-400/30 rounded-xl px-4 py-2">
+            <Star className="w-4 h-4 text-purple-300" />
+            <div>
+              <div className="text-xs text-purple-300/70">Pet Trophies</div>
+              <div className="text-lg font-bold text-purple-200">
+                {virtualPetHub ? Number(virtualPetHub.trophies) : 0}
               </div>
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 w-0 h-0 border-l-[20px] border-r-[20px] border-t-[30px] border-l-transparent border-r-transparent border-t-red-500 z-10"></div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-4xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+          {/* Wheel Section */}
+          <div className="flex flex-col items-center gap-6">
+            {/* Pointer */}
+            <div className="relative">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 z-10">
+                <div className="w-0 h-0 border-l-[12px] border-r-[12px] border-b-[28px] border-l-transparent border-r-transparent border-b-red-500 drop-shadow-lg" />
+              </div>
+              <canvas
+                ref={canvasRef}
+                width={360}
+                height={360}
+                className="rounded-full shadow-2xl shadow-purple-500/40 border-4 border-white/20"
+              />
             </div>
 
-            <div className="text-center space-y-4">
-              {canSpin ? (
-                <Button
-                  size="lg"
-                  onClick={handleSpin}
-                  disabled={isSpinning}
-                  className="text-xl px-8 py-6 font-bold"
-                >
-                  {isSpinning ? 'Spinning...' : 'Spin Now! 🎯'}
-                </Button>
+            {/* Spin Button */}
+            <Button
+              onClick={spin}
+              disabled={isDisabled}
+              className="w-56 h-14 text-xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-300 hover:to-orange-400 text-black border-0 rounded-full shadow-lg shadow-yellow-500/30 disabled:opacity-60 transition-all"
+            >
+              {isSpinning ? (
+                <span className="flex items-center gap-2">
+                  <span className="animate-spin">🎡</span> Spinning...
+                </span>
+              ) : isMutating ? (
+                <span className="flex items-center gap-2">
+                  <span className="animate-spin">⏳</span> Saving...
+                </span>
+              ) : isOnCooldown ? (
+                <span className="flex items-center gap-2 text-base">
+                  <Clock className="w-5 h-5" />
+                  {formatCountdown(cooldownSeconds)}
+                </span>
               ) : (
-                <div className="space-y-2">
-                  <Badge variant="secondary" className="text-lg px-4 py-2 text-black">
-                    <Clock className="w-4 h-4 mr-2" />
-                    Next spin in: {formatTime(timeRemaining)}
-                  </Badge>
-                  <p className="text-sm text-black">Come back soon for another spin!</p>
-                </div>
+                <span className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5" /> SPIN!
+                </span>
               )}
-            </div>
-          </CardContent>
-        </Card>
+            </Button>
 
-        <Card className="border-4">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-black">
-              <Gift className="w-6 h-6 text-pink-600" />
-              Your Prize History
-            </CardTitle>
-            <CardDescription className="text-black">Recent rewards you've won</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {rewardHistory.length === 0 ? (
-              <div className="text-center py-8 text-black">
-                <Gift className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                <p>No prizes yet. Spin the wheel to win!</p>
-              </div>
-            ) : (
-              <div className="space-y-3 max-h-96 overflow-y-auto">
-                {rewardHistory.map((reward, index) => (
-                  <Card key={index} className="border-2 bg-gradient-to-r from-yellow-50 to-orange-50">
-                    <CardContent className="p-4 flex items-center justify-between">
-                      <div>
-                        <p className="font-bold text-lg text-black">{reward.value}</p>
-                        <p className="text-sm text-black">{reward.rewardType}</p>
-                      </div>
-                      <Badge className="bg-green-500 text-white">Won! ✓</Badge>
-                    </CardContent>
-                  </Card>
-                ))}
+            {/* Cooldown message */}
+            {isOnCooldown && (
+              <p className="text-sm text-white/50 text-center">
+                Next spin available in{" "}
+                <span className="text-yellow-300 font-semibold">
+                  {formatCountdown(cooldownSeconds)}
+                </span>
+              </p>
+            )}
+          </div>
+
+          {/* Result & Info Section */}
+          <div className="flex flex-col gap-6">
+            {/* Result Banner */}
+            {showCelebration && result && (
+              <div
+                className={`rounded-2xl p-6 text-center border-2 animate-bounce-once ${
+                  result.type === "trophy"
+                    ? "bg-yellow-500/20 border-yellow-400/50"
+                    : "bg-purple-500/20 border-purple-400/50"
+                }`}
+              >
+                <div className="text-5xl mb-3">
+                  {result.type === "trophy" ? "🏆" : "⭐"}
+                </div>
+                <div className="text-2xl font-bold mb-2">
+                  {result.type === "trophy"
+                    ? `You won ${result.value} ${result.value === 1 ? "Trophy" : "Trophies"}!`
+                    : `You earned ${result.value} Points!`}
+                </div>
+                <div className="text-sm text-white/70 mt-2">
+                  {result.type === "trophy" ? (
+                    <>
+                      <span className="text-yellow-300 font-semibold">
+                        Keep playing and Spinning to earn more!
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-purple-300 font-semibold">
+                        Added to Your Virtual Pet!
+                      </span>
+                      <br />
+                      <span className="mt-1 block">
+                        Grow your pet by earning points from games and spin
+                        rewards!
+                      </span>
+                    </>
+                  )}
+                </div>
               </div>
             )}
-          </CardContent>
-        </Card>
-      </div>
+
+            {/* Possible Prizes */}
+            <div className="bg-white/5 rounded-2xl p-5 border border-white/10">
+              <h2 className="text-lg font-bold text-yellow-300 mb-4 flex items-center gap-2">
+                <Trophy className="w-5 h-5" /> Possible Prizes
+              </h2>
+              <div className="grid grid-cols-2 gap-2">
+                {SEGMENTS.map((seg, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium"
+                    style={{
+                      backgroundColor: `${seg.color}33`,
+                      border: `1px solid ${seg.color}66`,
+                    }}
+                  >
+                    <span>{seg.type === "trophy" ? "🏆" : "⭐"}</span>
+                    <span>
+                      {seg.label.replace("🏆 ", "").replace("⭐ ", "")}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Score Summary */}
+            <div className="bg-white/5 rounded-2xl p-5 border border-white/10">
+              <h2 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
+                <Star className="w-5 h-5 text-purple-300" /> Your Progress
+              </h2>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-white/70 text-sm flex items-center gap-2">
+                    <Star className="w-4 h-4 text-purple-300" /> Pet Happiness
+                  </span>
+                  <span className="font-bold text-purple-200 text-lg">
+                    {virtualPetHub ? Number(virtualPetHub.happinessLevel) : 0}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-white/70 text-sm flex items-center gap-2">
+                    🏆 Pet Trophies
+                  </span>
+                  <span className="font-bold text-yellow-200 text-lg">
+                    {virtualPetHub ? Number(virtualPetHub.trophies) : 0}
+                  </span>
+                </div>
+              </div>
+              <p className="text-xs text-white/40 mt-3 text-center">
+                Grow your pet by earning points from games and spin rewards!
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Spin History */}
+        {spinHistory.length > 0 && (
+          <div className="mt-8 bg-white/5 rounded-2xl p-5 border border-white/10">
+            <h2 className="text-lg font-bold text-white mb-4">Recent Spins</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+              {spinHistory.slice(0, 10).map((entry, i) => (
+                <div
+                  key={i}
+                  className={`rounded-xl px-3 py-2 text-center text-sm ${
+                    entry.type === "trophy"
+                      ? "bg-yellow-500/20 border border-yellow-400/30"
+                      : "bg-purple-500/20 border border-purple-400/30"
+                  }`}
+                >
+                  <div className="text-xl">
+                    {entry.type === "trophy" ? "🏆" : "⭐"}
+                  </div>
+                  <div className="font-semibold text-white/90 text-xs mt-1">
+                    {entry.value}{" "}
+                    {entry.type === "trophy" ? "Trophies" : "Points"}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* Footer */}
+      <footer className="text-center py-6 text-white/30 text-xs mt-8">
+        <p>
+          Built with ❤️ using{" "}
+          <a
+            href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-white/60"
+          >
+            caffeine.ai
+          </a>{" "}
+          &copy; {new Date().getFullYear()}
+        </p>
+      </footer>
     </div>
   );
 }

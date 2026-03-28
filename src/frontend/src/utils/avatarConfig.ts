@@ -1,21 +1,21 @@
-import type { AvatarConfig } from '../hooks/useQueries';
+import type { AvatarConfig } from "../hooks/useQueries";
 
 export function getDefaultAvatarConfig(): AvatarConfig {
   return {
-    body: 'body1',
-    head: 'head1',
-    hair: 'hair1',
-    pants: 'pants1',
-    headwear: 'none',
-    shoes: 'shoes1',
+    body: "body1",
+    head: "head1",
+    hair: "hair1",
+    pants: "pants1",
+    headwear: "none",
+    shoes: "shoes1",
   };
 }
 
 export function mergeAvatarConfig(
-  userConfig: AvatarConfig | undefined | null
+  userConfig: AvatarConfig | undefined | null,
 ): AvatarConfig {
   const defaultConfig = getDefaultAvatarConfig();
-  
+
   if (!userConfig) {
     return defaultConfig;
   }

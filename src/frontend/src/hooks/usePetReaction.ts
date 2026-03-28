@@ -1,18 +1,18 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from "react";
 
-export type PetReactionType = 'feed' | 'play' | null;
+export type PetReactionType = "feed" | "play" | null;
 
 export interface UsePetReactionReturn {
   reaction: PetReactionType;
-  triggerReaction: (type: 'feed' | 'play') => void;
+  triggerReaction: (type: "feed" | "play") => void;
 }
 
 export function usePetReaction(): UsePetReactionReturn {
   const [reaction, setReaction] = useState<PetReactionType>(null);
-  const [reactionKey, setReactionKey] = useState(0);
+  const [_reactionKey, setReactionKey] = useState(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const triggerReaction = (type: 'feed' | 'play') => {
+  const triggerReaction = (type: "feed" | "play") => {
     // Clear any existing timeout to prevent stuck states
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);

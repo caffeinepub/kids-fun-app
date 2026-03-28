@@ -1,18 +1,45 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { useGetVirtualPetHub, useSaveVirtualPetHub, useGetUserRewards, useGetUserTrophies } from '../hooks/useQueries';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { usePetReaction } from '../hooks/usePetReaction';
-import { toast } from 'sonner';
-import { Heart, Sparkles, Home, ShoppingBag, Trophy, Star, Gift, Zap } from 'lucide-react';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Gift,
+  Heart,
+  Home,
+  ShoppingBag,
+  Sparkles,
+  Star,
+  Trophy,
+  Zap,
+} from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { toast } from "sonner";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
+import { usePetReaction } from "../hooks/usePetReaction";
+import {
+  useGetUserRewards,
+  useGetUserTrophies,
+  useGetVirtualPetHub,
+  useSaveVirtualPetHub,
+} from "../hooks/useQueries";
 
 export default function VirtualPetHubPage() {
   const { identity } = useInternetIdentity();
@@ -22,54 +49,78 @@ export default function VirtualPetHubPage() {
   const savePetHub = useSaveVirtualPetHub();
   const { reaction, triggerReaction } = usePetReaction();
 
-  const [petName, setPetName] = useState('');
-  const [selectedAccessory, setSelectedAccessory] = useState<string | null>(null);
-  const [selectedDecoration, setSelectedDecoration] = useState<string | null>(null);
-  const [selectedHomeStyle, setSelectedHomeStyle] = useState('cozy');
+  const [petName, setPetName] = useState("");
+  const [_selectedAccessory, _setSelectedAccessory] = useState<string | null>(
+    null,
+  );
+  const [_selectedDecoration, _setSelectedDecoration] = useState<string | null>(
+    null,
+  );
+  const [_selectedHomeStyle, setSelectedHomeStyle] = useState("cozy");
   const [showNameDialog, setShowNameDialog] = useState(false);
 
   useEffect(() => {
     if (petHub) {
       setPetName(petHub.petName);
-      setSelectedHomeStyle(petHub.homeStyle || 'cozy');
+      setSelectedHomeStyle(petHub.homeStyle || "cozy");
     } else if (identity && !petLoading) {
       setShowNameDialog(true);
     }
   }, [petHub, identity, petLoading]);
 
   const accessories = [
-    { id: 'hat_party', name: 'Party Hat', emoji: '🎩', cost: 50 },
-    { id: 'hat_crown', name: 'Crown', emoji: '👑', cost: 100 },
-    { id: 'glasses_cool', name: 'Cool Glasses', emoji: '😎', cost: 75 },
-    { id: 'bow_tie', name: 'Bow Tie', emoji: '🎀', cost: 60 },
-    { id: 'scarf', name: 'Scarf', emoji: '🧣', cost: 80 },
-    { id: 'necklace', name: 'Necklace', emoji: '📿', cost: 90 },
+    { id: "hat_party", name: "Party Hat", emoji: "🎩", cost: 50 },
+    { id: "hat_crown", name: "Crown", emoji: "👑", cost: 100 },
+    { id: "glasses_cool", name: "Cool Glasses", emoji: "😎", cost: 75 },
+    { id: "bow_tie", name: "Bow Tie", emoji: "🎀", cost: 60 },
+    { id: "scarf", name: "Scarf", emoji: "🧣", cost: 80 },
+    { id: "necklace", name: "Necklace", emoji: "📿", cost: 90 },
   ];
 
   const decorations = [
-    { id: 'plant', name: 'Plant', emoji: '🪴', cost: 40 },
-    { id: 'lamp', name: 'Lamp', emoji: '💡', cost: 50 },
-    { id: 'rug', name: 'Rug', emoji: '🧶', cost: 60 },
-    { id: 'painting', name: 'Painting', emoji: '🖼️', cost: 70 },
-    { id: 'bookshelf', name: 'Bookshelf', emoji: '📚', cost: 80 },
-    { id: 'toy_box', name: 'Toy Box', emoji: '🧸', cost: 90 },
+    { id: "plant", name: "Plant", emoji: "🪴", cost: 40 },
+    { id: "lamp", name: "Lamp", emoji: "💡", cost: 50 },
+    { id: "rug", name: "Rug", emoji: "🧶", cost: 60 },
+    { id: "painting", name: "Painting", emoji: "🖼️", cost: 70 },
+    { id: "bookshelf", name: "Bookshelf", emoji: "📚", cost: 80 },
+    { id: "toy_box", name: "Toy Box", emoji: "🧸", cost: 90 },
   ];
 
   const homeStyles = [
-    { id: 'cozy', name: 'Cozy Cottage', emoji: '🏡', description: 'Warm and comfortable' },
-    { id: 'modern', name: 'Modern Loft', emoji: '🏢', description: 'Sleek and stylish' },
-    { id: 'garden', name: 'Garden Paradise', emoji: '🌳', description: 'Nature-inspired' },
-    { id: 'castle', name: 'Royal Castle', emoji: '🏰', description: 'Fit for royalty' },
+    {
+      id: "cozy",
+      name: "Cozy Cottage",
+      emoji: "🏡",
+      description: "Warm and comfortable",
+    },
+    {
+      id: "modern",
+      name: "Modern Loft",
+      emoji: "🏢",
+      description: "Sleek and stylish",
+    },
+    {
+      id: "garden",
+      name: "Garden Paradise",
+      emoji: "🌳",
+      description: "Nature-inspired",
+    },
+    {
+      id: "castle",
+      name: "Royal Castle",
+      emoji: "🏰",
+      description: "Fit for royalty",
+    },
   ];
 
   const handleCreatePet = async () => {
     if (!petName.trim()) {
-      toast.error('Please enter a name for your pet!');
+      toast.error("Please enter a name for your pet!");
       return;
     }
 
     if (!identity) {
-      toast.error('Please log in first!');
+      toast.error("Please log in first!");
       return;
     }
 
@@ -81,7 +132,7 @@ export default function VirtualPetHubPage() {
         growthStage: BigInt(1),
         accessories: [],
         decorations: [],
-        homeStyle: 'cozy',
+        homeStyle: "cozy",
         warnedAboutExtremeChanges: false,
         trophies: BigInt(trophies),
       });
@@ -89,8 +140,8 @@ export default function VirtualPetHubPage() {
       toast.success(`Welcome ${petName}! 🎉`);
       setShowNameDialog(false);
     } catch (error) {
-      console.error('Error creating pet:', error);
-      toast.error('Failed to create pet. Please try again.');
+      console.error("Error creating pet:", error);
+      toast.error("Failed to create pet. Please try again.");
     }
   };
 
@@ -98,10 +149,13 @@ export default function VirtualPetHubPage() {
     if (!petHub || !identity) return;
 
     // Trigger the feed reaction immediately
-    triggerReaction('feed');
+    triggerReaction("feed");
 
     const newHappiness = Math.min(Number(petHub.happinessLevel) + 10, 100);
-    const newGrowth = newHappiness === 100 ? Number(petHub.growthStage) + 1 : Number(petHub.growthStage);
+    const newGrowth =
+      newHappiness === 100
+        ? Number(petHub.growthStage) + 1
+        : Number(petHub.growthStage);
 
     try {
       await savePetHub.mutateAsync({
@@ -110,10 +164,10 @@ export default function VirtualPetHubPage() {
         growthStage: BigInt(newGrowth),
       });
 
-      toast.success('Your pet is happy! 😊');
+      toast.success("Your pet is happy! 😊");
     } catch (error) {
-      console.error('Error feeding pet:', error);
-      toast.error('Failed to feed pet');
+      console.error("Error feeding pet:", error);
+      toast.error("Failed to feed pet");
     }
   };
 
@@ -121,10 +175,13 @@ export default function VirtualPetHubPage() {
     if (!petHub || !identity) return;
 
     // Trigger the play reaction immediately
-    triggerReaction('play');
+    triggerReaction("play");
 
     const newHappiness = Math.min(Number(petHub.happinessLevel) + 15, 100);
-    const newGrowth = newHappiness === 100 ? Number(petHub.growthStage) + 1 : Number(petHub.growthStage);
+    const newGrowth =
+      newHappiness === 100
+        ? Number(petHub.growthStage) + 1
+        : Number(petHub.growthStage);
 
     try {
       await savePetHub.mutateAsync({
@@ -133,10 +190,10 @@ export default function VirtualPetHubPage() {
         growthStage: BigInt(newGrowth),
       });
 
-      toast.success('Your pet loves playing with you! 🎮');
+      toast.success("Your pet loves playing with you! 🎮");
     } catch (error) {
-      console.error('Error playing with pet:', error);
-      toast.error('Failed to play with pet');
+      console.error("Error playing with pet:", error);
+      toast.error("Failed to play with pet");
     }
   };
 
@@ -149,7 +206,7 @@ export default function VirtualPetHubPage() {
     }
 
     if (petHub.accessories.includes(accessoryId)) {
-      toast.error('You already own this accessory!');
+      toast.error("You already own this accessory!");
       return;
     }
 
@@ -159,10 +216,10 @@ export default function VirtualPetHubPage() {
         accessories: [...petHub.accessories, accessoryId],
       });
 
-      toast.success('Accessory purchased! 🎉');
+      toast.success("Accessory purchased! 🎉");
     } catch (error) {
-      console.error('Error buying accessory:', error);
-      toast.error('Failed to purchase accessory');
+      console.error("Error buying accessory:", error);
+      toast.error("Failed to purchase accessory");
     }
   };
 
@@ -175,7 +232,7 @@ export default function VirtualPetHubPage() {
     }
 
     if (petHub.decorations.includes(decorationId)) {
-      toast.error('You already own this decoration!');
+      toast.error("You already own this decoration!");
       return;
     }
 
@@ -185,10 +242,10 @@ export default function VirtualPetHubPage() {
         decorations: [...petHub.decorations, decorationId],
       });
 
-      toast.success('Decoration purchased! 🎉');
+      toast.success("Decoration purchased! 🎉");
     } catch (error) {
-      console.error('Error buying decoration:', error);
-      toast.error('Failed to purchase decoration');
+      console.error("Error buying decoration:", error);
+      toast.error("Failed to purchase decoration");
     }
   };
 
@@ -202,34 +259,34 @@ export default function VirtualPetHubPage() {
       });
 
       setSelectedHomeStyle(styleId);
-      toast.success('Home style updated! 🏡');
+      toast.success("Home style updated! 🏡");
     } catch (error) {
-      console.error('Error changing home style:', error);
-      toast.error('Failed to change home style');
+      console.error("Error changing home style:", error);
+      toast.error("Failed to change home style");
     }
   };
 
   const getGrowthStageName = (stage: number) => {
-    if (stage <= 1) return 'Baby';
-    if (stage <= 3) return 'Child';
-    if (stage <= 5) return 'Teen';
-    if (stage <= 7) return 'Adult';
-    return 'Elder';
+    if (stage <= 1) return "Baby";
+    if (stage <= 3) return "Child";
+    if (stage <= 5) return "Teen";
+    if (stage <= 7) return "Adult";
+    return "Elder";
   };
 
   const getPetEmoji = (stage: number) => {
-    if (stage <= 1) return '🥚';
-    if (stage <= 3) return '🐣';
-    if (stage <= 5) return '🐥';
-    if (stage <= 7) return '🐤';
-    return '🦜';
+    if (stage <= 1) return "🥚";
+    if (stage <= 3) return "🐣";
+    if (stage <= 5) return "🐥";
+    if (stage <= 7) return "🐤";
+    return "🦜";
   };
 
   if (petLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto" />
           <p className="text-lg text-gray-600">Loading your pet...</p>
         </div>
       </div>
@@ -256,7 +313,9 @@ export default function VirtualPetHubPage() {
       <Dialog open={showNameDialog} onOpenChange={setShowNameDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="text-2xl">Create Your Virtual Pet! 🐾</DialogTitle>
+            <DialogTitle className="text-2xl">
+              Create Your Virtual Pet! 🐾
+            </DialogTitle>
             <DialogDescription>
               Choose a name for your new companion
             </DialogDescription>
@@ -269,7 +328,7 @@ export default function VirtualPetHubPage() {
                 placeholder="Enter a name..."
                 value={petName}
                 onChange={(e) => setPetName(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleCreatePet()}
+                onKeyPress={(e) => e.key === "Enter" && handleCreatePet()}
               />
             </div>
             <Button onClick={handleCreatePet} className="w-full" size="lg">
@@ -283,7 +342,9 @@ export default function VirtualPetHubPage() {
         <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
           🐾 Virtual Pet Hub
         </h1>
-        <p className="text-lg text-gray-700">Take care of your virtual companion!</p>
+        <p className="text-lg text-gray-700">
+          Take care of your virtual companion!
+        </p>
       </div>
 
       {petHub && (
@@ -309,9 +370,14 @@ export default function VirtualPetHubPage() {
                       <Heart className="w-5 h-5 text-red-500" />
                       Happiness
                     </Label>
-                    <span className="font-bold">{Number(petHub.happinessLevel)}%</span>
+                    <span className="font-bold">
+                      {Number(petHub.happinessLevel)}%
+                    </span>
                   </div>
-                  <Progress value={Number(petHub.happinessLevel)} className="h-3" />
+                  <Progress
+                    value={Number(petHub.happinessLevel)}
+                    className="h-3"
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -320,9 +386,14 @@ export default function VirtualPetHubPage() {
                       <Star className="w-5 h-5 text-yellow-500" />
                       Growth Stage
                     </Label>
-                    <span className="font-bold">Level {Number(petHub.growthStage)}</span>
+                    <span className="font-bold">
+                      Level {Number(petHub.growthStage)}
+                    </span>
                   </div>
-                  <Progress value={(Number(petHub.growthStage) / 10) * 100} className="h-3" />
+                  <Progress
+                    value={(Number(petHub.growthStage) / 10) * 100}
+                    className="h-3"
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -339,7 +410,9 @@ export default function VirtualPetHubPage() {
               {/* Pet Visual with Reaction Overlay */}
               <div className="relative bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg p-8 min-h-[300px] flex items-center justify-center border-4 border-purple-300 overflow-hidden">
                 <div className="text-center space-y-4">
-                  <div className={`text-9xl ${reaction ? 'pet-reaction-bounce' : 'animate-bounce'}`}>
+                  <div
+                    className={`text-9xl ${reaction ? "pet-reaction-bounce" : "animate-bounce"}`}
+                  >
                     {getPetEmoji(Number(petHub.growthStage))}
                   </div>
                   {petHub.accessories.length > 0 && (
@@ -357,26 +430,40 @@ export default function VirtualPetHubPage() {
                 </div>
 
                 {/* Feed Reaction Overlay */}
-                {reaction === 'feed' && (
+                {reaction === "feed" && (
                   <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                     <div className="pet-reaction-feed">
                       <div className="text-6xl animate-ping">❤️</div>
-                      <div className="text-5xl absolute top-1/4 left-1/4 animate-pulse">🍎</div>
-                      <div className="text-5xl absolute top-1/3 right-1/4 animate-pulse delay-100">🍕</div>
-                      <div className="text-4xl absolute bottom-1/3 left-1/3 animate-pulse delay-200">🍰</div>
+                      <div className="text-5xl absolute top-1/4 left-1/4 animate-pulse">
+                        🍎
+                      </div>
+                      <div className="text-5xl absolute top-1/3 right-1/4 animate-pulse delay-100">
+                        🍕
+                      </div>
+                      <div className="text-4xl absolute bottom-1/3 left-1/3 animate-pulse delay-200">
+                        🍰
+                      </div>
                     </div>
                   </div>
                 )}
 
                 {/* Play Reaction Overlay */}
-                {reaction === 'play' && (
+                {reaction === "play" && (
                   <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                     <div className="pet-reaction-play">
                       <div className="text-6xl animate-spin-slow">⚡</div>
-                      <div className="text-5xl absolute top-1/4 left-1/4 pet-reaction-sparkle">✨</div>
-                      <div className="text-5xl absolute top-1/3 right-1/4 pet-reaction-sparkle delay-100">⭐</div>
-                      <div className="text-4xl absolute bottom-1/3 left-1/3 pet-reaction-sparkle delay-200">💫</div>
-                      <div className="text-4xl absolute bottom-1/4 right-1/3 pet-reaction-sparkle delay-300">🎉</div>
+                      <div className="text-5xl absolute top-1/4 left-1/4 pet-reaction-sparkle">
+                        ✨
+                      </div>
+                      <div className="text-5xl absolute top-1/3 right-1/4 pet-reaction-sparkle delay-100">
+                        ⭐
+                      </div>
+                      <div className="text-4xl absolute bottom-1/3 left-1/3 pet-reaction-sparkle delay-200">
+                        💫
+                      </div>
+                      <div className="text-4xl absolute bottom-1/4 right-1/3 pet-reaction-sparkle delay-300">
+                        🎉
+                      </div>
                     </div>
                   </div>
                 )}
@@ -431,9 +518,13 @@ export default function VirtualPetHubPage() {
                           <CardContent className="p-3">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
-                                <span className="text-2xl">{accessory.emoji}</span>
+                                <span className="text-2xl">
+                                  {accessory.emoji}
+                                </span>
                                 <div>
-                                  <p className="font-semibold">{accessory.name}</p>
+                                  <p className="font-semibold">
+                                    {accessory.name}
+                                  </p>
                                   <p className="text-sm text-gray-600">
                                     {accessory.cost} 🏆
                                   </p>
@@ -441,10 +532,15 @@ export default function VirtualPetHubPage() {
                               </div>
                               <Button
                                 size="sm"
-                                onClick={() => handleBuyAccessory(accessory.id, accessory.cost)}
+                                onClick={() =>
+                                  handleBuyAccessory(
+                                    accessory.id,
+                                    accessory.cost,
+                                  )
+                                }
                                 disabled={owned || savePetHub.isPending}
                               >
-                                {owned ? 'Owned' : 'Buy'}
+                                {owned ? "Owned" : "Buy"}
                               </Button>
                             </div>
                           </CardContent>
@@ -463,9 +559,13 @@ export default function VirtualPetHubPage() {
                           <CardContent className="p-3">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
-                                <span className="text-2xl">{decoration.emoji}</span>
+                                <span className="text-2xl">
+                                  {decoration.emoji}
+                                </span>
                                 <div>
-                                  <p className="font-semibold">{decoration.name}</p>
+                                  <p className="font-semibold">
+                                    {decoration.name}
+                                  </p>
                                   <p className="text-sm text-gray-600">
                                     {decoration.cost} 🏆
                                   </p>
@@ -473,10 +573,15 @@ export default function VirtualPetHubPage() {
                               </div>
                               <Button
                                 size="sm"
-                                onClick={() => handleBuyDecoration(decoration.id, decoration.cost)}
+                                onClick={() =>
+                                  handleBuyDecoration(
+                                    decoration.id,
+                                    decoration.cost,
+                                  )
+                                }
                                 disabled={owned || savePetHub.isPending}
                               >
-                                {owned ? 'Owned' : 'Buy'}
+                                {owned ? "Owned" : "Buy"}
                               </Button>
                             </div>
                           </CardContent>
@@ -508,7 +613,7 @@ export default function VirtualPetHubPage() {
                                 onClick={() => handleChangeHomeStyle(style.id)}
                                 disabled={selected || savePetHub.isPending}
                               >
-                                {selected ? 'Active' : 'Select'}
+                                {selected ? "Active" : "Select"}
                               </Button>
                             </div>
                           </CardContent>

@@ -1,31 +1,46 @@
-import { useEffect, useRef, useState } from 'react';
-import GameLayout from '../../components/GameLayout';
-import { ModulePage } from '../../App';
+import { useEffect, useRef, useState } from "react";
+import type { ModulePage } from "../../App";
+import GameLayout from "../../components/GameLayout";
 
 interface EnemiesPlatformsProps {
   onNavigate: (page: ModulePage) => void;
 }
 
-export default function EnemiesPlatforms({ onNavigate }: EnemiesPlatformsProps) {
+export default function EnemiesPlatforms({
+  onNavigate,
+}: EnemiesPlatformsProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [level, setLevel] = useState(1);
-  
+
   const gameStateRef = useRef({
     player: { x: 50, y: 500, vx: 0, vy: 0, onGround: false, onEnemy: false },
-    enemies: [] as { x: number; y: number; vx: number; vy: number; attacking: boolean }[],
+    enemies: [] as {
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      attacking: boolean;
+    }[],
     goal: { x: 750, y: 50 },
     keys: {} as Record<string, boolean>,
   });
 
   const initGame = () => {
     const state = gameStateRef.current;
-    state.player = { x: 50, y: 500, vx: 0, vy: 0, onGround: false, onEnemy: false };
+    state.player = {
+      x: 50,
+      y: 500,
+      vx: 0,
+      vy: 0,
+      onGround: false,
+      onEnemy: false,
+    };
     state.goal = { x: 750, y: 50 };
     state.enemies = [];
-    
+
     // Create flying enemies as platforms
     for (let i = 0; i < 5 + level; i++) {
       state.enemies.push({
@@ -36,7 +51,7 @@ export default function EnemiesPlatforms({ onNavigate }: EnemiesPlatformsProps) 
         attacking: false,
       });
     }
-    
+
     setGameOver(false);
   };
 
@@ -54,7 +69,7 @@ export default function EnemiesPlatforms({ onNavigate }: EnemiesPlatformsProps) 
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -65,8 +80,8 @@ export default function EnemiesPlatforms({ onNavigate }: EnemiesPlatformsProps) 
       gameStateRef.current.keys[e.key] = false;
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
 
     let animationId: number;
     let time = 0;
@@ -78,12 +93,15 @@ export default function EnemiesPlatforms({ onNavigate }: EnemiesPlatformsProps) 
       if (!gameOver) {
         // Player movement
         const speed = 4;
-        if (state.keys['ArrowLeft'] || state.keys['a']) state.player.vx = -speed;
-        else if (state.keys['ArrowRight'] || state.keys['d']) state.player.vx = speed;
+        if (state.keys.ArrowLeft || state.keys.a) state.player.vx = -speed;
+        else if (state.keys.ArrowRight || state.keys.d) state.player.vx = speed;
         else state.player.vx *= 0.8;
 
         // Jump
-        if ((state.keys['ArrowUp'] || state.keys['w'] || state.keys[' ']) && (state.player.onGround || state.player.onEnemy)) {
+        if (
+          (state.keys.ArrowUp || state.keys.w || state.keys[" "]) &&
+          (state.player.onGround || state.player.onEnemy)
+        ) {
           state.player.vy = -13;
           state.player.onGround = false;
           state.player.onEnemy = false;
@@ -108,7 +126,7 @@ export default function EnemiesPlatforms({ onNavigate }: EnemiesPlatformsProps) 
           // Floating movement
           enemy.x += enemy.vx;
           enemy.y += Math.sin(time + idx) * 1.5;
-          
+
           // Bounce off walls
           if (enemy.x < 50 || enemy.x > 750) enemy.vx *= -1;
           enemy.y = Math.max(100, Math.min(500, enemy.y));
@@ -144,8 +162,8 @@ export default function EnemiesPlatforms({ onNavigate }: EnemiesPlatformsProps) 
         const dy = state.goal.y - state.player.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         if (dist < 40) {
-          setScore(s => s + level * 10);
-          setLevel(l => l + 1);
+          setScore((s) => s + level * 10);
+          setLevel((l) => l + 1);
         }
 
         // Fall off
@@ -156,51 +174,51 @@ export default function EnemiesPlatforms({ onNavigate }: EnemiesPlatformsProps) 
       }
 
       // Render
-      ctx.fillStyle = '#0c4a6e';
+      ctx.fillStyle = "#0c4a6e";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Goal
-      ctx.fillStyle = '#22c55e';
+      ctx.fillStyle = "#22c55e";
       ctx.beginPath();
       ctx.arc(state.goal.x, state.goal.y, 30, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = '#fff';
-      ctx.font = '32px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText('🏁', state.goal.x, state.goal.y + 10);
+      ctx.fillStyle = "#fff";
+      ctx.font = "32px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText("🏁", state.goal.x, state.goal.y + 10);
 
       // Ground
-      ctx.fillStyle = '#1e3a8a';
+      ctx.fillStyle = "#1e3a8a";
       ctx.fillRect(0, 570, 800, 30);
 
       // Enemies (as platforms)
-      state.enemies.forEach(enemy => {
+      state.enemies.forEach((enemy) => {
         // Enemy body
-        ctx.fillStyle = enemy.attacking ? '#dc2626' : '#f59e0b';
+        ctx.fillStyle = enemy.attacking ? "#dc2626" : "#f59e0b";
         ctx.fillRect(enemy.x - 25, enemy.y - 20, 50, 40);
-        
+
         // Wings
-        ctx.fillStyle = '#fbbf24';
+        ctx.fillStyle = "#fbbf24";
         ctx.beginPath();
         ctx.moveTo(enemy.x - 25, enemy.y);
         ctx.lineTo(enemy.x - 40, enemy.y - 10);
         ctx.lineTo(enemy.x - 25, enemy.y + 10);
         ctx.fill();
-        
+
         ctx.beginPath();
         ctx.moveTo(enemy.x + 25, enemy.y);
         ctx.lineTo(enemy.x + 40, enemy.y - 10);
         ctx.lineTo(enemy.x + 25, enemy.y + 10);
         ctx.fill();
-        
+
         // Face
-        ctx.fillStyle = '#fff';
-        ctx.font = '28px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('👾', enemy.x, enemy.y + 8);
-        
+        ctx.fillStyle = "#fff";
+        ctx.font = "28px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("👾", enemy.x, enemy.y + 8);
+
         // Platform indicator on top
-        ctx.strokeStyle = '#22c55e';
+        ctx.strokeStyle = "#22c55e";
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.moveTo(enemy.x - 25, enemy.y - 20);
@@ -209,22 +227,22 @@ export default function EnemiesPlatforms({ onNavigate }: EnemiesPlatformsProps) 
       });
 
       // Player
-      ctx.fillStyle = '#3b82f6';
+      ctx.fillStyle = "#3b82f6";
       ctx.beginPath();
       ctx.arc(state.player.x, state.player.y, 15, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = '#fff';
+      ctx.strokeStyle = "#fff";
       ctx.lineWidth = 3;
       ctx.stroke();
 
       // UI
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
       ctx.fillRect(10, 10, 280, 80);
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 14px Arial';
-      ctx.textAlign = 'left';
-      ctx.fillText('Jump on enemies to use as platforms!', 20, 35);
-      ctx.fillText('Avoid touching their sides!', 20, 60);
+      ctx.fillStyle = "#fff";
+      ctx.font = "bold 14px Arial";
+      ctx.textAlign = "left";
+      ctx.fillText("Jump on enemies to use as platforms!", 20, 35);
+      ctx.fillText("Avoid touching their sides!", 20, 60);
       ctx.fillText(`Level: ${level}`, 20, 85);
 
       animationId = requestAnimationFrame(gameLoop);
@@ -234,8 +252,8 @@ export default function EnemiesPlatforms({ onNavigate }: EnemiesPlatformsProps) 
 
     return () => {
       cancelAnimationFrame(animationId);
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
     };
   }, [gameOver, score, highScore, level]);
 
@@ -250,8 +268,12 @@ export default function EnemiesPlatforms({ onNavigate }: EnemiesPlatformsProps) 
     >
       <div className="flex flex-col items-center justify-center p-4 bg-gradient-to-br from-sky-900 to-blue-900">
         <div className="mb-4 text-center text-white">
-          <p className="text-lg font-semibold">Use enemies as moving platforms!</p>
-          <p className="text-sm">Arrow keys/WASD • Space to jump • Land on top only!</p>
+          <p className="text-lg font-semibold">
+            Use enemies as moving platforms!
+          </p>
+          <p className="text-sm">
+            Arrow keys/WASD • Space to jump • Land on top only!
+          </p>
         </div>
         <canvas
           ref={canvasRef}

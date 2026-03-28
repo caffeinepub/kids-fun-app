@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import GameLayout from '../../components/GameLayout';
-import { Button } from '@/components/ui/button';
-import { ModulePage } from '../../App';
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import type { ModulePage } from "../../App";
+import GameLayout from "../../components/GameLayout";
 
 interface Decoration {
   id: number;
@@ -14,12 +14,14 @@ interface BirthdayCakeDecoratorProps {
   onNavigate: (page: ModulePage) => void;
 }
 
-export default function BirthdayCakeDecorator({ onNavigate }: BirthdayCakeDecoratorProps) {
+export default function BirthdayCakeDecorator({
+  onNavigate,
+}: BirthdayCakeDecoratorProps) {
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [decorations, setDecorations] = useState<Decoration[]>([]);
-  const [selectedDecoration, setSelectedDecoration] = useState('🍓');
+  const [selectedDecoration, setSelectedDecoration] = useState("🍓");
   const [nextId, setNextId] = useState(0);
 
   const startGame = () => {
@@ -30,7 +32,16 @@ export default function BirthdayCakeDecorator({ onNavigate }: BirthdayCakeDecora
   };
 
   const decorationOptions = [
-    '🍓', '🍒', '🍫', '🍬', '🍭', '🌸', '⭐', '💝', '🎀', '🦄'
+    "🍓",
+    "🍒",
+    "🍫",
+    "🍬",
+    "🍭",
+    "🌸",
+    "⭐",
+    "💝",
+    "🎀",
+    "🦄",
   ];
 
   const handleCakeClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -38,14 +49,17 @@ export default function BirthdayCakeDecorator({ onNavigate }: BirthdayCakeDecora
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
 
-    setDecorations(prev => [...prev, {
-      id: nextId,
-      type: selectedDecoration,
-      x,
-      y,
-    }]);
-    setNextId(id => id + 1);
-    setScore(prev => prev + 5);
+    setDecorations((prev) => [
+      ...prev,
+      {
+        id: nextId,
+        type: selectedDecoration,
+        x,
+        y,
+      },
+    ]);
+    setNextId((id) => id + 1);
+    setScore((prev) => prev + 5);
   };
 
   const finishDecorating = () => {
@@ -77,11 +91,11 @@ export default function BirthdayCakeDecorator({ onNavigate }: BirthdayCakeDecora
           <div className="bg-white p-4 rounded-lg border-4 border-purple-300">
             <h3 className="font-bold mb-3">Choose Decoration:</h3>
             <div className="flex flex-wrap gap-2">
-              {decorationOptions.map(deco => (
+              {decorationOptions.map((deco) => (
                 <Button
                   key={deco}
                   onClick={() => setSelectedDecoration(deco)}
-                  variant={selectedDecoration === deco ? 'default' : 'outline'}
+                  variant={selectedDecoration === deco ? "default" : "outline"}
                   className="text-3xl w-16 h-16"
                 >
                   {deco}
@@ -93,7 +107,7 @@ export default function BirthdayCakeDecorator({ onNavigate }: BirthdayCakeDecora
           {/* Cake Canvas */}
           <div
             className="relative bg-gradient-to-b from-pink-300 to-pink-400 rounded-lg border-4 border-white shadow-2xl cursor-pointer"
-            style={{ height: '400px' }}
+            style={{ height: "400px" }}
             onClick={handleCakeClick}
           >
             {/* Cake layers */}
@@ -103,14 +117,14 @@ export default function BirthdayCakeDecorator({ onNavigate }: BirthdayCakeDecora
             </div>
 
             {/* Decorations */}
-            {decorations.map(deco => (
+            {decorations.map((deco) => (
               <div
                 key={deco.id}
                 className="absolute text-3xl pointer-events-none"
                 style={{
                   left: `${deco.x}%`,
                   top: `${deco.y}%`,
-                  transform: 'translate(-50%, -50%)',
+                  transform: "translate(-50%, -50%)",
                 }}
               >
                 {deco.type}
@@ -119,10 +133,19 @@ export default function BirthdayCakeDecorator({ onNavigate }: BirthdayCakeDecora
           </div>
 
           <div className="flex gap-4">
-            <Button onClick={finishDecorating} size="lg" className="flex-1 text-xl">
+            <Button
+              onClick={finishDecorating}
+              size="lg"
+              className="flex-1 text-xl"
+            >
               Finish Decorating! 🎉
             </Button>
-            <Button onClick={() => setDecorations([])} variant="outline" size="lg" className="flex-1 text-xl">
+            <Button
+              onClick={() => setDecorations([])}
+              variant="outline"
+              size="lg"
+              className="flex-1 text-xl"
+            >
               Clear All
             </Button>
           </div>

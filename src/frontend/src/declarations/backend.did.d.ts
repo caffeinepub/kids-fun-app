@@ -15,14 +15,6 @@ export interface AccessibilitySettings {
   'largeText' : boolean,
   'readAloudEnabled' : boolean,
 }
-export interface ActivityEvent {
-  'id' : bigint,
-  'activityType' : ActivityType,
-  'userId' : Principal,
-  'timestamp' : Time,
-}
-export type ActivityType = { 'user_created' : null } |
-  { 'game_played' : { 'gameId' : string, 'gameName' : string } };
 export type ApprovalStatus = { 'pending' : null } |
   { 'approved' : null } |
   { 'rejected' : null };
@@ -34,53 +26,24 @@ export interface AvatarConfig {
   'shoes' : string,
   'pants' : string,
 }
-export interface Character {
-  'name' : string,
-  'position' : { 'x' : bigint, 'y' : bigint },
-  'avatarConfig' : AvatarConfig,
+export interface Reward {
+  'userId' : Principal,
+  'badges' : Array<string>,
+  'achievements' : Array<string>,
+  'totalTrophies' : bigint,
+  'virtualPetLevel' : bigint,
+  'points' : bigint,
 }
-export interface Prop {
-  'name' : string,
-  'type' : string,
-  'position' : { 'x' : bigint, 'y' : bigint },
+export interface SpinReward {
+  'value' : string,
+  'rewardType' : string,
+  'timestamp' : bigint,
 }
-export interface ScaryHubGameEntry {
-  'id' : string,
-  'lastPlayed' : bigint,
-  'theme' : string,
-  'title' : string,
-  'isScary' : boolean,
-  'difficulty' : string,
-  'assets' : Array<string>,
-  'description' : string,
-  'isFavorite' : boolean,
-  'instructions' : string,
-  'highScore' : bigint,
-  'category' : string,
+export interface SpinWheelResult {
+  'remainingCooldown' : bigint,
+  'pointsAdded' : bigint,
+  'message' : string,
 }
-export interface Scene {
-  'background' : string,
-  'textBubbles' : Array<TextBubble>,
-  'characters' : Array<Character>,
-  'animations' : Array<string>,
-  'props' : Array<Prop>,
-}
-export interface StoryProject {
-  'id' : string,
-  'title' : string,
-  'owner' : Principal,
-  'scenes' : Array<Scene>,
-  'published' : boolean,
-  'createdAt' : bigint,
-  'approved' : boolean,
-}
-export interface TextBubble {
-  'content' : string,
-  'character' : string,
-  'style' : string,
-  'position' : { 'x' : bigint, 'y' : bigint },
-}
-export type Time = bigint;
 export interface UserApprovalInfo {
   'status' : ApprovalStatus,
   'principal' : Principal,
@@ -101,22 +64,6 @@ export interface UserProfile {
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };
-export interface VideoChannel {
-  'categoryId' : string,
-  'lastPlayed' : [] | [Time],
-  'channelId' : string,
-  'views' : bigint,
-  'name' : string,
-  'createdAt' : Time,
-  'safe' : boolean,
-  'lastUpdated' : [] | [Time],
-  'description' : string,
-  'isFavorite' : boolean,
-  'playlistUrl' : string,
-  'approved' : boolean,
-  'totalVideos' : bigint,
-  'iconUrl' : string,
-}
 export interface VirtualPetHub {
   'growthStage' : bigint,
   'accessories' : Array<string>,
@@ -155,42 +102,27 @@ export interface _SERVICE {
     _CaffeineStorageRefillResult
   >,
   '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
-  'addVideoChannel' : ActorMethod<[VideoChannel], undefined>,
-  'approveStoryProject' : ActorMethod<[string], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
-  'deleteStoryProject' : ActorMethod<[string], undefined>,
-  'deleteVideoChannel' : ActorMethod<[string], undefined>,
-  'getAllStoryProjects' : ActorMethod<[], Array<StoryProject>>,
-  'getCallerFavoriteChannels' : ActorMethod<[], Array<string>>,
-  'getCallerStoryProjects' : ActorMethod<[], Array<StoryProject>>,
+  'claimSpinReward' : ActorMethod<[bigint], SpinWheelResult>,
+  'getCallerRewards' : ActorMethod<[], [] | [Reward]>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
-  'getCallerVirtualPet' : ActorMethod<[], [] | [VirtualPetHub]>,
-  'getRecentActivityEvents' : ActorMethod<[bigint], Array<ActivityEvent>>,
-  'getScaryHubGames' : ActorMethod<[], Array<ScaryHubGameEntry>>,
-  'getStoryProject' : ActorMethod<[string], [] | [StoryProject]>,
+  'getLastSpinTime' : ActorMethod<[], [] | [bigint]>,
+  'getRemainingSpinCooldown' : ActorMethod<[], bigint>,
+  'getSpinRewards' : ActorMethod<[], Array<SpinReward>>,
+  'getTotalScore' : ActorMethod<[], bigint>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
-  'getVideoChannel' : ActorMethod<[string], [] | [VideoChannel]>,
-  'getVideoChannels' : ActorMethod<[], Array<VideoChannel>>,
-  'getVirtualPet' : ActorMethod<[Principal], [] | [VirtualPetHub]>,
+  'getVirtualPetHub' : ActorMethod<[], [] | [VirtualPetHub]>,
   'initializeAccessControl' : ActorMethod<[], undefined>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'isCallerApproved' : ActorMethod<[], boolean>,
   'listApprovals' : ActorMethod<[], Array<UserApprovalInfo>>,
-  'markChannelAsFavorite' : ActorMethod<[string], undefined>,
-  'publishStoryProject' : ActorMethod<[string], undefined>,
-  'recordGamePlay' : ActorMethod<[string, string], undefined>,
+  'recordSpinReward' : ActorMethod<[SpinReward], undefined>,
   'requestApproval' : ActorMethod<[], undefined>,
+  'saveCallerRewards' : ActorMethod<[Reward], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
-  'saveCallerVirtualPet' : ActorMethod<[VirtualPetHub], undefined>,
-  'saveStoryProject' : ActorMethod<[StoryProject], undefined>,
+  'saveVirtualPetHub' : ActorMethod<[VirtualPetHub], undefined>,
   'setApproval' : ActorMethod<[Principal, ApprovalStatus], undefined>,
-  'unmarkChannelAsFavorite' : ActorMethod<[string], undefined>,
-  'updateGamesTrophies' : ActorMethod<[], bigint>,
-  'updateStoryProject' : ActorMethod<[string, StoryProject], undefined>,
-  'updateVideoChannel' : ActorMethod<[string, VideoChannel], undefined>,
-  'updateVideoChannelViews' : ActorMethod<[string], undefined>,
-  'welcomeBackReward' : ActorMethod<[], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

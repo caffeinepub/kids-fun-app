@@ -1,48 +1,73 @@
-import { useState, useEffect, useRef } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Sparkles, Star, Trophy, Clock } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Clock, Sparkles, Star, Trophy } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 interface InstantMiniActivityProps {
   onGetStarted: () => void;
 }
 
-type AgeGroup = '1-3' | '4-6' | '7-12' | null;
-type GameState = 'idle' | 'playing' | 'completed';
+type AgeGroup = "1-3" | "4-6" | "7-12" | null;
+type GameState = "idle" | "playing" | "completed";
 
-export default function InstantMiniActivity({ onGetStarted }: InstantMiniActivityProps) {
+export default function InstantMiniActivity({
+  onGetStarted,
+}: InstantMiniActivityProps) {
   const [selectedAge, setSelectedAge] = useState<AgeGroup>(null);
-  const [gameState, setGameState] = useState<GameState>('idle');
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [gameState, setGameState] = useState<GameState>("idle");
+  const _canvasRef = useRef<HTMLCanvasElement>(null);
   const gameLoopRef = useRef<number | null>(null);
 
   // Ages 1-3: Tap & Smile state
   const [tapSmileScore, setTapSmileScore] = useState(0);
-  const [tapSmileTime, setTapSmileTime] = useState(0);
-  const [animals, setAnimals] = useState<Array<{ x: number; y: number; emoji: string; id: number }>>([]);
-  const [balloons, setBalloons] = useState<Array<{ x: number; y: number; color: string; id: number }>>([]);
+  const [_tapSmileTime, setTapSmileTime] = useState(0);
+  const [animals, setAnimals] = useState<
+    Array<{ x: number; y: number; emoji: string; id: number }>
+  >([]);
+  const [balloons, setBalloons] = useState<
+    Array<{ x: number; y: number; color: string; id: number }>
+  >([]);
 
   // Ages 4-6: Match & Move state
   const [matchMoveScore, setMatchMoveScore] = useState(0);
   const [matchMoveTime, setMatchMoveTime] = useState(30);
-  const [shapes, setShapes] = useState<Array<{ x: number; y: number; shape: string; color: string; id: number; matched: boolean }>>([]);
+  const [shapes, setShapes] = useState<
+    Array<{
+      x: number;
+      y: number;
+      shape: string;
+      color: string;
+      id: number;
+      matched: boolean;
+    }>
+  >([]);
   const [draggedShape, setDraggedShape] = useState<number | null>(null);
 
   // Ages 7-12: Challenge Mode state
   const [challengeScore, setChallengeScore] = useState(0);
   const [challengeTime, setChallengeTime] = useState(30);
-  const [collectibles, setCollectibles] = useState<Array<{ x: number; y: number; id: number }>>([]);
-  const [obstacles, setObstacles] = useState<Array<{ x: number; y: number; id: number }>>([]);
-  const [playerPos, setPlayerPos] = useState({ x: 200, y: 300 });
+  const [collectibles, setCollectibles] = useState<
+    Array<{ x: number; y: number; id: number }>
+  >([]);
+  const [obstacles, setObstacles] = useState<
+    Array<{ x: number; y: number; id: number }>
+  >([]);
+  const [_playerPos, _setPlayerPos] = useState({ x: 200, y: 300 });
 
   // Initialize game based on age group
   useEffect(() => {
-    if (selectedAge && gameState === 'playing') {
-      if (selectedAge === '1-3') {
+    if (selectedAge && gameState === "playing") {
+      if (selectedAge === "1-3") {
         initTapSmile();
-      } else if (selectedAge === '4-6') {
+      } else if (selectedAge === "4-6") {
         initMatchMove();
-      } else if (selectedAge === '7-12') {
+      } else if (selectedAge === "7-12") {
         initChallenge();
       }
     }
@@ -56,21 +81,27 @@ export default function InstantMiniActivity({ onGetStarted }: InstantMiniActivit
 
   // Ages 1-3: Tap & Smile Game
   const initTapSmile = () => {
-    const animalEmojis = ['🐶', '🐱', '🐰', '🐻', '🐼', '🦁', '🐯', '🐸'];
+    const animalEmojis = ["🐶", "🐱", "🐰", "🐻", "🐼", "🦁", "🐯", "🐸"];
     const newAnimals = Array.from({ length: 5 }, (_, i) => ({
       x: Math.random() * 350 + 25,
       y: Math.random() * 250 + 50,
       emoji: animalEmojis[Math.floor(Math.random() * animalEmojis.length)],
-      id: i
+      id: i,
     }));
     setAnimals(newAnimals);
 
-    const balloonColors = ['#FF1493', '#00FFFF', '#00FF00', '#FF4500', '#9370DB'];
+    const balloonColors = [
+      "#FF1493",
+      "#00FFFF",
+      "#00FF00",
+      "#FF4500",
+      "#9370DB",
+    ];
     const newBalloons = Array.from({ length: 3 }, (_, i) => ({
       x: Math.random() * 350 + 25,
       y: Math.random() * 250 + 50,
       color: balloonColors[Math.floor(Math.random() * balloonColors.length)],
-      id: i + 100
+      id: i + 100,
     }));
     setBalloons(newBalloons);
 
@@ -80,7 +111,7 @@ export default function InstantMiniActivity({ onGetStarted }: InstantMiniActivit
       setTapSmileTime(elapsed);
 
       if (elapsed >= 40) {
-        setGameState('completed');
+        setGameState("completed");
         return;
       }
 
@@ -89,30 +120,30 @@ export default function InstantMiniActivity({ onGetStarted }: InstantMiniActivit
     gameLoop();
   };
 
-  const handleTapSmileClick = (id: number, type: 'animal' | 'balloon') => {
-    if (type === 'animal') {
-      setAnimals(prev => prev.filter(a => a.id !== id));
-      setTapSmileScore(prev => prev + 1);
-      playSound('cheer');
+  const handleTapSmileClick = (id: number, type: "animal" | "balloon") => {
+    if (type === "animal") {
+      setAnimals((prev) => prev.filter((a) => a.id !== id));
+      setTapSmileScore((prev) => prev + 1);
+      playSound("cheer");
     } else {
-      setBalloons(prev => prev.filter(b => b.id !== id));
-      setTapSmileScore(prev => prev + 1);
-      playSound('pop');
+      setBalloons((prev) => prev.filter((b) => b.id !== id));
+      setTapSmileScore((prev) => prev + 1);
+      playSound("pop");
     }
   };
 
   // Ages 4-6: Match & Move Game
   const initMatchMove = () => {
-    const shapeTypes = ['circle', 'square', 'triangle', 'star'];
-    const colors = ['#FF1493', '#00FFFF', '#00FF00', '#FF4500'];
-    
+    const shapeTypes = ["circle", "square", "triangle", "star"];
+    const colors = ["#FF1493", "#00FFFF", "#00FF00", "#FF4500"];
+
     const newShapes = shapeTypes.map((shape, i) => ({
       x: 50 + i * 90,
       y: 100,
       shape,
       color: colors[i],
       id: i,
-      matched: false
+      matched: false,
     }));
     setShapes(newShapes);
 
@@ -122,8 +153,8 @@ export default function InstantMiniActivity({ onGetStarted }: InstantMiniActivit
       const remaining = Math.max(0, 30 - elapsed);
       setMatchMoveTime(remaining);
 
-      if (remaining === 0 || shapes.every(s => s.matched)) {
-        setGameState('completed');
+      if (remaining === 0 || shapes.every((s) => s.matched)) {
+        setGameState("completed");
         return;
       }
 
@@ -138,12 +169,14 @@ export default function InstantMiniActivity({ onGetStarted }: InstantMiniActivit
 
   const handleShapeDrop = (targetId: number) => {
     if (draggedShape === targetId) {
-      setShapes(prev => prev.map(s => s.id === targetId ? { ...s, matched: true } : s));
-      setMatchMoveScore(prev => prev + 1);
-      playSound('success');
-      
-      if (shapes.filter(s => !s.matched).length === 1) {
-        setTimeout(() => setGameState('completed'), 500);
+      setShapes((prev) =>
+        prev.map((s) => (s.id === targetId ? { ...s, matched: true } : s)),
+      );
+      setMatchMoveScore((prev) => prev + 1);
+      playSound("success");
+
+      if (shapes.filter((s) => !s.matched).length === 1) {
+        setTimeout(() => setGameState("completed"), 500);
       }
     }
     setDraggedShape(null);
@@ -154,14 +187,14 @@ export default function InstantMiniActivity({ onGetStarted }: InstantMiniActivit
     const newCollectibles = Array.from({ length: 8 }, (_, i) => ({
       x: Math.random() * 350 + 25,
       y: Math.random() * 250 + 50,
-      id: i
+      id: i,
     }));
     setCollectibles(newCollectibles);
 
     const newObstacles = Array.from({ length: 5 }, (_, i) => ({
       x: Math.random() * 350 + 25,
       y: Math.random() * 250 + 50,
-      id: i + 100
+      id: i + 100,
     }));
     setObstacles(newObstacles);
 
@@ -172,7 +205,7 @@ export default function InstantMiniActivity({ onGetStarted }: InstantMiniActivit
       setChallengeTime(remaining);
 
       if (remaining === 0 || collectibles.length === 0) {
-        setGameState('completed');
+        setGameState("completed");
         return;
       }
 
@@ -182,14 +215,16 @@ export default function InstantMiniActivity({ onGetStarted }: InstantMiniActivit
   };
 
   const handleChallengeClick = (x: number, y: number) => {
-    const clickedCollectible = collectibles.find(c => 
-      Math.abs(c.x - x) < 20 && Math.abs(c.y - y) < 20
+    const clickedCollectible = collectibles.find(
+      (c) => Math.abs(c.x - x) < 20 && Math.abs(c.y - y) < 20,
     );
 
     if (clickedCollectible) {
-      setCollectibles(prev => prev.filter(c => c.id !== clickedCollectible.id));
-      setChallengeScore(prev => prev + 1);
-      playSound('collect');
+      setCollectibles((prev) =>
+        prev.filter((c) => c.id !== clickedCollectible.id),
+      );
+      setChallengeScore((prev) => prev + 1);
+      playSound("collect");
     }
   };
 
@@ -199,7 +234,7 @@ export default function InstantMiniActivity({ onGetStarted }: InstantMiniActivit
   };
 
   const handleStartGame = () => {
-    setGameState('playing');
+    setGameState("playing");
     setTapSmileScore(0);
     setMatchMoveScore(0);
     setChallengeScore(0);
@@ -209,12 +244,12 @@ export default function InstantMiniActivity({ onGetStarted }: InstantMiniActivit
   };
 
   const handleReplay = () => {
-    setGameState('idle');
+    setGameState("idle");
     setSelectedAge(null);
   };
 
   const renderReward = () => {
-    if (selectedAge === '1-3') {
+    if (selectedAge === "1-3") {
       return (
         <div className="text-center py-8 animate-bounce">
           <div className="text-6xl mb-4">⭐✨⭐</div>
@@ -226,7 +261,8 @@ export default function InstantMiniActivity({ onGetStarted }: InstantMiniActivit
           </p>
         </div>
       );
-    } else if (selectedAge === '4-6') {
+    }
+    if (selectedAge === "4-6") {
       return (
         <div className="text-center py-8 animate-bounce">
           <div className="text-6xl mb-4">⭐⭐</div>
@@ -238,19 +274,18 @@ export default function InstantMiniActivity({ onGetStarted }: InstantMiniActivit
           </p>
         </div>
       );
-    } else {
-      return (
-        <div className="text-center py-8 animate-bounce">
-          <div className="text-6xl mb-4">⭐⭐⭐</div>
-          <h3 className="text-3xl font-bold text-neon-orange text-shadow-neon-lg mb-2">
-            Badge Unlocked!
-          </h3>
-          <p className="text-xl text-neon-cyan text-shadow-neon-md">
-            You collected {challengeScore} items! Awesome!
-          </p>
-        </div>
-      );
     }
+    return (
+      <div className="text-center py-8 animate-bounce">
+        <div className="text-6xl mb-4">⭐⭐⭐</div>
+        <h3 className="text-3xl font-bold text-neon-orange text-shadow-neon-lg mb-2">
+          Badge Unlocked!
+        </h3>
+        <p className="text-xl text-neon-cyan text-shadow-neon-md">
+          You collected {challengeScore} items! Awesome!
+        </p>
+      </div>
+    );
   };
 
   if (!selectedAge) {
@@ -270,8 +305,8 @@ export default function InstantMiniActivity({ onGetStarted }: InstantMiniActivit
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card 
-              onClick={() => setSelectedAge('1-3')}
+            <Card
+              onClick={() => setSelectedAge("1-3")}
               className="bg-card/90 backdrop-blur-md border-4 border-neon-pink shadow-neon-lg hover:shadow-neon-xl transition-all duration-300 hover:scale-105 cursor-pointer"
             >
               <CardHeader>
@@ -289,8 +324,8 @@ export default function InstantMiniActivity({ onGetStarted }: InstantMiniActivit
               </CardContent>
             </Card>
 
-            <Card 
-              onClick={() => setSelectedAge('4-6')}
+            <Card
+              onClick={() => setSelectedAge("4-6")}
               className="bg-card/90 backdrop-blur-md border-4 border-neon-green shadow-neon-lg hover:shadow-neon-xl transition-all duration-300 hover:scale-105 cursor-pointer"
             >
               <CardHeader>
@@ -308,8 +343,8 @@ export default function InstantMiniActivity({ onGetStarted }: InstantMiniActivit
               </CardContent>
             </Card>
 
-            <Card 
-              onClick={() => setSelectedAge('7-12')}
+            <Card
+              onClick={() => setSelectedAge("7-12")}
               className="bg-card/90 backdrop-blur-md border-4 border-neon-orange shadow-neon-lg hover:shadow-neon-xl transition-all duration-300 hover:scale-105 cursor-pointer"
             >
               <CardHeader>
@@ -332,24 +367,27 @@ export default function InstantMiniActivity({ onGetStarted }: InstantMiniActivit
     );
   }
 
-  if (gameState === 'idle') {
+  if (gameState === "idle") {
     return (
       <section className="py-12 px-4">
         <div className="container mx-auto max-w-3xl">
           <Card className="bg-card/90 backdrop-blur-md border-4 border-neon-purple shadow-neon-lg">
             <CardHeader>
               <CardTitle className="text-3xl font-bold text-neon-pink text-shadow-neon-lg text-center">
-                {selectedAge === '1-3' && '🎈 Tap & Smile'}
-                {selectedAge === '4-6' && '🔷 Match & Move'}
-                {selectedAge === '7-12' && '🎯 Challenge Mode'}
+                {selectedAge === "1-3" && "🎈 Tap & Smile"}
+                {selectedAge === "4-6" && "🔷 Match & Move"}
+                {selectedAge === "7-12" && "🎯 Challenge Mode"}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="text-center">
                 <p className="text-xl text-foreground mb-4">
-                  {selectedAge === '1-3' && 'Tap on the cute animals and pop the colorful balloons! Have fun!'}
-                  {selectedAge === '4-6' && 'Drag each shape to its matching spot. You have 30 seconds!'}
-                  {selectedAge === '7-12' && 'Tap to collect items and avoid obstacles. Beat the clock!'}
+                  {selectedAge === "1-3" &&
+                    "Tap on the cute animals and pop the colorful balloons! Have fun!"}
+                  {selectedAge === "4-6" &&
+                    "Drag each shape to its matching spot. You have 30 seconds!"}
+                  {selectedAge === "7-12" &&
+                    "Tap to collect items and avoid obstacles. Beat the clock!"}
                 </p>
               </div>
               <div className="flex gap-4 justify-center">
@@ -377,7 +415,7 @@ export default function InstantMiniActivity({ onGetStarted }: InstantMiniActivit
     );
   }
 
-  if (gameState === 'completed') {
+  if (gameState === "completed") {
     return (
       <section className="py-12 px-4">
         <div className="container mx-auto max-w-3xl">
@@ -417,17 +455,17 @@ export default function InstantMiniActivity({ onGetStarted }: InstantMiniActivit
           <CardHeader>
             <div className="flex justify-between items-center">
               <CardTitle className="text-2xl font-bold text-neon-pink text-shadow-neon-lg">
-                {selectedAge === '1-3' && '🎈 Tap & Smile'}
-                {selectedAge === '4-6' && '🔷 Match & Move'}
-                {selectedAge === '7-12' && '🎯 Challenge Mode'}
+                {selectedAge === "1-3" && "🎈 Tap & Smile"}
+                {selectedAge === "4-6" && "🔷 Match & Move"}
+                {selectedAge === "7-12" && "🎯 Challenge Mode"}
               </CardTitle>
               <div className="flex items-center gap-4">
-                {selectedAge === '1-3' && (
+                {selectedAge === "1-3" && (
                   <div className="text-xl font-bold text-neon-cyan text-shadow-neon-md">
                     Taps: {tapSmileScore}
                   </div>
                 )}
-                {selectedAge === '4-6' && (
+                {selectedAge === "4-6" && (
                   <>
                     <div className="text-xl font-bold text-neon-cyan text-shadow-neon-md">
                       Matched: {matchMoveScore}/4
@@ -438,7 +476,7 @@ export default function InstantMiniActivity({ onGetStarted }: InstantMiniActivit
                     </div>
                   </>
                 )}
-                {selectedAge === '7-12' && (
+                {selectedAge === "7-12" && (
                   <>
                     <div className="text-xl font-bold text-neon-cyan text-shadow-neon-md">
                       Score: {challengeScore}
@@ -453,24 +491,29 @@ export default function InstantMiniActivity({ onGetStarted }: InstantMiniActivit
             </div>
           </CardHeader>
           <CardContent>
-            <div className="relative bg-background/50 rounded-lg border-2 border-neon-cyan shadow-neon-md" style={{ height: '400px' }}>
+            <div
+              className="relative bg-background/50 rounded-lg border-2 border-neon-cyan shadow-neon-md"
+              style={{ height: "400px" }}
+            >
               {/* Ages 1-3: Tap & Smile */}
-              {selectedAge === '1-3' && (
+              {selectedAge === "1-3" && (
                 <>
-                  {animals.map(animal => (
+                  {animals.map((animal) => (
                     <button
                       key={animal.id}
-                      onClick={() => handleTapSmileClick(animal.id, 'animal')}
+                      type="button"
+                      onClick={() => handleTapSmileClick(animal.id, "animal")}
                       className="absolute text-5xl hover:scale-125 transition-transform cursor-pointer"
                       style={{ left: `${animal.x}px`, top: `${animal.y}px` }}
                     >
                       {animal.emoji}
                     </button>
                   ))}
-                  {balloons.map(balloon => (
+                  {balloons.map((balloon) => (
                     <button
                       key={balloon.id}
-                      onClick={() => handleTapSmileClick(balloon.id, 'balloon')}
+                      type="button"
+                      onClick={() => handleTapSmileClick(balloon.id, "balloon")}
                       className="absolute text-5xl hover:scale-125 transition-transform cursor-pointer"
                       style={{ left: `${balloon.x}px`, top: `${balloon.y}px` }}
                     >
@@ -481,10 +524,10 @@ export default function InstantMiniActivity({ onGetStarted }: InstantMiniActivit
               )}
 
               {/* Ages 4-6: Match & Move */}
-              {selectedAge === '4-6' && (
+              {selectedAge === "4-6" && (
                 <div className="flex flex-col items-center justify-center h-full gap-8">
                   <div className="flex gap-6">
-                    {shapes.map(shape => (
+                    {shapes.map((shape) => (
                       <div
                         key={shape.id}
                         draggable={!shape.matched}
@@ -492,17 +535,41 @@ export default function InstantMiniActivity({ onGetStarted }: InstantMiniActivit
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={() => handleShapeDrop(shape.id)}
                         className={`w-20 h-20 flex items-center justify-center cursor-move border-4 rounded-lg transition-all ${
-                          shape.matched ? 'opacity-50 scale-90' : 'hover:scale-110'
+                          shape.matched
+                            ? "opacity-50 scale-90"
+                            : "hover:scale-110"
                         }`}
-                        style={{ 
+                        style={{
                           borderColor: shape.color,
-                          backgroundColor: shape.matched ? shape.color : 'transparent'
+                          backgroundColor: shape.matched
+                            ? shape.color
+                            : "transparent",
                         }}
                       >
-                        {shape.shape === 'circle' && <div className="w-12 h-12 rounded-full" style={{ backgroundColor: shape.color }} />}
-                        {shape.shape === 'square' && <div className="w-12 h-12" style={{ backgroundColor: shape.color }} />}
-                        {shape.shape === 'triangle' && <div className="w-0 h-0 border-l-[24px] border-r-[24px] border-b-[40px] border-l-transparent border-r-transparent" style={{ borderBottomColor: shape.color }} />}
-                        {shape.shape === 'star' && <Star className="w-12 h-12" style={{ color: shape.color, fill: shape.color }} />}
+                        {shape.shape === "circle" && (
+                          <div
+                            className="w-12 h-12 rounded-full"
+                            style={{ backgroundColor: shape.color }}
+                          />
+                        )}
+                        {shape.shape === "square" && (
+                          <div
+                            className="w-12 h-12"
+                            style={{ backgroundColor: shape.color }}
+                          />
+                        )}
+                        {shape.shape === "triangle" && (
+                          <div
+                            className="w-0 h-0 border-l-[24px] border-r-[24px] border-b-[40px] border-l-transparent border-r-transparent"
+                            style={{ borderBottomColor: shape.color }}
+                          />
+                        )}
+                        {shape.shape === "star" && (
+                          <Star
+                            className="w-12 h-12"
+                            style={{ color: shape.color, fill: shape.color }}
+                          />
+                        )}
                       </div>
                     ))}
                   </div>
@@ -513,8 +580,8 @@ export default function InstantMiniActivity({ onGetStarted }: InstantMiniActivit
               )}
 
               {/* Ages 7-12: Challenge Mode */}
-              {selectedAge === '7-12' && (
-                <div 
+              {selectedAge === "7-12" && (
+                <div
                   className="relative w-full h-full"
                   onClick={(e) => {
                     const rect = e.currentTarget.getBoundingClientRect();
@@ -522,8 +589,12 @@ export default function InstantMiniActivity({ onGetStarted }: InstantMiniActivit
                     const y = e.clientY - rect.top;
                     handleChallengeClick(x, y);
                   }}
+                  onKeyUp={(e) => {
+                    if (e.key === "Enter" || e.key === " ")
+                      handleChallengeClick(200, 200);
+                  }}
                 >
-                  {collectibles.map(item => (
+                  {collectibles.map((item) => (
                     <div
                       key={item.id}
                       className="absolute text-4xl animate-bounce cursor-pointer"
@@ -532,7 +603,7 @@ export default function InstantMiniActivity({ onGetStarted }: InstantMiniActivit
                       ⭐
                     </div>
                   ))}
-                  {obstacles.map(obs => (
+                  {obstacles.map((obs) => (
                     <div
                       key={obs.id}
                       className="absolute text-4xl"

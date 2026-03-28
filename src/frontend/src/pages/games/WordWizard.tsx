@@ -1,13 +1,41 @@
-import { useState, useEffect } from 'react';
-import GameLayout from '../../components/GameLayout';
-import { Button } from '@/components/ui/button';
-import { ModulePage } from '../../App';
+import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import type { ModulePage } from "../../App";
+import GameLayout from "../../components/GameLayout";
 
 const WORD_LIST = [
-  'CAT', 'DOG', 'BIRD', 'FISH', 'LION', 'BEAR', 'FROG', 'DUCK',
-  'PLAY', 'JUMP', 'RUN', 'SWIM', 'FLY', 'SING', 'DANCE', 'LAUGH',
-  'HAPPY', 'SUNNY', 'CLOUD', 'STAR', 'MOON', 'TREE', 'FLOWER', 'GRASS',
-  'BOOK', 'PENCIL', 'PAPER', 'DESK', 'CHAIR', 'TABLE', 'DOOR', 'WINDOW',
+  "CAT",
+  "DOG",
+  "BIRD",
+  "FISH",
+  "LION",
+  "BEAR",
+  "FROG",
+  "DUCK",
+  "PLAY",
+  "JUMP",
+  "RUN",
+  "SWIM",
+  "FLY",
+  "SING",
+  "DANCE",
+  "LAUGH",
+  "HAPPY",
+  "SUNNY",
+  "CLOUD",
+  "STAR",
+  "MOON",
+  "TREE",
+  "FLOWER",
+  "GRASS",
+  "BOOK",
+  "PENCIL",
+  "PAPER",
+  "DESK",
+  "CHAIR",
+  "TABLE",
+  "DOOR",
+  "WINDOW",
 ];
 
 interface WordWizardProps {
@@ -17,7 +45,7 @@ interface WordWizardProps {
 export default function WordWizard({ onNavigate }: WordWizardProps) {
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(90);
-  const [currentWord, setCurrentWord] = useState('');
+  const [currentWord, setCurrentWord] = useState("");
   const [scrambledLetters, setScrambledLetters] = useState<string[]>([]);
   const [selectedLetters, setSelectedLetters] = useState<number[]>([]);
   const [gameOver, setGameOver] = useState(false);
@@ -25,7 +53,7 @@ export default function WordWizard({ onNavigate }: WordWizardProps) {
   const [highScore, setHighScore] = useState(0);
 
   const scrambleWord = (word: string) => {
-    return word.split('').sort(() => Math.random() - 0.5);
+    return word.split("").sort(() => Math.random() - 0.5);
   };
 
   const startNewRound = () => {
@@ -51,7 +79,7 @@ export default function WordWizard({ onNavigate }: WordWizardProps) {
     if (gameOver || timeLeft <= 0) return;
 
     const interval = setInterval(() => {
-      setTimeLeft(prev => {
+      setTimeLeft((prev) => {
         if (prev <= 1) {
           setGameOver(true);
           return 0;
@@ -75,15 +103,15 @@ export default function WordWizard({ onNavigate }: WordWizardProps) {
   };
 
   const removeLetter = (index: number) => {
-    setSelectedLetters(selectedLetters.filter(i => i !== index));
+    setSelectedLetters(selectedLetters.filter((i) => i !== index));
   };
 
   const checkWord = () => {
-    const formedWord = selectedLetters.map(i => scrambledLetters[i]).join('');
-    
+    const formedWord = selectedLetters.map((i) => scrambledLetters[i]).join("");
+
     if (formedWord === currentWord) {
-      setScore(prev => prev + currentWord.length * 10);
-      setWordsFound(prev => [...prev, currentWord]);
+      setScore((prev) => prev + currentWord.length * 10);
+      setWordsFound((prev) => [...prev, currentWord]);
       startNewRound();
     } else {
       setSelectedLetters([]);
@@ -111,7 +139,9 @@ export default function WordWizard({ onNavigate }: WordWizardProps) {
               <span className="text-2xl font-bold">⏰ {timeLeft}s</span>
             </div>
             <div className="bg-white px-6 py-3 rounded-lg border-4 border-purple-300">
-              <span className="text-2xl font-bold">Words: {wordsFound.length}</span>
+              <span className="text-2xl font-bold">
+                Words: {wordsFound.length}
+              </span>
             </div>
           </div>
 
@@ -142,8 +172,8 @@ export default function WordWizard({ onNavigate }: WordWizardProps) {
                   key={index}
                   className={`w-16 h-16 border-4 rounded-lg flex items-center justify-center text-3xl font-bold cursor-pointer transition-all ${
                     selectedLetters.includes(index)
-                      ? 'bg-gray-200 border-gray-400 opacity-50'
-                      : 'bg-blue-200 border-blue-400 hover:bg-blue-300 hover:scale-110'
+                      ? "bg-gray-200 border-gray-400 opacity-50"
+                      : "bg-blue-200 border-blue-400 hover:bg-blue-300 hover:scale-110"
                   }`}
                   onClick={() => selectLetter(index)}
                 >
@@ -177,7 +207,10 @@ export default function WordWizard({ onNavigate }: WordWizardProps) {
               <h3 className="font-bold text-lg mb-2">Words Found:</h3>
               <div className="flex flex-wrap gap-2">
                 {wordsFound.slice(-5).map((word, i) => (
-                  <span key={i} className="bg-yellow-100 px-3 py-1 rounded-full border-2 border-yellow-300 font-bold">
+                  <span
+                    key={i}
+                    className="bg-yellow-100 px-3 py-1 rounded-full border-2 border-yellow-300 font-bold"
+                  >
                     {word}
                   </span>
                 ))}

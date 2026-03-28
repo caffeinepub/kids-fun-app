@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 interface FeedbackMessage {
   id: string;
@@ -26,8 +26,10 @@ const encouragingMessages = [
 export function showEmotionFeedback(customMessage?: string) {
   const feedback = customMessage
     ? { message: customMessage, emoji: "🎉" }
-    : encouragingMessages[Math.floor(Math.random() * encouragingMessages.length)];
-  
+    : encouragingMessages[
+        Math.floor(Math.random() * encouragingMessages.length)
+      ];
+
   const feedbackMessage: FeedbackMessage = {
     id: Date.now().toString(),
     ...feedback,
@@ -51,7 +53,9 @@ export default function EmotionFeedback() {
       }, 3000);
     };
 
-    feedbackQueue.forEach((message) => triggerFeedback?.(message));
+    for (const message of feedbackQueue) {
+      triggerFeedback?.(message);
+    }
     feedbackQueue = [];
 
     return () => {
@@ -89,6 +93,6 @@ export default function EmotionFeedback() {
         }
       `}</style>
     </div>,
-    document.body
+    document.body,
   );
 }

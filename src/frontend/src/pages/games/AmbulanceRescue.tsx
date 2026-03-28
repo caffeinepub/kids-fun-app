@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
-import GameLayout from '../../components/GameLayout';
-import { ModulePage } from '../../App';
+import { useCallback, useEffect, useState } from "react";
+import type { ModulePage } from "../../App";
+import GameLayout from "../../components/GameLayout";
 
 interface Patient {
   id: number;
@@ -37,7 +37,7 @@ export default function AmbulanceRescue({ onNavigate }: AmbulanceRescueProps) {
     if (gameOver || timeLeft <= 0) return;
 
     const interval = setInterval(() => {
-      setTimeLeft(prev => {
+      setTimeLeft((prev) => {
         if (prev <= 1) {
           setGameOver(true);
           return 0;
@@ -53,14 +53,17 @@ export default function AmbulanceRescue({ onNavigate }: AmbulanceRescueProps) {
     if (gameOver) return;
 
     const spawnInterval = setInterval(() => {
-      if (patients.filter(p => !p.rescued).length < 5) {
-        setPatients(prev => [...prev, {
-          id: nextId,
-          x: Math.random() * 90 + 5,
-          y: Math.random() * 90 + 5,
-          rescued: false,
-        }]);
-        setNextId(id => id + 1);
+      if (patients.filter((p) => !p.rescued).length < 5) {
+        setPatients((prev) => [
+          ...prev,
+          {
+            id: nextId,
+            x: Math.random() * 90 + 5,
+            y: Math.random() * 90 + 5,
+            rescued: false,
+          },
+        ]);
+        setNextId((id) => id + 1);
       }
     }, 3000);
 
@@ -73,38 +76,43 @@ export default function AmbulanceRescue({ onNavigate }: AmbulanceRescueProps) {
     }
   }, [gameOver, score, highScore]);
 
-  const handleKeyPress = useCallback((e: KeyboardEvent) => {
-    if (gameOver) return;
-    
-    const speed = 3;
-    if (e.key === 'ArrowUp') {
-      setAmbulanceY(prev => Math.max(5, prev - speed));
-    } else if (e.key === 'ArrowDown') {
-      setAmbulanceY(prev => Math.min(90, prev + speed));
-    } else if (e.key === 'ArrowLeft') {
-      setAmbulanceX(prev => Math.max(5, prev - speed));
-    } else if (e.key === 'ArrowRight') {
-      setAmbulanceX(prev => Math.min(90, prev + speed));
-    }
-  }, [gameOver]);
+  const handleKeyPress = useCallback(
+    (e: KeyboardEvent) => {
+      if (gameOver) return;
+
+      const speed = 3;
+      if (e.key === "ArrowUp") {
+        setAmbulanceY((prev) => Math.max(5, prev - speed));
+      } else if (e.key === "ArrowDown") {
+        setAmbulanceY((prev) => Math.min(90, prev + speed));
+      } else if (e.key === "ArrowLeft") {
+        setAmbulanceX((prev) => Math.max(5, prev - speed));
+      } else if (e.key === "ArrowRight") {
+        setAmbulanceX((prev) => Math.min(90, prev + speed));
+      }
+    },
+    [gameOver],
+  );
 
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
   }, [handleKeyPress]);
 
   useEffect(() => {
     // Check for patient rescue
-    patients.forEach(patient => {
+    patients.forEach((patient) => {
       if (!patient.rescued) {
         const distance = Math.sqrt(
-          Math.pow(ambulanceX - patient.x, 2) + Math.pow(ambulanceY - patient.y, 2)
+          (ambulanceX - patient.x) ** 2 + (ambulanceY - patient.y) ** 2,
         );
         if (distance < 8) {
-          setPatients(prev => prev.map(p => 
-            p.id === patient.id ? { ...p, rescued: true } : p
-          ));
-          setScore(prev => prev + 10);
+          setPatients((prev) =>
+            prev.map((p) =>
+              p.id === patient.id ? { ...p, rescued: true } : p,
+            ),
+          );
+          setScore((prev) => prev + 10);
         }
       }
     });
@@ -142,32 +150,35 @@ export default function AmbulanceRescue({ onNavigate }: AmbulanceRescueProps) {
           style={{
             left: `${ambulanceX}%`,
             top: `${ambulanceY}%`,
-            transform: 'translate(-50%, -50%)',
+            transform: "translate(-50%, -50%)",
           }}
         >
           <div className="text-5xl">🚑</div>
         </div>
 
         {/* Patients */}
-        {patients.map(patient => (
-          !patient.rescued && (
-            <div
-              key={patient.id}
-              className="absolute"
-              style={{
-                left: `${patient.x}%`,
-                top: `${patient.y}%`,
-                transform: 'translate(-50%, -50%)',
-              }}
-            >
-              <div className="text-4xl animate-bounce">🤕</div>
-            </div>
-          )
-        ))}
+        {patients.map(
+          (patient) =>
+            !patient.rescued && (
+              <div
+                key={patient.id}
+                className="absolute"
+                style={{
+                  left: `${patient.x}%`,
+                  top: `${patient.y}%`,
+                  transform: "translate(-50%, -50%)",
+                }}
+              >
+                <div className="text-4xl animate-bounce">🤕</div>
+              </div>
+            ),
+        )}
 
         {/* Rescued Count */}
         <div className="absolute bottom-4 right-4 bg-white px-4 py-2 rounded-lg border-3 border-green-400">
-          <span className="font-bold">Rescued: {patients.filter(p => p.rescued).length}</span>
+          <span className="font-bold">
+            Rescued: {patients.filter((p) => p.rescued).length}
+          </span>
         </div>
       </div>
     </GameLayout>

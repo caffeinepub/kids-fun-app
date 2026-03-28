@@ -1,18 +1,20 @@
-import { useEffect, useRef, useState } from 'react';
-import GameLayout from '../../components/GameLayout';
-import { ModulePage } from '../../App';
+import { useEffect, useRef, useState } from "react";
+import type { ModulePage } from "../../App";
+import GameLayout from "../../components/GameLayout";
 
 interface ReverseProgressionProps {
   onNavigate: (page: ModulePage) => void;
 }
 
-export default function ReverseProgression({ onNavigate }: ReverseProgressionProps) {
+export default function ReverseProgression({
+  onNavigate,
+}: ReverseProgressionProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [level, setLevel] = useState(1);
-  
+
   const gameStateRef = useRef({
     player: { x: 100, y: 500, vx: 0, vy: 0, onGround: false },
     abilities: {
@@ -41,7 +43,7 @@ export default function ReverseProgression({ onNavigate }: ReverseProgressionPro
     state.dashCooldown = 0;
     state.shieldActive = false;
     state.slowTimeActive = false;
-    
+
     // Remove one ability per level
     state.abilities = {
       doubleJump: level < 2,
@@ -49,7 +51,7 @@ export default function ReverseProgression({ onNavigate }: ReverseProgressionPro
       shield: level < 4,
       slowTime: level < 5,
     };
-    
+
     // Create platforms
     state.platforms.push({ x: 0, y: 550, width: 200 });
     for (let i = 0; i < 6; i++) {
@@ -60,7 +62,7 @@ export default function ReverseProgression({ onNavigate }: ReverseProgressionPro
       });
     }
     state.platforms.push({ x: 650, y: 150, width: 150 });
-    
+
     // Create enemies
     for (let i = 0; i < 2 + level; i++) {
       state.enemies.push({
@@ -69,7 +71,7 @@ export default function ReverseProgression({ onNavigate }: ReverseProgressionPro
         vx: 2,
       });
     }
-    
+
     setGameOver(false);
   };
 
@@ -87,27 +89,31 @@ export default function ReverseProgression({ onNavigate }: ReverseProgressionPro
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       const state = gameStateRef.current;
       state.keys[e.key] = true;
-      
+
       // Dash ability
-      if (e.key === 'Shift' && state.abilities.dash && state.dashCooldown <= 0) {
-        const direction = state.keys['ArrowLeft'] || state.keys['a'] ? -1 : 1;
+      if (
+        e.key === "Shift" &&
+        state.abilities.dash &&
+        state.dashCooldown <= 0
+      ) {
+        const direction = state.keys.ArrowLeft || state.keys.a ? -1 : 1;
         state.player.vx = direction * 15;
         state.dashCooldown = 60;
       }
-      
+
       // Shield ability
-      if (e.key === 'e' && state.abilities.shield) {
+      if (e.key === "e" && state.abilities.shield) {
         state.shieldActive = true;
       }
-      
+
       // Slow time ability
-      if (e.key === 'q' && state.abilities.slowTime) {
+      if (e.key === "q" && state.abilities.slowTime) {
         state.slowTimeActive = !state.slowTimeActive;
       }
     };
@@ -116,8 +122,8 @@ export default function ReverseProgression({ onNavigate }: ReverseProgressionPro
       gameStateRef.current.keys[e.key] = false;
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
 
     let animationId: number;
 
@@ -128,17 +134,20 @@ export default function ReverseProgression({ onNavigate }: ReverseProgressionPro
       if (!gameOver) {
         // Player movement
         const speed = 4;
-        if (state.keys['ArrowLeft'] || state.keys['a']) state.player.vx = -speed;
-        else if (state.keys['ArrowRight'] || state.keys['d']) state.player.vx = speed;
+        if (state.keys.ArrowLeft || state.keys.a) state.player.vx = -speed;
+        else if (state.keys.ArrowRight || state.keys.d) state.player.vx = speed;
         else state.player.vx *= 0.8;
 
         // Jump
-        if ((state.keys['ArrowUp'] || state.keys['w'] || state.keys[' ']) && state.player.onGround) {
+        if (
+          (state.keys.ArrowUp || state.keys.w || state.keys[" "]) &&
+          state.player.onGround
+        ) {
           state.player.vy = -12;
           state.player.onGround = false;
           state.hasDoubleJumped = false;
         } else if (
-          (state.keys['ArrowUp'] || state.keys['w'] || state.keys[' ']) &&
+          (state.keys.ArrowUp || state.keys.w || state.keys[" "]) &&
           !state.hasDoubleJumped &&
           state.abilities.doubleJump &&
           !state.player.onGround
@@ -154,7 +163,7 @@ export default function ReverseProgression({ onNavigate }: ReverseProgressionPro
 
         // Platform collision
         state.player.onGround = false;
-        state.platforms.forEach(platform => {
+        state.platforms.forEach((platform) => {
           if (
             state.player.x + 15 > platform.x &&
             state.player.x - 15 < platform.x + platform.width &&
@@ -169,14 +178,14 @@ export default function ReverseProgression({ onNavigate }: ReverseProgressionPro
         });
 
         // Update enemies
-        state.enemies.forEach(enemy => {
+        state.enemies.forEach((enemy) => {
           enemy.x += enemy.vx * timeScale;
           if (enemy.x < 100 || enemy.x > 700) enemy.vx *= -1;
         });
 
         // Enemy collision
         if (!state.shieldActive) {
-          state.enemies.forEach(enemy => {
+          state.enemies.forEach((enemy) => {
             const dx = enemy.x - state.player.x;
             const dy = enemy.y - state.player.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
@@ -200,8 +209,8 @@ export default function ReverseProgression({ onNavigate }: ReverseProgressionPro
         const dy = state.goal.y - state.player.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         if (dist < 40) {
-          setScore(s => s + (5 - level) * 20);
-          setLevel(l => l + 1);
+          setScore((s) => s + (5 - level) * 20);
+          setLevel((l) => l + 1);
         }
 
         // Fall off
@@ -212,48 +221,48 @@ export default function ReverseProgression({ onNavigate }: ReverseProgressionPro
       }
 
       // Render
-      ctx.fillStyle = state.slowTimeActive ? '#1a1a3e' : '#0f172a';
+      ctx.fillStyle = state.slowTimeActive ? "#1a1a3e" : "#0f172a";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Goal
-      ctx.fillStyle = '#22c55e';
+      ctx.fillStyle = "#22c55e";
       ctx.beginPath();
       ctx.arc(state.goal.x, state.goal.y, 30, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = '#fff';
-      ctx.font = '32px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText('🏁', state.goal.x, state.goal.y + 10);
+      ctx.fillStyle = "#fff";
+      ctx.font = "32px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText("🏁", state.goal.x, state.goal.y + 10);
 
       // Platforms
-      state.platforms.forEach(platform => {
-        ctx.fillStyle = '#6366f1';
+      state.platforms.forEach((platform) => {
+        ctx.fillStyle = "#6366f1";
         ctx.fillRect(platform.x, platform.y, platform.width, 20);
-        ctx.strokeStyle = '#fff';
+        ctx.strokeStyle = "#fff";
         ctx.lineWidth = 2;
         ctx.strokeRect(platform.x, platform.y, platform.width, 20);
       });
 
       // Enemies
-      state.enemies.forEach(enemy => {
-        ctx.fillStyle = '#ef4444';
+      state.enemies.forEach((enemy) => {
+        ctx.fillStyle = "#ef4444";
         ctx.beginPath();
         ctx.arc(enemy.x, enemy.y, 20, 0, Math.PI * 2);
         ctx.fill();
-        ctx.fillStyle = '#fff';
-        ctx.font = '24px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('👹', enemy.x, enemy.y + 8);
+        ctx.fillStyle = "#fff";
+        ctx.font = "24px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("👹", enemy.x, enemy.y + 8);
       });
 
       // Player
-      ctx.fillStyle = '#fbbf24';
+      ctx.fillStyle = "#fbbf24";
       ctx.beginPath();
       ctx.arc(state.player.x, state.player.y, 15, 0, Math.PI * 2);
       ctx.fill();
-      
+
       if (state.shieldActive) {
-        ctx.strokeStyle = '#60a5fa';
+        ctx.strokeStyle = "#60a5fa";
         ctx.lineWidth = 5;
         ctx.beginPath();
         ctx.arc(state.player.x, state.player.y, 25, 0, Math.PI * 2);
@@ -261,25 +270,33 @@ export default function ReverseProgression({ onNavigate }: ReverseProgressionPro
       }
 
       // UI
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+      ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
       ctx.fillRect(10, 10, 300, 140);
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 14px Arial';
-      ctx.textAlign = 'left';
+      ctx.fillStyle = "#fff";
+      ctx.font = "bold 14px Arial";
+      ctx.textAlign = "left";
       ctx.fillText(`Level: ${level} - Abilities Lost: ${level - 1}`, 20, 30);
-      
+
       let y = 55;
-      ctx.fillStyle = state.abilities.doubleJump ? '#22c55e' : '#ef4444';
-      ctx.fillText(`Double Jump: ${state.abilities.doubleJump ? '✓' : '✗'}`, 20, y);
+      ctx.fillStyle = state.abilities.doubleJump ? "#22c55e" : "#ef4444";
+      ctx.fillText(
+        `Double Jump: ${state.abilities.doubleJump ? "✓" : "✗"}`,
+        20,
+        y,
+      );
       y += 25;
-      ctx.fillStyle = state.abilities.dash ? '#22c55e' : '#ef4444';
-      ctx.fillText(`Dash (Shift): ${state.abilities.dash ? '✓' : '✗'}`, 20, y);
+      ctx.fillStyle = state.abilities.dash ? "#22c55e" : "#ef4444";
+      ctx.fillText(`Dash (Shift): ${state.abilities.dash ? "✓" : "✗"}`, 20, y);
       y += 25;
-      ctx.fillStyle = state.abilities.shield ? '#22c55e' : '#ef4444';
-      ctx.fillText(`Shield (E): ${state.abilities.shield ? '✓' : '✗'}`, 20, y);
+      ctx.fillStyle = state.abilities.shield ? "#22c55e" : "#ef4444";
+      ctx.fillText(`Shield (E): ${state.abilities.shield ? "✓" : "✗"}`, 20, y);
       y += 25;
-      ctx.fillStyle = state.abilities.slowTime ? '#22c55e' : '#ef4444';
-      ctx.fillText(`Slow Time (Q): ${state.abilities.slowTime ? '✓' : '✗'}`, 20, y);
+      ctx.fillStyle = state.abilities.slowTime ? "#22c55e" : "#ef4444";
+      ctx.fillText(
+        `Slow Time (Q): ${state.abilities.slowTime ? "✓" : "✗"}`,
+        20,
+        y,
+      );
 
       animationId = requestAnimationFrame(gameLoop);
     };
@@ -288,8 +305,8 @@ export default function ReverseProgression({ onNavigate }: ReverseProgressionPro
 
     return () => {
       cancelAnimationFrame(animationId);
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
     };
   }, [gameOver, score, highScore, level]);
 
@@ -304,8 +321,12 @@ export default function ReverseProgression({ onNavigate }: ReverseProgressionPro
     >
       <div className="flex flex-col items-center justify-center p-4 bg-gradient-to-br from-slate-900 to-indigo-900">
         <div className="mb-4 text-center text-white">
-          <p className="text-lg font-semibold">Start powerful, lose abilities each level!</p>
-          <p className="text-sm">Arrow keys/WASD • Space to jump • Shift/E/Q for abilities</p>
+          <p className="text-lg font-semibold">
+            Start powerful, lose abilities each level!
+          </p>
+          <p className="text-sm">
+            Arrow keys/WASD • Space to jump • Shift/E/Q for abilities
+          </p>
         </div>
         <canvas
           ref={canvasRef}

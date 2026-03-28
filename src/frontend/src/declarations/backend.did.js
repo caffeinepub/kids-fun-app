@@ -19,33 +19,23 @@ export const _CaffeineStorageRefillResult = IDL.Record({
   'success' : IDL.Opt(IDL.Bool),
   'topped_up_amount' : IDL.Opt(IDL.Nat),
 });
-export const Time = IDL.Int;
-export const VideoChannel = IDL.Record({
-  'categoryId' : IDL.Text,
-  'lastPlayed' : IDL.Opt(Time),
-  'channelId' : IDL.Text,
-  'views' : IDL.Nat,
-  'name' : IDL.Text,
-  'createdAt' : Time,
-  'safe' : IDL.Bool,
-  'lastUpdated' : IDL.Opt(Time),
-  'description' : IDL.Text,
-  'isFavorite' : IDL.Bool,
-  'playlistUrl' : IDL.Text,
-  'approved' : IDL.Bool,
-  'totalVideos' : IDL.Nat,
-  'iconUrl' : IDL.Text,
-});
 export const UserRole = IDL.Variant({
   'admin' : IDL.Null,
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
-export const TextBubble = IDL.Record({
-  'content' : IDL.Text,
-  'character' : IDL.Text,
-  'style' : IDL.Text,
-  'position' : IDL.Record({ 'x' : IDL.Nat, 'y' : IDL.Nat }),
+export const SpinWheelResult = IDL.Record({
+  'remainingCooldown' : IDL.Nat,
+  'pointsAdded' : IDL.Nat,
+  'message' : IDL.Text,
+});
+export const Reward = IDL.Record({
+  'userId' : IDL.Principal,
+  'badges' : IDL.Vec(IDL.Text),
+  'achievements' : IDL.Vec(IDL.Text),
+  'totalTrophies' : IDL.Nat,
+  'virtualPetLevel' : IDL.Nat,
+  'points' : IDL.Nat,
 });
 export const AvatarConfig = IDL.Record({
   'body' : IDL.Text,
@@ -54,32 +44,6 @@ export const AvatarConfig = IDL.Record({
   'headwear' : IDL.Text,
   'shoes' : IDL.Text,
   'pants' : IDL.Text,
-});
-export const Character = IDL.Record({
-  'name' : IDL.Text,
-  'position' : IDL.Record({ 'x' : IDL.Nat, 'y' : IDL.Nat }),
-  'avatarConfig' : AvatarConfig,
-});
-export const Prop = IDL.Record({
-  'name' : IDL.Text,
-  'type' : IDL.Text,
-  'position' : IDL.Record({ 'x' : IDL.Nat, 'y' : IDL.Nat }),
-});
-export const Scene = IDL.Record({
-  'background' : IDL.Text,
-  'textBubbles' : IDL.Vec(TextBubble),
-  'characters' : IDL.Vec(Character),
-  'animations' : IDL.Vec(IDL.Text),
-  'props' : IDL.Vec(Prop),
-});
-export const StoryProject = IDL.Record({
-  'id' : IDL.Text,
-  'title' : IDL.Text,
-  'owner' : IDL.Principal,
-  'scenes' : IDL.Vec(Scene),
-  'published' : IDL.Bool,
-  'createdAt' : IDL.Int,
-  'approved' : IDL.Bool,
 });
 export const AccessibilitySettings = IDL.Record({
   'highContrastMode' : IDL.Bool,
@@ -99,6 +63,11 @@ export const UserProfile = IDL.Record({
   'avatarConfig' : IDL.Opt(AvatarConfig),
   'accessibilitySettings' : AccessibilitySettings,
 });
+export const SpinReward = IDL.Record({
+  'value' : IDL.Text,
+  'rewardType' : IDL.Text,
+  'timestamp' : IDL.Int,
+});
 export const VirtualPetHub = IDL.Record({
   'growthStage' : IDL.Nat,
   'accessories' : IDL.Vec(IDL.Text),
@@ -109,30 +78,6 @@ export const VirtualPetHub = IDL.Record({
   'trophies' : IDL.Nat,
   'homeStyle' : IDL.Text,
   'decorations' : IDL.Vec(IDL.Text),
-});
-export const ActivityType = IDL.Variant({
-  'user_created' : IDL.Null,
-  'game_played' : IDL.Record({ 'gameId' : IDL.Text, 'gameName' : IDL.Text }),
-});
-export const ActivityEvent = IDL.Record({
-  'id' : IDL.Nat,
-  'activityType' : ActivityType,
-  'userId' : IDL.Principal,
-  'timestamp' : Time,
-});
-export const ScaryHubGameEntry = IDL.Record({
-  'id' : IDL.Text,
-  'lastPlayed' : IDL.Int,
-  'theme' : IDL.Text,
-  'title' : IDL.Text,
-  'isScary' : IDL.Bool,
-  'difficulty' : IDL.Text,
-  'assets' : IDL.Vec(IDL.Text),
-  'description' : IDL.Text,
-  'isFavorite' : IDL.Bool,
-  'instructions' : IDL.Text,
-  'highScore' : IDL.Nat,
-  'category' : IDL.Text,
 });
 export const ApprovalStatus = IDL.Variant({
   'pending' : IDL.Null,
@@ -171,54 +116,31 @@ export const idlService = IDL.Service({
       [],
     ),
   '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
-  'addVideoChannel' : IDL.Func([VideoChannel], [], []),
-  'approveStoryProject' : IDL.Func([IDL.Text], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-  'deleteStoryProject' : IDL.Func([IDL.Text], [], []),
-  'deleteVideoChannel' : IDL.Func([IDL.Text], [], []),
-  'getAllStoryProjects' : IDL.Func([], [IDL.Vec(StoryProject)], ['query']),
-  'getCallerFavoriteChannels' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
-  'getCallerStoryProjects' : IDL.Func([], [IDL.Vec(StoryProject)], ['query']),
+  'claimSpinReward' : IDL.Func([IDL.Nat], [SpinWheelResult], []),
+  'getCallerRewards' : IDL.Func([], [IDL.Opt(Reward)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
-  'getCallerVirtualPet' : IDL.Func([], [IDL.Opt(VirtualPetHub)], ['query']),
-  'getRecentActivityEvents' : IDL.Func(
-      [IDL.Nat],
-      [IDL.Vec(ActivityEvent)],
-      ['query'],
-    ),
-  'getScaryHubGames' : IDL.Func([], [IDL.Vec(ScaryHubGameEntry)], ['query']),
-  'getStoryProject' : IDL.Func([IDL.Text], [IDL.Opt(StoryProject)], ['query']),
+  'getLastSpinTime' : IDL.Func([], [IDL.Opt(IDL.Int)], ['query']),
+  'getRemainingSpinCooldown' : IDL.Func([], [IDL.Nat], ['query']),
+  'getSpinRewards' : IDL.Func([], [IDL.Vec(SpinReward)], ['query']),
+  'getTotalScore' : IDL.Func([], [IDL.Nat], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
       ['query'],
     ),
-  'getVideoChannel' : IDL.Func([IDL.Text], [IDL.Opt(VideoChannel)], ['query']),
-  'getVideoChannels' : IDL.Func([], [IDL.Vec(VideoChannel)], ['query']),
-  'getVirtualPet' : IDL.Func(
-      [IDL.Principal],
-      [IDL.Opt(VirtualPetHub)],
-      ['query'],
-    ),
+  'getVirtualPetHub' : IDL.Func([], [IDL.Opt(VirtualPetHub)], ['query']),
   'initializeAccessControl' : IDL.Func([], [], []),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'isCallerApproved' : IDL.Func([], [IDL.Bool], ['query']),
   'listApprovals' : IDL.Func([], [IDL.Vec(UserApprovalInfo)], ['query']),
-  'markChannelAsFavorite' : IDL.Func([IDL.Text], [], []),
-  'publishStoryProject' : IDL.Func([IDL.Text], [], []),
-  'recordGamePlay' : IDL.Func([IDL.Text, IDL.Text], [], []),
+  'recordSpinReward' : IDL.Func([SpinReward], [], []),
   'requestApproval' : IDL.Func([], [], []),
+  'saveCallerRewards' : IDL.Func([Reward], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
-  'saveCallerVirtualPet' : IDL.Func([VirtualPetHub], [], []),
-  'saveStoryProject' : IDL.Func([StoryProject], [], []),
+  'saveVirtualPetHub' : IDL.Func([VirtualPetHub], [], []),
   'setApproval' : IDL.Func([IDL.Principal, ApprovalStatus], [], []),
-  'unmarkChannelAsFavorite' : IDL.Func([IDL.Text], [], []),
-  'updateGamesTrophies' : IDL.Func([], [IDL.Nat], []),
-  'updateStoryProject' : IDL.Func([IDL.Text, StoryProject], [], []),
-  'updateVideoChannel' : IDL.Func([IDL.Text, VideoChannel], [], []),
-  'updateVideoChannelViews' : IDL.Func([IDL.Text], [], []),
-  'welcomeBackReward' : IDL.Func([], [], []),
 });
 
 export const idlInitArgs = [];
@@ -235,33 +157,23 @@ export const idlFactory = ({ IDL }) => {
     'success' : IDL.Opt(IDL.Bool),
     'topped_up_amount' : IDL.Opt(IDL.Nat),
   });
-  const Time = IDL.Int;
-  const VideoChannel = IDL.Record({
-    'categoryId' : IDL.Text,
-    'lastPlayed' : IDL.Opt(Time),
-    'channelId' : IDL.Text,
-    'views' : IDL.Nat,
-    'name' : IDL.Text,
-    'createdAt' : Time,
-    'safe' : IDL.Bool,
-    'lastUpdated' : IDL.Opt(Time),
-    'description' : IDL.Text,
-    'isFavorite' : IDL.Bool,
-    'playlistUrl' : IDL.Text,
-    'approved' : IDL.Bool,
-    'totalVideos' : IDL.Nat,
-    'iconUrl' : IDL.Text,
-  });
   const UserRole = IDL.Variant({
     'admin' : IDL.Null,
     'user' : IDL.Null,
     'guest' : IDL.Null,
   });
-  const TextBubble = IDL.Record({
-    'content' : IDL.Text,
-    'character' : IDL.Text,
-    'style' : IDL.Text,
-    'position' : IDL.Record({ 'x' : IDL.Nat, 'y' : IDL.Nat }),
+  const SpinWheelResult = IDL.Record({
+    'remainingCooldown' : IDL.Nat,
+    'pointsAdded' : IDL.Nat,
+    'message' : IDL.Text,
+  });
+  const Reward = IDL.Record({
+    'userId' : IDL.Principal,
+    'badges' : IDL.Vec(IDL.Text),
+    'achievements' : IDL.Vec(IDL.Text),
+    'totalTrophies' : IDL.Nat,
+    'virtualPetLevel' : IDL.Nat,
+    'points' : IDL.Nat,
   });
   const AvatarConfig = IDL.Record({
     'body' : IDL.Text,
@@ -270,32 +182,6 @@ export const idlFactory = ({ IDL }) => {
     'headwear' : IDL.Text,
     'shoes' : IDL.Text,
     'pants' : IDL.Text,
-  });
-  const Character = IDL.Record({
-    'name' : IDL.Text,
-    'position' : IDL.Record({ 'x' : IDL.Nat, 'y' : IDL.Nat }),
-    'avatarConfig' : AvatarConfig,
-  });
-  const Prop = IDL.Record({
-    'name' : IDL.Text,
-    'type' : IDL.Text,
-    'position' : IDL.Record({ 'x' : IDL.Nat, 'y' : IDL.Nat }),
-  });
-  const Scene = IDL.Record({
-    'background' : IDL.Text,
-    'textBubbles' : IDL.Vec(TextBubble),
-    'characters' : IDL.Vec(Character),
-    'animations' : IDL.Vec(IDL.Text),
-    'props' : IDL.Vec(Prop),
-  });
-  const StoryProject = IDL.Record({
-    'id' : IDL.Text,
-    'title' : IDL.Text,
-    'owner' : IDL.Principal,
-    'scenes' : IDL.Vec(Scene),
-    'published' : IDL.Bool,
-    'createdAt' : IDL.Int,
-    'approved' : IDL.Bool,
   });
   const AccessibilitySettings = IDL.Record({
     'highContrastMode' : IDL.Bool,
@@ -315,6 +201,11 @@ export const idlFactory = ({ IDL }) => {
     'avatarConfig' : IDL.Opt(AvatarConfig),
     'accessibilitySettings' : AccessibilitySettings,
   });
+  const SpinReward = IDL.Record({
+    'value' : IDL.Text,
+    'rewardType' : IDL.Text,
+    'timestamp' : IDL.Int,
+  });
   const VirtualPetHub = IDL.Record({
     'growthStage' : IDL.Nat,
     'accessories' : IDL.Vec(IDL.Text),
@@ -325,30 +216,6 @@ export const idlFactory = ({ IDL }) => {
     'trophies' : IDL.Nat,
     'homeStyle' : IDL.Text,
     'decorations' : IDL.Vec(IDL.Text),
-  });
-  const ActivityType = IDL.Variant({
-    'user_created' : IDL.Null,
-    'game_played' : IDL.Record({ 'gameId' : IDL.Text, 'gameName' : IDL.Text }),
-  });
-  const ActivityEvent = IDL.Record({
-    'id' : IDL.Nat,
-    'activityType' : ActivityType,
-    'userId' : IDL.Principal,
-    'timestamp' : Time,
-  });
-  const ScaryHubGameEntry = IDL.Record({
-    'id' : IDL.Text,
-    'lastPlayed' : IDL.Int,
-    'theme' : IDL.Text,
-    'title' : IDL.Text,
-    'isScary' : IDL.Bool,
-    'difficulty' : IDL.Text,
-    'assets' : IDL.Vec(IDL.Text),
-    'description' : IDL.Text,
-    'isFavorite' : IDL.Bool,
-    'instructions' : IDL.Text,
-    'highScore' : IDL.Nat,
-    'category' : IDL.Text,
   });
   const ApprovalStatus = IDL.Variant({
     'pending' : IDL.Null,
@@ -387,62 +254,31 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
-    'addVideoChannel' : IDL.Func([VideoChannel], [], []),
-    'approveStoryProject' : IDL.Func([IDL.Text], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-    'deleteStoryProject' : IDL.Func([IDL.Text], [], []),
-    'deleteVideoChannel' : IDL.Func([IDL.Text], [], []),
-    'getAllStoryProjects' : IDL.Func([], [IDL.Vec(StoryProject)], ['query']),
-    'getCallerFavoriteChannels' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
-    'getCallerStoryProjects' : IDL.Func([], [IDL.Vec(StoryProject)], ['query']),
+    'claimSpinReward' : IDL.Func([IDL.Nat], [SpinWheelResult], []),
+    'getCallerRewards' : IDL.Func([], [IDL.Opt(Reward)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
-    'getCallerVirtualPet' : IDL.Func([], [IDL.Opt(VirtualPetHub)], ['query']),
-    'getRecentActivityEvents' : IDL.Func(
-        [IDL.Nat],
-        [IDL.Vec(ActivityEvent)],
-        ['query'],
-      ),
-    'getScaryHubGames' : IDL.Func([], [IDL.Vec(ScaryHubGameEntry)], ['query']),
-    'getStoryProject' : IDL.Func(
-        [IDL.Text],
-        [IDL.Opt(StoryProject)],
-        ['query'],
-      ),
+    'getLastSpinTime' : IDL.Func([], [IDL.Opt(IDL.Int)], ['query']),
+    'getRemainingSpinCooldown' : IDL.Func([], [IDL.Nat], ['query']),
+    'getSpinRewards' : IDL.Func([], [IDL.Vec(SpinReward)], ['query']),
+    'getTotalScore' : IDL.Func([], [IDL.Nat], ['query']),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
         ['query'],
       ),
-    'getVideoChannel' : IDL.Func(
-        [IDL.Text],
-        [IDL.Opt(VideoChannel)],
-        ['query'],
-      ),
-    'getVideoChannels' : IDL.Func([], [IDL.Vec(VideoChannel)], ['query']),
-    'getVirtualPet' : IDL.Func(
-        [IDL.Principal],
-        [IDL.Opt(VirtualPetHub)],
-        ['query'],
-      ),
+    'getVirtualPetHub' : IDL.Func([], [IDL.Opt(VirtualPetHub)], ['query']),
     'initializeAccessControl' : IDL.Func([], [], []),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'isCallerApproved' : IDL.Func([], [IDL.Bool], ['query']),
     'listApprovals' : IDL.Func([], [IDL.Vec(UserApprovalInfo)], ['query']),
-    'markChannelAsFavorite' : IDL.Func([IDL.Text], [], []),
-    'publishStoryProject' : IDL.Func([IDL.Text], [], []),
-    'recordGamePlay' : IDL.Func([IDL.Text, IDL.Text], [], []),
+    'recordSpinReward' : IDL.Func([SpinReward], [], []),
     'requestApproval' : IDL.Func([], [], []),
+    'saveCallerRewards' : IDL.Func([Reward], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
-    'saveCallerVirtualPet' : IDL.Func([VirtualPetHub], [], []),
-    'saveStoryProject' : IDL.Func([StoryProject], [], []),
+    'saveVirtualPetHub' : IDL.Func([VirtualPetHub], [], []),
     'setApproval' : IDL.Func([IDL.Principal, ApprovalStatus], [], []),
-    'unmarkChannelAsFavorite' : IDL.Func([IDL.Text], [], []),
-    'updateGamesTrophies' : IDL.Func([], [IDL.Nat], []),
-    'updateStoryProject' : IDL.Func([IDL.Text, StoryProject], [], []),
-    'updateVideoChannel' : IDL.Func([IDL.Text, VideoChannel], [], []),
-    'updateVideoChannelViews' : IDL.Func([IDL.Text], [], []),
-    'welcomeBackReward' : IDL.Func([], [], []),
   });
 };
 

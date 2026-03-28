@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
-import GameLayout from '../../components/GameLayout';
-import { ModulePage } from '../../App';
+import { useCallback, useEffect, useState } from "react";
+import type { ModulePage } from "../../App";
+import GameLayout from "../../components/GameLayout";
 
 interface Item {
   id: number;
@@ -22,7 +22,9 @@ interface EscapeRoomUniverseProps {
   onNavigate: (page: ModulePage) => void;
 }
 
-export default function EscapeRoomUniverse({ onNavigate }: EscapeRoomUniverseProps) {
+export default function EscapeRoomUniverse({
+  onNavigate,
+}: EscapeRoomUniverseProps) {
   const [score, setScore] = useState(0);
   const [currentRoomId, setCurrentRoomId] = useState(0);
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -37,40 +39,40 @@ export default function EscapeRoomUniverse({ onNavigate }: EscapeRoomUniversePro
     setInventory([]);
     setGameOver(false);
     setTimeLeft(180);
-    
+
     const newRooms: Room[] = [
       {
         id: 0,
-        name: 'Ancient Temple',
-        theme: '🏛️',
+        name: "Ancient Temple",
+        theme: "🏛️",
         items: [
-          { id: 0, name: 'key', emoji: '🔑', found: false },
-          { id: 1, name: 'torch', emoji: '🔦', found: false },
-          { id: 2, name: 'scroll', emoji: '📜', found: false },
+          { id: 0, name: "key", emoji: "🔑", found: false },
+          { id: 1, name: "torch", emoji: "🔦", found: false },
+          { id: 2, name: "scroll", emoji: "📜", found: false },
         ],
         unlocked: true,
         completed: false,
       },
       {
         id: 1,
-        name: 'Space Lab',
-        theme: '🚀',
+        name: "Space Lab",
+        theme: "🚀",
         items: [
-          { id: 3, name: 'chip', emoji: '💾', found: false },
-          { id: 4, name: 'battery', emoji: '🔋', found: false },
-          { id: 5, name: 'tool', emoji: '🔧', found: false },
+          { id: 3, name: "chip", emoji: "💾", found: false },
+          { id: 4, name: "battery", emoji: "🔋", found: false },
+          { id: 5, name: "tool", emoji: "🔧", found: false },
         ],
         unlocked: false,
         completed: false,
       },
       {
         id: 2,
-        name: 'Haunted Mansion',
-        theme: '👻',
+        name: "Haunted Mansion",
+        theme: "👻",
         items: [
-          { id: 6, name: 'candle', emoji: '🕯️', found: false },
-          { id: 7, name: 'book', emoji: '📖', found: false },
-          { id: 8, name: 'crystal', emoji: '💎', found: false },
+          { id: 6, name: "candle", emoji: "🕯️", found: false },
+          { id: 7, name: "book", emoji: "📖", found: false },
+          { id: 8, name: "crystal", emoji: "💎", found: false },
         ],
         unlocked: false,
         completed: false,
@@ -83,7 +85,7 @@ export default function EscapeRoomUniverse({ onNavigate }: EscapeRoomUniversePro
     if (gameOver || timeLeft <= 0) return;
 
     const interval = setInterval(() => {
-      setTimeLeft(prev => {
+      setTimeLeft((prev) => {
         if (prev <= 1) {
           setGameOver(true);
           return 0;
@@ -104,65 +106,75 @@ export default function EscapeRoomUniverse({ onNavigate }: EscapeRoomUniversePro
   useEffect(() => {
     // Check if current room is completed
     const currentRoom = rooms[currentRoomId];
-    if (currentRoom && currentRoom.items.every(item => item.found) && !currentRoom.completed) {
-      setRooms(prev => prev.map(r => {
-        if (r.id === currentRoomId) {
-          return { ...r, completed: true };
-        }
-        if (r.id === currentRoomId + 1) {
-          return { ...r, unlocked: true };
-        }
-        return r;
-      }));
-      setScore(prev => prev + 100);
+    if (
+      currentRoom?.items.every((item) => item.found) &&
+      !currentRoom.completed
+    ) {
+      setRooms((prev) =>
+        prev.map((r) => {
+          if (r.id === currentRoomId) {
+            return { ...r, completed: true };
+          }
+          if (r.id === currentRoomId + 1) {
+            return { ...r, unlocked: true };
+          }
+          return r;
+        }),
+      );
+      setScore((prev) => prev + 100);
     }
 
     // Check if all rooms completed
-    if (rooms.length > 0 && rooms.every(r => r.completed)) {
+    if (rooms.length > 0 && rooms.every((r) => r.completed)) {
       setGameOver(true);
     }
   }, [rooms, currentRoomId]);
 
   const findItem = (itemId: number) => {
     const currentRoom = rooms[currentRoomId];
-    const item = currentRoom.items.find(i => i.id === itemId);
-    
+    const item = currentRoom.items.find((i) => i.id === itemId);
+
     if (item && !item.found) {
-      setRooms(prev => prev.map(r => {
-        if (r.id === currentRoomId) {
-          return {
-            ...r,
-            items: r.items.map(i => 
-              i.id === itemId ? { ...i, found: true } : i
-            ),
-          };
-        }
-        return r;
-      }));
-      setInventory(prev => [...prev, item.emoji]);
-      setScore(prev => prev + 20);
+      setRooms((prev) =>
+        prev.map((r) => {
+          if (r.id === currentRoomId) {
+            return {
+              ...r,
+              items: r.items.map((i) =>
+                i.id === itemId ? { ...i, found: true } : i,
+              ),
+            };
+          }
+          return r;
+        }),
+      );
+      setInventory((prev) => [...prev, item.emoji]);
+      setScore((prev) => prev + 20);
     }
   };
 
   const switchRoom = (roomId: number) => {
     const room = rooms[roomId];
-    if (room && room.unlocked) {
+    if (room?.unlocked) {
       setCurrentRoomId(roomId);
     }
   };
 
-  const handleKeyPress = useCallback((e: KeyboardEvent) => {
-    if (gameOver) return;
-    
-    if (e.key >= '1' && e.key <= '3') {
-      const roomId = parseInt(e.key) - 1;
-      switchRoom(roomId);
-    }
-  }, [gameOver, rooms]);
+  const handleKeyPress = useCallback(
+    (e: KeyboardEvent) => {
+      if (gameOver) return;
+
+      if (e.key >= "1" && e.key <= "3") {
+        const roomId = Number.parseInt(e.key) - 1;
+        switchRoom(roomId);
+      }
+    },
+    [gameOver, rooms],
+  );
 
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
   }, [handleKeyPress]);
 
   const currentRoom = rooms[currentRoomId];
@@ -179,23 +191,26 @@ export default function EscapeRoomUniverse({ onNavigate }: EscapeRoomUniversePro
       <div className="relative w-full h-[600px] bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900 overflow-hidden">
         {/* Timer */}
         <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-full border-4 border-red-700 z-20">
-          <span className="text-2xl font-bold">⏰ {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</span>
+          <span className="text-2xl font-bold">
+            ⏰ {Math.floor(timeLeft / 60)}:
+            {(timeLeft % 60).toString().padStart(2, "0")}
+          </span>
         </div>
 
         {/* Room selector */}
         <div className="absolute top-4 left-4 bg-white p-3 rounded-lg border-4 border-purple-300 z-20">
           <div className="text-sm font-bold mb-2">Rooms (1-3):</div>
           <div className="flex gap-2">
-            {rooms.map(room => (
+            {rooms.map((room) => (
               <button
                 key={room.id}
                 onClick={() => switchRoom(room.id)}
                 disabled={!room.unlocked}
                 className={`px-3 py-2 rounded border-2 transition-all ${
-                  currentRoomId === room.id 
-                    ? 'border-purple-600 bg-purple-100 scale-110' 
-                    : 'border-gray-300'
-                } ${room.completed ? 'bg-green-100' : ''} disabled:opacity-30 disabled:cursor-not-allowed`}
+                  currentRoomId === room.id
+                    ? "border-purple-600 bg-purple-100 scale-110"
+                    : "border-gray-300"
+                } ${room.completed ? "bg-green-100" : ""} disabled:opacity-30 disabled:cursor-not-allowed`}
               >
                 <div className="text-3xl">{room.theme}</div>
                 {room.completed && <div className="text-lg">✅</div>}
@@ -213,7 +228,9 @@ export default function EscapeRoomUniverse({ onNavigate }: EscapeRoomUniversePro
               <div className="text-gray-400">Empty</div>
             ) : (
               inventory.map((item, idx) => (
-                <div key={idx} className="text-3xl">{item}</div>
+                <div key={idx} className="text-3xl">
+                  {item}
+                </div>
               ))
             )}
           </div>
@@ -224,25 +241,31 @@ export default function EscapeRoomUniverse({ onNavigate }: EscapeRoomUniversePro
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center space-y-8">
               <div className="text-8xl">{currentRoom.theme}</div>
-              <h2 className="text-4xl font-bold text-white">{currentRoom.name}</h2>
-              
+              <h2 className="text-4xl font-bold text-white">
+                {currentRoom.name}
+              </h2>
+
               {/* Items to find */}
               <div className="bg-white/90 p-6 rounded-lg border-4 border-purple-400 max-w-md mx-auto">
                 <h3 className="text-xl font-bold mb-4">Find Hidden Items:</h3>
                 <div className="grid grid-cols-3 gap-4">
-                  {currentRoom.items.map(item => (
+                  {currentRoom.items.map((item) => (
                     <button
                       key={item.id}
                       onClick={() => findItem(item.id)}
                       disabled={item.found}
                       className={`p-4 rounded-lg border-3 transition-all ${
-                        item.found 
-                          ? 'bg-green-100 border-green-400 opacity-50' 
-                          : 'bg-purple-100 border-purple-400 hover:scale-110'
+                        item.found
+                          ? "bg-green-100 border-green-400 opacity-50"
+                          : "bg-purple-100 border-purple-400 hover:scale-110"
                       }`}
                     >
-                      <div className="text-5xl mb-2">{item.found ? '✅' : '❓'}</div>
-                      <div className="text-sm font-bold capitalize">{item.name}</div>
+                      <div className="text-5xl mb-2">
+                        {item.found ? "✅" : "❓"}
+                      </div>
+                      <div className="text-sm font-bold capitalize">
+                        {item.name}
+                      </div>
                     </button>
                   ))}
                 </div>
@@ -252,11 +275,15 @@ export default function EscapeRoomUniverse({ onNavigate }: EscapeRoomUniversePro
         )}
 
         {/* Instructions */}
-        {currentRoom && !currentRoom.completed && currentRoom.items.filter(i => i.found).length === 0 && (
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white px-6 py-3 rounded-lg border-4 border-purple-300 z-20 text-center">
-            <p className="font-bold">Click items to find them! Complete all rooms to escape!</p>
-          </div>
-        )}
+        {currentRoom &&
+          !currentRoom.completed &&
+          currentRoom.items.filter((i) => i.found).length === 0 && (
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white px-6 py-3 rounded-lg border-4 border-purple-300 z-20 text-center">
+              <p className="font-bold">
+                Click items to find them! Complete all rooms to escape!
+              </p>
+            </div>
+          )}
       </div>
     </GameLayout>
   );

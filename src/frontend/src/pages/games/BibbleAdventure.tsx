@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
-import GameLayout from '../../components/GameLayout';
-import { ModulePage } from '../../App';
+import { useCallback, useEffect, useState } from "react";
+import type { ModulePage } from "../../App";
+import GameLayout from "../../components/GameLayout";
 
 interface Coin {
   id: number;
@@ -27,7 +27,7 @@ export default function BibbleAdventure({ onNavigate }: BibbleAdventureProps) {
   const [isJumping, setIsJumping] = useState(false);
   const [coins, setCoins] = useState<Coin[]>([]);
   const [gameOver, setGameOver] = useState(false);
-  const [nextId, setNextId] = useState(0);
+  const [_nextId, setNextId] = useState(0);
   const [highScore, setHighScore] = useState(0);
 
   const platforms: Platform[] = [
@@ -73,13 +73,13 @@ export default function BibbleAdventure({ onNavigate }: BibbleAdventureProps) {
 
     const gravity = 0.5;
     const gameLoop = setInterval(() => {
-      setVelocityY(prev => prev + gravity);
-      setPlayerY(prev => {
+      setVelocityY((prev) => prev + gravity);
+      setPlayerY((prev) => {
         const newY = prev + velocityY;
-        
+
         // Check platform collision
         let onPlatform = false;
-        platforms.forEach(platform => {
+        platforms.forEach((platform) => {
           if (
             playerX > platform.x &&
             playerX < platform.x + platform.width &&
@@ -114,37 +114,40 @@ export default function BibbleAdventure({ onNavigate }: BibbleAdventureProps) {
 
   useEffect(() => {
     // Check coin collection
-    coins.forEach(coin => {
+    coins.forEach((coin) => {
       if (!coin.collected) {
         const distance = Math.sqrt(
-          Math.pow(playerX - coin.x, 2) + Math.pow(playerY - coin.y, 2)
+          (playerX - coin.x) ** 2 + (playerY - coin.y) ** 2,
         );
         if (distance < 5) {
-          setCoins(prev => prev.map(c => 
-            c.id === coin.id ? { ...c, collected: true } : c
-          ));
-          setScore(prev => prev + 10);
+          setCoins((prev) =>
+            prev.map((c) => (c.id === coin.id ? { ...c, collected: true } : c)),
+          );
+          setScore((prev) => prev + 10);
         }
       }
     });
   }, [playerX, playerY, coins]);
 
-  const handleKeyPress = useCallback((e: KeyboardEvent) => {
-    if (gameOver) return;
-    
-    if (e.key === 'ArrowLeft') {
-      setPlayerX(prev => Math.max(0, prev - 3));
-    } else if (e.key === 'ArrowRight') {
-      setPlayerX(prev => Math.min(95, prev + 3));
-    } else if (e.key === ' ' && !isJumping) {
-      setVelocityY(-12);
-      setIsJumping(true);
-    }
-  }, [gameOver, isJumping]);
+  const handleKeyPress = useCallback(
+    (e: KeyboardEvent) => {
+      if (gameOver) return;
+
+      if (e.key === "ArrowLeft") {
+        setPlayerX((prev) => Math.max(0, prev - 3));
+      } else if (e.key === "ArrowRight") {
+        setPlayerX((prev) => Math.min(95, prev + 3));
+      } else if (e.key === " " && !isJumping) {
+        setVelocityY(-12);
+        setIsJumping(true);
+      }
+    },
+    [gameOver, isJumping],
+  );
 
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
   }, [handleKeyPress]);
 
   return (
@@ -173,7 +176,7 @@ export default function BibbleAdventure({ onNavigate }: BibbleAdventureProps) {
               left: `${platform.x}%`,
               top: `${platform.y}%`,
               width: `${platform.width}%`,
-              height: '20px',
+              height: "20px",
             }}
           />
         ))}
@@ -184,32 +187,35 @@ export default function BibbleAdventure({ onNavigate }: BibbleAdventureProps) {
           style={{
             left: `${playerX}%`,
             top: `${playerY}%`,
-            transform: 'translate(-50%, -50%)',
+            transform: "translate(-50%, -50%)",
           }}
         >
           <div className="text-5xl">🐻</div>
         </div>
 
         {/* Coins */}
-        {coins.map(coin => (
-          !coin.collected && (
-            <div
-              key={coin.id}
-              className="absolute animate-bounce"
-              style={{
-                left: `${coin.x}%`,
-                top: `${coin.y}%`,
-                transform: 'translate(-50%, -50%)',
-              }}
-            >
-              <div className="text-3xl">🪙</div>
-            </div>
-          )
-        ))}
+        {coins.map(
+          (coin) =>
+            !coin.collected && (
+              <div
+                key={coin.id}
+                className="absolute animate-bounce"
+                style={{
+                  left: `${coin.x}%`,
+                  top: `${coin.y}%`,
+                  transform: "translate(-50%, -50%)",
+                }}
+              >
+                <div className="text-3xl">🪙</div>
+              </div>
+            ),
+        )}
 
         {/* Collected coins indicator */}
         <div className="absolute bottom-4 right-4 bg-white px-4 py-2 rounded-lg border-3 border-yellow-400">
-          <span className="font-bold">Coins: {coins.filter(c => c.collected).length}/{coins.length}</span>
+          <span className="font-bold">
+            Coins: {coins.filter((c) => c.collected).length}/{coins.length}
+          </span>
         </div>
       </div>
     </GameLayout>

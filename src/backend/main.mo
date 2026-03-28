@@ -4,14 +4,15 @@ import UserApproval "user-approval/approval";
 import Storage "blob-storage/Storage";
 import Map "mo:core/Map";
 import Array "mo:core/Array";
-import Iter "mo:core/Iter";
-import Principal "mo:core/Principal";
-import Time "mo:core/Time";
-import Runtime "mo:core/Runtime";
-import Nat "mo:core/Nat";
-import Text "mo:core/Text";
 import Set "mo:core/Set";
 import List "mo:core/List";
+import Iter "mo:core/Iter";
+import Text "mo:core/Text";
+import Time "mo:core/Time";
+import Principal "mo:core/Principal";
+import Runtime "mo:core/Runtime";
+import Nat "mo:core/Nat";
+import Int "mo:core/Int";
 
 actor {
   include MixinStorage();
@@ -19,7 +20,7 @@ actor {
   let accessControlState = AccessControl.initState();
   let approvalState = UserApproval.initState(accessControlState);
 
-  let SPIN_COOLDOWN = 1200000000000; // 20 minutes
+  let SPIN_COOLDOWN = 1200000000000; // 20 minutes in nanoseconds
   let DEFAULT_TROPHIES : Nat = 70;
   let TROPHIES_PER_GAME : Nat = 2;
   let WELCOME_BACK_BONUS : Nat = 40;
@@ -37,13 +38,11 @@ actor {
     accessibilitySettings : AccessibilitySettings;
     avatarConfig : ?AvatarConfig;
   };
-
   public type AccessibilitySettings = {
     readAloudEnabled : Bool;
     highContrastMode : Bool;
     largeText : Bool;
   };
-
   public type AvatarConfig = {
     body : Text;
     head : Text;
@@ -52,7 +51,6 @@ actor {
     headwear : Text;
     shoes : Text;
   };
-
   public type GameProgress = {
     gameId : Text;
     highScore : Nat;
@@ -62,7 +60,6 @@ actor {
     lastPlayed : Int;
     difficulty : Text;
   };
-
   public type EclipseAIBehavior = {
     userId : Principal;
     gameId : Text;
@@ -74,7 +71,6 @@ actor {
     dialogueEvolution : [DialogueState];
     timestamp : Int;
   };
-
   public type PlayerAction = {
     actionType : Text;
     timestamp : Int;
@@ -100,7 +96,6 @@ actor {
     adaptationLevel : Nat;
     timestamp : Int;
   };
-
   public type Event = {
     id : Text;
     owner : Principal;
@@ -114,7 +109,6 @@ actor {
     isSeasonal : Bool;
     seasonalType : ?Text;
   };
-
   public type ChatMessage = {
     id : Text;
     sender : Principal;
@@ -124,13 +118,11 @@ actor {
     isGroupChat : Bool;
     groupId : ?Text;
   };
-
   public type OnlineUser = {
     userId : Principal;
     lastSeen : Int;
     isOnline : Bool;
   };
-
   public type CardDesign = {
     id : Text;
     owner : Principal;
@@ -138,7 +130,6 @@ actor {
     content : Text;
     createdAt : Int;
   };
-
   public type Joke = {
     id : Text;
     category : Text;
@@ -147,7 +138,6 @@ actor {
     approved : Bool;
     rating : Nat;
   };
-
   public type Feedback = {
     id : Text;
     submitter : Principal;
@@ -157,15 +147,14 @@ actor {
     response : ?Text;
     anonymous : Bool;
   };
-
   public type Reward = {
     userId : Principal;
     points : Nat;
     badges : [Text];
     achievements : [Text];
     virtualPetLevel : Nat;
+    totalTrophies : Nat;
   };
-
   public type ParentalControl = {
     childPrincipal : Principal;
     parentPrincipal : Principal;
@@ -174,7 +163,6 @@ actor {
     approvedContacts : [Principal];
     chatMonitoring : Bool;
   };
-
   public type Game = {
     id : Text;
     title : Text;
@@ -187,14 +175,12 @@ actor {
     lastPlayed : Int;
     isFavorite : Bool;
   };
-
   public type HubCategory = {
     id : Text;
     name : Text;
     description : Text;
     games : [Text];
   };
-
   public type SeasonalEvent = {
     id : Text;
     name : Text;
@@ -204,14 +190,12 @@ actor {
     activities : [Text];
     isActive : Bool;
   };
-
   public type MascotInteraction = {
     userId : Principal;
     interactionType : Text;
     timestamp : Int;
     message : Text;
   };
-
   public type StoryProject = {
     id : Text;
     owner : Principal;
@@ -221,7 +205,6 @@ actor {
     published : Bool;
     approved : Bool;
   };
-
   public type Scene = {
     background : Text;
     characters : [Character];
@@ -229,26 +212,22 @@ actor {
     animations : [Text];
     textBubbles : [TextBubble];
   };
-
   public type Character = {
     name : Text;
     position : { x : Nat; y : Nat };
     avatarConfig : AvatarConfig;
   };
-
   public type Prop = {
     name : Text;
     position : { x : Nat; y : Nat };
     type_ : Text;
   };
-
   public type TextBubble = {
     content : Text;
     position : { x : Nat; y : Nat };
     character : Text;
     style : Text;
   };
-
   public type CraftProject = {
     id : Text;
     category : Text;
@@ -260,7 +239,6 @@ actor {
     completedBy : [Principal];
     badges : [Text];
   };
-
   public type ArtGallerySubmission = {
     id : Text;
     owner : Principal;
@@ -271,13 +249,11 @@ actor {
     isPublic : Bool;
     approved : Bool;
   };
-
   public type SpinReward = {
     rewardType : Text;
     value : Text;
     timestamp : Int;
   };
-
   public type Sticker = {
     id : Text;
     creator : Principal;
@@ -286,7 +262,6 @@ actor {
     isModerated : Bool;
     approved : Bool;
   };
-
   public type VideoProject = {
     id : Text;
     owner : Principal;
@@ -300,7 +275,6 @@ actor {
     isPublic : Bool;
     approved : Bool;
   };
-
   public type MusicRemix = {
     id : Text;
     creator : Principal;
@@ -310,7 +284,16 @@ actor {
     isPublic : Bool;
     approved : Bool;
   };
-
+  public type MusicRemixStudio = {
+    id : Text;
+    creator : Principal;
+    title : Text;
+    tempo : Nat;
+    pitch : Int;
+    volume : Nat;
+    reverb : Nat;
+    delay : Nat;
+  };
   public type Certificate = {
     id : Text;
     userId : Principal;
@@ -322,7 +305,6 @@ actor {
     backgroundColor : Text;
     theme : Text;
   };
-
   public type InteractiveShort = {
     id : Text;
     title : Text;
@@ -334,7 +316,6 @@ actor {
     isPublic : Bool;
     approved : Bool;
   };
-
   public type ShortScene = {
     id : Text;
     description : Text;
@@ -344,20 +325,17 @@ actor {
     backgroundMusic : ?Text;
     visualStyles : VisualStyle;
   };
-
   public type ShortChoice = {
     id : Text;
     description : Text;
     leadsToScene : Text;
   };
-
   public type VisualStyle = {
     colorPalette : [Text];
     animationType : Text;
     transitionEffects : [Text];
     sceneryType : Text;
   };
-
   public type GreenScreenFun = {
     id : Text;
     owner : Principal;
@@ -373,7 +351,6 @@ actor {
     isPublic : Bool;
     approved : Bool;
   };
-
   public type KaraokeMode = {
     songId : Text;
     owner : Principal;
@@ -388,7 +365,6 @@ actor {
     recordingUrl : ?Text;
     isPublic : Bool;
   };
-
   public type DanceRoutine = {
     id : Text;
     owner : Principal;
@@ -401,7 +377,6 @@ actor {
     encouragementMessages : [Text];
     completedBy : [Principal];
   };
-
   public type CreativeFunHub = {
     userId : Principal;
     shortsWatched : Nat;
@@ -411,14 +386,12 @@ actor {
     preferences : CreativeFunPreferences;
     lastAccessed : Int;
   };
-
   public type CreativeFunPreferences = {
     preferredVisualStyle : Text;
     mascotVoiceEnabled : Bool;
     language : Text;
     accessibilityMode : Bool;
   };
-
   public type LearnHub = {
     userId : Principal;
     readingProgress : ReadingProgress;
@@ -428,14 +401,12 @@ actor {
     preferences : LearnHubPreferences;
     lastAccessed : Int;
   };
-
   public type LearnHubPreferences = {
     preferredCategory : Text;
     mascotVoiceEnabled : Bool;
     language : Text;
     accessibilityMode : Bool;
   };
-
   public type Lesson = {
     id : Text;
     title : Text;
@@ -447,25 +418,21 @@ actor {
     attempts : Nat;
     starsEarned : [Text];
   };
-
   public type ReadingProgress = {
     progressLevel : Text;
     lessonsCompleted : [Lesson];
     starsEarned : [Text];
   };
-
   public type ScienceProgress = {
     focusArea : Text;
     lessonsCompleted : [Lesson];
     badgesEarned : [Text];
   };
-
   public type ArtsMusicProgress = {
     progressArea : Text;
     lessonsCompleted : [Lesson];
     artisticAchievements : [Text];
   };
-
   public type DiscoveryZoneProgress = {
     curiosityScore : Nat;
     lessonsCompleted : [Lesson];
@@ -474,7 +441,6 @@ actor {
     currentInventionStoryId : ?Text;
     lastStoryStartedAt : ?Time.Time;
   };
-
   public type VirtualPetHub = {
     userId : Principal;
     petName : Text;
@@ -486,7 +452,6 @@ actor {
     warnedAboutExtremeChanges : Bool;
     trophies : Nat;
   };
-
   public type RecentlyPlayedItem = {
     activityId : Text;
     title : Text;
@@ -494,7 +459,6 @@ actor {
     timestamp : Time.Time;
     difficulty : Text;
   };
-
   public type SmartHubData = {
     userId : Principal;
     recommendedActivities : [Text];
@@ -506,7 +470,6 @@ actor {
     dailyPickChangedAt : Time.Time;
     dailyPickPrevious : ?Text;
   };
-
   public type InventionStory = {
     id : Text;
     title : Text;
@@ -526,14 +489,12 @@ actor {
     funFacts : [Text];
     mascotCommentary : [Text];
   };
-
   public type AdminUserStatus = {
     #active;
     #restricted;
     #suspended;
     #banned;
   };
-
   public type AdminStatusRecord = {
     userId : Principal;
     status : AdminUserStatus;
@@ -541,7 +502,6 @@ actor {
     changedBy : Principal;
     changedAt : Time.Time;
   };
-
   public type AdminFeatureRestriction = {
     userId : Principal;
     feature : Text;
@@ -550,13 +510,11 @@ actor {
     createdAt : Time.Time;
     updatedAt : ?Time.Time;
   };
-
   public type AdminDashboardOverview = {
     activeUsers : [Principal];
     userStats : { total : Nat; active : Nat; restricted : Nat; suspended : Nat; banned : Nat };
     activitySummary : { recentActivities : Nat; systemEvents : Nat };
   };
-
   public type AdminDashboardSection = {
     overview : AdminDashboardOverview;
     manageUsers : [UserProfile];
@@ -564,7 +522,6 @@ actor {
     settings : { adminPreferences : Text };
     safetyAlerts : [Text];
   };
-
   public type TicTacToe = {
     userId : ?Principal;
     opponentId : ?Principal;
@@ -572,20 +529,17 @@ actor {
     moves : [Move];
     outcome : TicTacToeOutcome;
   };
-
   public type Move = {
     player : Text;
     playerId : ?Principal;
     x : Nat;
     y : Nat;
   };
-
   public type TicTacToeOutcome = {
     #won : Text;
     #draw;
     #ongoing;
   };
-
   public type Badge = {
     name : Text;
     description : Text;
@@ -593,20 +547,17 @@ actor {
     requirement : Text;
     rewardPoints : Nat;
   };
-
   public type BadgeProof = {
     badge : Badge;
     proof : Text;
     timestamp : Int;
   };
-
   public type SpinRewardUpdate = {
     spinReward : SpinReward;
     badgesEarned : [BadgeProof];
     pointsAwarded : Nat;
     extraSpin : Bool;
   };
-
   public type ScaryHubGameEntry = {
     id : Text;
     title : Text;
@@ -621,7 +572,6 @@ actor {
     lastPlayed : Int;
     isFavorite : Bool;
   };
-
   public type VideoChannelCategory = {
     categoryId : Text;
     name : Text;
@@ -629,7 +579,6 @@ actor {
     description : Text;
     channels : [VideoChannel];
   };
-
   public type VideoChannel = {
     channelId : Text;
     name : Text;
@@ -646,12 +595,10 @@ actor {
     totalVideos : Nat;
     views : Nat;
   };
-
   public type ActivityType = {
     #user_created;
     #game_played : { gameId : Text; gameName : Text };
   };
-
   public type ActivityEvent = {
     id : Nat;
     userId : Principal;
@@ -687,6 +634,7 @@ actor {
   let lastSpinTime = Map.empty<Principal, Int>();
   let stickers = Map.empty<Text, Sticker>();
   let musicRemixes = Map.empty<Text, MusicRemix>();
+  let musicRemixStudios = Map.empty<Text, MusicRemixStudio>();
   let certificates = Map.empty<Text, Certificate>();
   let interactiveShorts = Map.empty<Text, InteractiveShort>();
   let greenScreenFun = Map.empty<Text, GreenScreenFun>();
@@ -706,7 +654,7 @@ actor {
   let userFavoriteChannels = Map.empty<Principal, Set.Set<Text>>();
 
   let activityLog = List.empty<ActivityEvent>();
-  var nextActivityId = 0;
+  var nextActivityId : Nat = 0;
 
   public shared ({ caller }) func initializeAccessControl() : async () {
     AccessControl.initialize(accessControlState, caller);
@@ -717,6 +665,7 @@ actor {
   };
 
   public shared ({ caller }) func assignCallerUserRole(user : Principal, role : AccessControl.UserRole) : async () {
+    // Admin-only guard is enforced inside AccessControl.assignRole
     AccessControl.assignRole(accessControlState, caller, user, role);
   };
 
@@ -748,7 +697,7 @@ actor {
 
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can save profiles");
+      Runtime.trap("Unauthorized: Only users can access profiles");
     };
     userProfiles.get(caller);
   };
@@ -765,7 +714,6 @@ actor {
       Runtime.trap("Unauthorized: Only users can save profiles");
     };
 
-    // Only record user_created activity if this is the first time creating a profile
     let isNewProfile = switch (userProfiles.get(caller)) {
       case (null) { true };
       case (?_) { false };
@@ -785,417 +733,145 @@ actor {
     };
   };
 
-  // Story Builder Functions with proper authorization
-
-  // User can save their own story project
-  public shared ({ caller }) func saveStoryProject(story : StoryProject) : async () {
+  public query ({ caller }) func getTotalScore() : async Nat {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can save stories");
+      Runtime.trap("Unauthorized: Only users can view their total score");
     };
-
-    if (story.owner != caller) {
-      Runtime.trap("Unauthorized: Cannot save story for another user");
+    switch (rewards.get(caller)) {
+      case (?reward) { reward.points };
+      case (null) { 0 };
     };
-
-    storyProjects.add(story.id, story);
   };
 
-  // User retrieves all their own story projects
-  public query ({ caller }) func getCallerStoryProjects() : async [StoryProject] {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can view stories");
-    };
-
-    let allStories = storyProjects.values().toArray();
-    allStories.filter<StoryProject>(func(story) { story.owner == caller });
+  public type SpinWheelResult = {
+    pointsAdded : Nat;
+    remainingCooldown : Nat;
+    message : Text;
   };
 
-  // User or admin can view a specific story project
-  public query ({ caller }) func getStoryProject(storyId : Text) : async ?StoryProject {
+  public shared ({ caller }) func claimSpinReward(points : Nat) : async SpinWheelResult {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can view stories");
+      Runtime.trap("Unauthorized: Only users can claim spin rewards");
     };
+    let now = Time.now();
+    let lastSpin = switch (lastSpinTime.get(caller)) {
+      case (?t) { t };
+      case (null) { 0 };
+    };
+    // Enforce 20-minute cooldown
+    if (now - lastSpin < SPIN_COOLDOWN) {
+      let remaining = ((lastSpin + SPIN_COOLDOWN) - now) / 1_000_000_000;
+      return {
+        pointsAdded = 0;
+        // Always convert remaining to Nat type, using Int::toNat() from mo:core module for type compatibility.
+        remainingCooldown = remaining.toNat();
+        message = "SPIN IS ON COOLDOWN";
+      };
+    };
+    // Record the spin timestamp
+    lastSpinTime.add(caller, now);
+    // Add points EXCLUSIVELY to VirtualPetHub trophies (not to any other score/reward field)
+    let currentPet = switch (virtualPetHubMap.get(caller)) {
+      case (?p) { p };
+      case (null) {
+        {
+          userId = caller;
+          petName = "";
+          happinessLevel = 0;
+          growthStage = 0;
+          accessories = [];
+          decorations = [];
+          homeStyle = "";
+          warnedAboutExtremeChanges = false;
+          trophies = 0;
+        };
+      };
+    };
+    let updatedPet : VirtualPetHub = {
+      currentPet with
+      trophies = currentPet.trophies + points;
+    };
+    virtualPetHubMap.add(caller, updatedPet);
+    {
+      pointsAdded = points;
+      remainingCooldown = 0;
+      message = "Points added to Virtual Pet";
+    };
+  };
 
-    switch (storyProjects.get(storyId)) {
-      case (?story) {
-        // Owner can view their own story, admin can view any story
-        if (story.owner == caller or AccessControl.isAdmin(accessControlState, caller)) {
-          ?story;
+  public query ({ caller }) func getRemainingSpinCooldown() : async Nat {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can check spin cooldown");
+    };
+    let now = Time.now();
+    switch (lastSpinTime.get(caller)) {
+      case (?last) {
+        if (now - last < SPIN_COOLDOWN) {
+          let remaining = ((last + SPIN_COOLDOWN) - now) / 1_000_000_000;
+          // Always convert remaining to Nat type, using Int::toNat() from mo:core module for type compatibility.
+          remaining.toNat();
         } else {
-          Runtime.trap("Unauthorized: Can only view your own stories");
+          0;
         };
       };
-      case (null) { null };
+      case (null) { 0 };
     };
   };
 
-  // User can update their own story project
-  public shared ({ caller }) func updateStoryProject(storyId : Text, updatedStory : StoryProject) : async () {
+  public query ({ caller }) func getVirtualPetHub() : async ?VirtualPetHub {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can update stories");
-    };
-
-    switch (storyProjects.get(storyId)) {
-      case (?existingStory) {
-        if (existingStory.owner != caller) {
-          Runtime.trap("Unauthorized: Can only update your own stories");
-        };
-
-        if (updatedStory.owner != caller) {
-          Runtime.trap("Unauthorized: Cannot change story ownership");
-        };
-
-        storyProjects.add(storyId, updatedStory);
-      };
-      case (null) {
-        Runtime.trap("Story not found");
-      };
-    };
-  };
-
-  // User can delete their own story project
-  public shared ({ caller }) func deleteStoryProject(storyId : Text) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can delete stories");
-    };
-
-    switch (storyProjects.get(storyId)) {
-      case (?story) {
-        if (story.owner != caller and not AccessControl.isAdmin(accessControlState, caller)) {
-          Runtime.trap("Unauthorized: Can only delete your own stories");
-        };
-
-        storyProjects.remove(storyId);
-      };
-      case (null) {
-        Runtime.trap("Story not found");
-      };
-    };
-  };
-
-  // User can publish their story (requires parental approval in specification)
-  public shared ({ caller }) func publishStoryProject(storyId : Text) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can publish stories");
-    };
-
-    switch (storyProjects.get(storyId)) {
-      case (?story) {
-        if (story.owner != caller) {
-          Runtime.trap("Unauthorized: Can only publish your own stories");
-        };
-
-        let updatedStory = {
-          story with
-          published = true;
-          approved = false; // Requires admin approval
-        };
-
-        storyProjects.add(storyId, updatedStory);
-      };
-      case (null) {
-        Runtime.trap("Story not found");
-      };
-    };
-  };
-
-  // Admin can view all story projects for moderation
-  public query ({ caller }) func getAllStoryProjects() : async [StoryProject] {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admins can view all stories");
-    };
-
-    storyProjects.values().toArray();
-  };
-
-  // Admin can approve a published story
-  public shared ({ caller }) func approveStoryProject(storyId : Text) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admins can approve stories");
-    };
-
-    switch (storyProjects.get(storyId)) {
-      case (?story) {
-        let updatedStory = {
-          story with
-          approved = true;
-        };
-
-        storyProjects.add(storyId, updatedStory);
-      };
-      case (null) {
-        Runtime.trap("Story not found");
-      };
-    };
-  };
-
-  // Virtual Pet Hub Functions
-  public query ({ caller }) func getCallerVirtualPet() : async ?VirtualPetHub {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can access virtual pets");
+      Runtime.trap("Unauthorized: Only users can view their virtual pet");
     };
     virtualPetHubMap.get(caller);
   };
 
-  public query ({ caller }) func getVirtualPet(user : Principal) : async ?VirtualPetHub {
-    if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Can only view your own virtual pet");
-    };
-    virtualPetHubMap.get(user);
-  };
-
-  public shared ({ caller }) func saveCallerVirtualPet(pet : VirtualPetHub) : async () {
+  public shared ({ caller }) func saveVirtualPetHub(pet : VirtualPetHub) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can save virtual pets");
+      Runtime.trap("Unauthorized: Only users can update their virtual pet");
     };
-
-    if (pet.userId != caller) {
-      Runtime.trap("Unauthorized: Cannot save virtual pet for another user");
-    };
-
-    virtualPetHubMap.add(caller, pet);
+    virtualPetHubMap.add(caller, { pet with userId = caller });
   };
 
-  // Allow guests to browse games for trial gameplay (pre-login experience)
-  public query ({ caller }) func getScaryHubGames() : async [ScaryHubGameEntry] {
-    // No authorization check - guests can browse games for trial gameplay
-    scaryHubGames.values().toArray();
-  };
-
-  public shared ({ caller }) func updateGamesTrophies() : async Nat {
+  public query ({ caller }) func getCallerRewards() : async ?Reward {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can update trophies from games");
+      Runtime.trap("Unauthorized: Only users can view their rewards");
     };
-
-    let currentTrophies = switch (virtualPetHubMap.get(caller)) {
-      case (?existingPet) { existingPet.trophies };
-      case (null) { DEFAULT_TROPHIES };
-    };
-
-    if (currentTrophies < TROPHIES_PER_GAME) {
-      Runtime.trap("Not enough trophies to play a game");
-    };
-
-    let userId : Principal = caller;
-
-    let updatedTrophies = currentTrophies - TROPHIES_PER_GAME;
-
-    let currentPet = switch (virtualPetHubMap.get(userId)) {
-      case (?pet) { pet };
-      case null {
-        {
-          userId;
-          petName = "Pet";
-          happinessLevel = 0;
-          growthStage = 0;
-          accessories = [];
-          decorations = [];
-          homeStyle = "";
-          warnedAboutExtremeChanges = false;
-          trophies = 0;
-        };
-      };
-    };
-
-    let updatedPet : VirtualPetHub = {
-      currentPet with
-      trophies = updatedTrophies;
-    };
-    virtualPetHubMap.add(userId, updatedPet);
-
-    updatedTrophies;
+    rewards.get(caller);
   };
 
-  public shared ({ caller }) func welcomeBackReward() : async () {
+  public shared ({ caller }) func saveCallerRewards(reward : Reward) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can receive welcome back rewards");
+      Runtime.trap("Unauthorized: Only users can update their rewards");
     };
-
-    let currentTrophies = switch (virtualPetHubMap.get(caller)) {
-      case (?existingPet) { existingPet.trophies };
-      case (null) { DEFAULT_TROPHIES };
-    };
-
-    let updatedTrophies = currentTrophies + WELCOME_BACK_BONUS;
-    let userId : Principal = caller;
-
-    let currentPet = switch (virtualPetHubMap.get(userId)) {
-      case (?pet) { pet };
-      case null {
-        {
-          userId;
-          petName = "Pet";
-          happinessLevel = 0;
-          growthStage = 0;
-          accessories = [];
-          decorations = [];
-          homeStyle = "";
-          warnedAboutExtremeChanges = false;
-          trophies = 0;
-        };
-      };
-    };
-
-    let updatedPet : VirtualPetHub = {
-      currentPet with
-      trophies = updatedTrophies;
-    };
-    virtualPetHubMap.add(userId, updatedPet);
+    rewards.add(caller, { reward with userId = caller });
   };
 
-  // Video Hub Functions
-  // Admin-only: Add new video channel
-  public shared ({ caller }) func addVideoChannel(channel : VideoChannel) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admins can add video channels");
-    };
-    videoChannels.add(channel.channelId, channel);
-  };
-
-  // Admin-only: Update existing video channel
-  public shared ({ caller }) func updateVideoChannel(channelId : Text, updatedChannel : VideoChannel) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admins can update video channels");
-    };
-
-    switch (videoChannels.get(channelId)) {
-      case (?_) {
-        videoChannels.add(channelId, updatedChannel);
-      };
-      case (null) {
-        Runtime.trap("Video channel not found");
-      };
-    };
-  };
-
-  // Admin-only: Delete video channel
-  public shared ({ caller }) func deleteVideoChannel(channelId : Text) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admins can delete video channels");
-    };
-
-    switch (videoChannels.get(channelId)) {
-      case (?_) {
-        videoChannels.remove(channelId);
-      };
-      case (null) {
-        Runtime.trap("Video channel not found");
-      };
-    };
-  };
-
-  // Public: Get all video channels (browsing is public for kids, including guests)
-  public query ({ caller }) func getVideoChannels() : async [VideoChannel] {
-    // No authorization check - guests can browse video channels
-    videoChannels.values().toArray();
-  };
-
-  // Public: Get specific video channel details (browsing is public for kids, including guests)
-  public query ({ caller }) func getVideoChannel(channelId : Text) : async ?VideoChannel {
-    // No authorization check - guests can view video channel details
-    videoChannels.get(channelId);
-  };
-
-  // User-only: Update video channel views (requires authentication to prevent abuse)
-  public shared ({ caller }) func updateVideoChannelViews(channelId : Text) : async () {
+  public query ({ caller }) func getSpinRewards() : async [SpinReward] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can update video views");
+      Runtime.trap("Unauthorized: Only users can view their spin rewards");
     };
-
-    switch (videoChannels.get(channelId)) {
-      case (?channel) {
-        let updatedChannel = {
-          channel with
-          views = channel.views + 1;
-          lastPlayed = ?Time.now();
-        };
-        videoChannels.add(channelId, updatedChannel);
-      };
-      case (null) {
-        Runtime.trap("Video channel not found");
-      };
-    };
-  };
-
-  // User-only: Mark channel as favorite
-  public shared ({ caller }) func markChannelAsFavorite(channelId : Text) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can mark favorites");
-    };
-
-    switch (videoChannels.get(channelId)) {
-      case (?_) {
-        let userFavorites = switch (userFavoriteChannels.get(caller)) {
-          case (?favorites) { favorites };
-          case (null) { Set.empty<Text>() };
-        };
-
-        userFavorites.add(channelId);
-        userFavoriteChannels.add(caller, userFavorites);
-      };
-      case (null) {
-        Runtime.trap("Video channel not found");
-      };
-    };
-  };
-
-  // User-only: Unmark channel as favorite
-  public shared ({ caller }) func unmarkChannelAsFavorite(channelId : Text) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can unmark favorites");
-    };
-
-    switch (userFavoriteChannels.get(caller)) {
-      case (?favorites) {
-        favorites.remove(channelId);
-        userFavoriteChannels.add(caller, favorites);
-      };
-      case (null) {};
-    };
-  };
-
-  // User-only: Get caller's favorite channels
-  public query ({ caller }) func getCallerFavoriteChannels() : async [Text] {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can view favorites");
-    };
-
-    switch (userFavoriteChannels.get(caller)) {
-      case (?favorites) {
-        favorites.toArray();
-      };
+    switch (spinRewards.get(caller)) {
+      case (?sr) { sr };
       case (null) { [] };
     };
   };
 
-  // Record game_played activity event for user
-  public shared ({ caller }) func recordGamePlay(gameId : Text, gameName : Text) : async () {
-    if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
-      Runtime.trap("Unauthorized: Only users can record game play activities");
+  public shared ({ caller }) func recordSpinReward(reward : SpinReward) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can record spin rewards");
     };
-
-    let activity : ActivityEvent = {
-      id = nextActivityId;
-      userId = caller;
-      activityType = #game_played({ gameId; gameName });
-      timestamp = Time.now();
+    let existing = switch (spinRewards.get(caller)) {
+      case (?sr) { sr };
+      case (null) { [] };
     };
-
-    nextActivityId += 1;
-    activityLog.add(activity);
+    spinRewards.add(caller, existing.concat([reward]));
+    // NOTE: lastSpinTime is NOT updated here; cooldown is enforced only in claimSpinReward.
   };
 
-  // Admin-only: fetch the most recent activity events
-  public query ({ caller }) func getRecentActivityEvents(limit : Nat) : async [ActivityEvent] {
-    if (not AccessControl.hasPermission(accessControlState, caller, #admin)) {
-      Runtime.trap("Unauthorized: Only admins can fetch activity events");
+  public query ({ caller }) func getLastSpinTime() : async ?Int {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view their spin time");
     };
-
-    let activityArray = activityLog.toArray();
-    let total = activityArray.size();
-    if (total == 0) { return [] };
-
-    let startIndex = if (limit >= total) { 0 } else { total - limit };
-    Array.tabulate<ActivityEvent>(Nat.min(limit, total), func(i) { activityArray[startIndex + i] });
+    lastSpinTime.get(caller);
   };
 };

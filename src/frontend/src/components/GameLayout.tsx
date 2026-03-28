@@ -1,13 +1,32 @@
-import { ReactNode, useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ArrowLeft, RotateCcw, Volume2, VolumeX, Trophy, Star, Sparkles, TrendingUp } from 'lucide-react';
-import { toast } from 'sonner';
-import { ModulePage } from '../App';
-import { useGetUserTrophies, useUpdateGamesTrophies } from '../hooks/useQueries';
-import { triggerAchievementCelebration } from './AchievementCelebration';
-import { showEmotionFeedback } from './EmotionFeedback';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  ArrowLeft,
+  RotateCcw,
+  Sparkles,
+  Star,
+  TrendingUp,
+  Trophy,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
+import { type ReactNode, useEffect, useState } from "react";
+import { toast } from "sonner";
+import type { ModulePage } from "../App";
+import {
+  useGetUserTrophies,
+  useUpdateGamesTrophies,
+} from "../hooks/useQueries";
+import { triggerAchievementCelebration } from "./AchievementCelebration";
+import { showEmotionFeedback } from "./EmotionFeedback";
 
 interface GameLayoutProps {
   title: string;
@@ -37,7 +56,7 @@ export default function GameLayout({
 
   useEffect(() => {
     if (gameOver && score > highScore) {
-      toast.success('🎉 New High Score!', {
+      toast.success("🎉 New High Score!", {
         description: `You scored ${score} points!`,
       });
     }
@@ -45,21 +64,25 @@ export default function GameLayout({
 
   const handleUpgradePet = async () => {
     if (trophies < 2) {
-      toast.error('Not enough trophies! You need 2 trophies to upgrade your pet.');
+      toast.error(
+        "Not enough trophies! You need 2 trophies to upgrade your pet.",
+      );
       return;
     }
 
     try {
       const newTrophies = await updateTrophiesMutation.mutateAsync();
-      toast.success(`🏆 Pet Upgraded! You now have ${newTrophies} trophies remaining.`);
-      showEmotionFeedback('Your pet is so happy! 🐾');
-      triggerAchievementCelebration('Pet Upgraded!', 'confetti');
+      toast.success(
+        `🏆 Pet Upgraded! You now have ${newTrophies} trophies remaining.`,
+      );
+      showEmotionFeedback("Your pet is so happy! 🐾");
+      triggerAchievementCelebration("Pet Upgraded!", "confetti");
       setShowUpgradeDialog(false);
     } catch (error: any) {
-      if (error.message && error.message.includes('Not enough trophies')) {
-        toast.error('Not enough trophies to upgrade your pet!');
+      if (error.message?.includes("Not enough trophies")) {
+        toast.error("Not enough trophies to upgrade your pet!");
       } else {
-        toast.error('Failed to upgrade pet. Please try again.');
+        toast.error("Failed to upgrade pet. Please try again.");
       }
     }
   };
@@ -75,14 +98,14 @@ export default function GameLayout({
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => onNavigate('games')}
+                  onClick={() => onNavigate("games")}
                   className="border-3"
                 >
                   <ArrowLeft className="w-5 h-5" />
                 </Button>
                 <CardTitle className="text-2xl md:text-3xl">{title}</CardTitle>
               </div>
-              
+
               <div className="flex items-center gap-3 flex-wrap">
                 {showScore && (
                   <>
@@ -92,25 +115,31 @@ export default function GameLayout({
                     </div>
                     <div className="flex items-center gap-2 bg-purple-100 px-4 py-2 rounded-lg border-3 border-purple-300">
                       <Trophy className="w-5 h-5 text-purple-600" />
-                      <span className="font-bold text-lg">Best: {highScore}</span>
+                      <span className="font-bold text-lg">
+                        Best: {highScore}
+                      </span>
                     </div>
                   </>
                 )}
-                
+
                 <div className="flex items-center gap-2 bg-orange-100 px-4 py-2 rounded-lg border-3 border-orange-300">
                   <Trophy className="w-5 h-5 text-orange-600" />
                   <span className="font-bold text-lg">{trophies} 🏆</span>
                 </div>
-                
+
                 <Button
                   variant="outline"
                   size="icon"
                   onClick={() => setSoundEnabled(!soundEnabled)}
                   className="border-3"
                 >
-                  {soundEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+                  {soundEnabled ? (
+                    <Volume2 className="w-5 h-5" />
+                  ) : (
+                    <VolumeX className="w-5 h-5" />
+                  )}
                 </Button>
-                
+
                 <Button
                   variant="outline"
                   size="icon"
@@ -126,9 +155,7 @@ export default function GameLayout({
 
         {/* Game Content */}
         <Card className="border-4">
-          <CardContent className="p-0">
-            {children}
-          </CardContent>
+          <CardContent className="p-0">{children}</CardContent>
         </Card>
 
         {/* Game Over Overlay */}
@@ -137,18 +164,22 @@ export default function GameLayout({
             <Card className="border-4 max-w-md w-full">
               <CardHeader>
                 <CardTitle className="text-3xl text-center">
-                  {score > highScore ? '🎉 New High Score! 🎉' : 'Game Over!'}
+                  {score > highScore ? "🎉 New High Score! 🎉" : "Game Over!"}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="text-center space-y-2">
-                  <div className="text-5xl font-bold text-purple-600">{score}</div>
+                  <div className="text-5xl font-bold text-purple-600">
+                    {score}
+                  </div>
                   <div className="text-gray-600">Your Score</div>
                   {highScore > 0 && (
-                    <div className="text-sm text-gray-500">Previous Best: {highScore}</div>
+                    <div className="text-sm text-gray-500">
+                      Previous Best: {highScore}
+                    </div>
                   )}
                 </div>
-                
+
                 <div className="flex gap-3">
                   <Button
                     onClick={onRestart}
@@ -165,9 +196,9 @@ export default function GameLayout({
                     Upgrade Pet
                   </Button>
                 </div>
-                
+
                 <Button
-                  onClick={() => onNavigate('games')}
+                  onClick={() => onNavigate("games")}
                   variant="outline"
                   className="w-full text-lg h-12 font-bold border-3"
                 >
@@ -190,7 +221,7 @@ export default function GameLayout({
                 Use your trophies to upgrade your virtual pet and help it grow!
               </DialogDescription>
             </DialogHeader>
-            
+
             <div className="space-y-6 py-4">
               <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-lg border-3 border-purple-300">
                 <div className="text-center space-y-4">
@@ -198,7 +229,9 @@ export default function GameLayout({
                   <div className="space-y-2">
                     <div className="flex items-center justify-center gap-2">
                       <Trophy className="w-6 h-6 text-orange-600" />
-                      <span className="text-2xl font-bold">{trophies} Trophies</span>
+                      <span className="text-2xl font-bold">
+                        {trophies} Trophies
+                      </span>
                     </div>
                     <p className="text-sm text-gray-600">
                       Each game costs 2 trophies to play
@@ -221,14 +254,17 @@ export default function GameLayout({
                     <Star className="w-5 h-5 text-green-600" />
                     <span className="font-bold">Benefits:</span>
                   </div>
-                  <span className="text-sm font-bold text-green-600">Pet Growth & Happiness</span>
+                  <span className="text-sm font-bold text-green-600">
+                    Pet Growth & Happiness
+                  </span>
                 </div>
               </div>
 
               {trophies < 2 && (
                 <div className="bg-yellow-50 p-4 rounded-lg border-2 border-yellow-300">
                   <p className="text-sm text-yellow-800 text-center font-bold">
-                    ⚠️ Not enough trophies! Play more games or visit the Virtual Pet Hub to earn more.
+                    ⚠️ Not enough trophies! Play more games or visit the Virtual
+                    Pet Hub to earn more.
                   </p>
                 </div>
               )}
@@ -253,7 +289,7 @@ export default function GameLayout({
                 )}
               </Button>
               <Button
-                onClick={() => onNavigate('virtual-pet-hub')}
+                onClick={() => onNavigate("virtual-pet-hub")}
                 variant="outline"
                 className="w-full sm:w-auto border-3"
               >
@@ -266,4 +302,3 @@ export default function GameLayout({
     </div>
   );
 }
-

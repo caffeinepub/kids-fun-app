@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import GameLayout from '../../components/GameLayout';
-import { ModulePage } from '../../App';
+import { useEffect, useState } from "react";
+import type { ModulePage } from "../../App";
+import GameLayout from "../../components/GameLayout";
 
 interface Ride {
   id: number;
@@ -17,18 +17,22 @@ interface ThemeParkBuilderProps {
 }
 
 const rideTypes = [
-  { type: 'roller-coaster', emoji: '🎢', cost: 100, income: 20 },
-  { type: 'ferris-wheel', emoji: '🎡', cost: 150, income: 30 },
-  { type: 'carousel', emoji: '🎠', cost: 80, income: 15 },
-  { type: 'bumper-cars', emoji: '🚗', cost: 120, income: 25 },
+  { type: "roller-coaster", emoji: "🎢", cost: 100, income: 20 },
+  { type: "ferris-wheel", emoji: "🎡", cost: 150, income: 30 },
+  { type: "carousel", emoji: "🎠", cost: 80, income: 15 },
+  { type: "bumper-cars", emoji: "🚗", cost: 120, income: 25 },
 ];
 
-export default function ThemeParkBuilder({ onNavigate }: ThemeParkBuilderProps) {
+export default function ThemeParkBuilder({
+  onNavigate,
+}: ThemeParkBuilderProps) {
   const [score, setScore] = useState(0);
   const [cash, setCash] = useState(200);
   const [happiness, setHappiness] = useState(50);
   const [rides, setRides] = useState<Ride[]>([]);
-  const [selectedRide, setSelectedRide] = useState<typeof rideTypes[0] | null>(null);
+  const [selectedRide, setSelectedRide] = useState<
+    (typeof rideTypes)[0] | null
+  >(null);
   const [gameOver, setGameOver] = useState(false);
   const [highScore, setHighScore] = useState(0);
   const [nextId, setNextId] = useState(0);
@@ -50,12 +54,12 @@ export default function ThemeParkBuilder({ onNavigate }: ThemeParkBuilderProps) 
 
     const incomeInterval = setInterval(() => {
       const totalIncome = rides.reduce((sum, ride) => sum + ride.income, 0);
-      setCash(prev => prev + totalIncome);
-      setScore(prev => prev + totalIncome);
-      
+      setCash((prev) => prev + totalIncome);
+      setScore((prev) => prev + totalIncome);
+
       // Update happiness based on rides
       const targetHappiness = Math.min(100, 50 + rides.length * 5);
-      setHappiness(prev => {
+      setHappiness((prev) => {
         if (prev < targetHappiness) return Math.min(100, prev + 2);
         if (prev > targetHappiness) return Math.max(0, prev - 2);
         return prev;
@@ -86,22 +90,25 @@ export default function ThemeParkBuilder({ onNavigate }: ThemeParkBuilderProps) 
     const gridY = Math.floor(y / 15) * 15 + 7.5;
 
     // Check if spot is occupied
-    const occupied = rides.some(ride => 
-      Math.abs(ride.x - gridX) < 10 && Math.abs(ride.y - gridY) < 10
+    const occupied = rides.some(
+      (ride) => Math.abs(ride.x - gridX) < 10 && Math.abs(ride.y - gridY) < 10,
     );
 
     if (!occupied) {
-      setRides(prev => [...prev, {
-        id: nextId,
-        type: selectedRide.type,
-        x: gridX,
-        y: gridY,
-        cost: selectedRide.cost,
-        income: selectedRide.income,
-        emoji: selectedRide.emoji,
-      }]);
-      setCash(prev => prev - selectedRide.cost);
-      setNextId(id => id + 1);
+      setRides((prev) => [
+        ...prev,
+        {
+          id: nextId,
+          type: selectedRide.type,
+          x: gridX,
+          y: gridY,
+          cost: selectedRide.cost,
+          income: selectedRide.income,
+          emoji: selectedRide.emoji,
+        },
+      ]);
+      setCash((prev) => prev - selectedRide.cost);
+      setNextId((id) => id + 1);
       setSelectedRide(null);
     }
   };
@@ -134,22 +141,24 @@ export default function ThemeParkBuilder({ onNavigate }: ThemeParkBuilderProps) 
         {rides.length === 0 && (
           <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-white px-6 py-3 rounded-lg border-4 border-purple-300 z-20 text-center max-w-md">
             <p className="font-bold">Build rides to attract visitors!</p>
-            <p className="text-sm">Select a ride below, then click to place it</p>
+            <p className="text-sm">
+              Select a ride below, then click to place it
+            </p>
           </div>
         )}
 
         {/* Ride selector */}
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white p-4 rounded-lg border-4 border-purple-300 z-20">
           <div className="flex gap-3">
-            {rideTypes.map(ride => (
+            {rideTypes.map((ride) => (
               <button
                 key={ride.type}
                 onClick={() => setSelectedRide(ride)}
                 disabled={cash < ride.cost}
                 className={`p-3 rounded border-3 transition-all ${
-                  selectedRide?.type === ride.type 
-                    ? 'border-purple-600 bg-purple-100 scale-110' 
-                    : 'border-gray-300'
+                  selectedRide?.type === ride.type
+                    ? "border-purple-600 bg-purple-100 scale-110"
+                    : "border-gray-300"
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 <div className="text-4xl mb-1">{ride.emoji}</div>
@@ -161,29 +170,37 @@ export default function ThemeParkBuilder({ onNavigate }: ThemeParkBuilderProps) 
         </div>
 
         {/* Park area */}
-        <div 
+        <div
           className="absolute inset-0 cursor-crosshair"
           onClick={handleClick}
         >
           {/* Grid */}
           <div className="absolute inset-0 opacity-20">
             {Array.from({ length: 7 }).map((_, i) => (
-              <div key={`h-${i}`} className="absolute w-full h-px bg-gray-400" style={{ top: `${i * 15}%` }} />
+              <div
+                key={`h-${i}`}
+                className="absolute w-full h-px bg-gray-400"
+                style={{ top: `${i * 15}%` }}
+              />
             ))}
             {Array.from({ length: 7 }).map((_, i) => (
-              <div key={`v-${i}`} className="absolute h-full w-px bg-gray-400" style={{ left: `${i * 15}%` }} />
+              <div
+                key={`v-${i}`}
+                className="absolute h-full w-px bg-gray-400"
+                style={{ left: `${i * 15}%` }}
+              />
             ))}
           </div>
 
           {/* Rides */}
-          {rides.map(ride => (
+          {rides.map((ride) => (
             <div
               key={ride.id}
               className="absolute transition-all duration-300 hover:scale-110"
               style={{
                 left: `${ride.x}%`,
                 top: `${ride.y}%`,
-                transform: 'translate(-50%, -50%)',
+                transform: "translate(-50%, -50%)",
               }}
             >
               <div className="text-6xl animate-bounce">{ride.emoji}</div>

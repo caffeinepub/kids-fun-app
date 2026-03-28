@@ -1,9 +1,15 @@
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Play, RotateCcw } from 'lucide-react';
-import { ModulePage } from '../App';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { ArrowLeft, Play, RotateCcw } from "lucide-react";
+import { useState } from "react";
+import type { ModulePage } from "../App";
 
 interface InteractiveShortsPageProps {
   onNavigate: (page: ModulePage) => void;
@@ -32,69 +38,73 @@ interface Choice {
 
 const stories: Story[] = [
   {
-    id: 'magical-forest',
-    title: 'The Magical Forest Adventure',
-    description: 'Help a brave explorer find the hidden treasure!',
-    thumbnail: '/assets/generated/interactive-shorts-scene.dim_300x200.png',
+    id: "magical-forest",
+    title: "The Magical Forest Adventure",
+    description: "Help a brave explorer find the hidden treasure!",
+    thumbnail: "/assets/generated/interactive-shorts-scene.dim_300x200.png",
     scenes: [
       {
-        id: 'start',
-        text: 'You enter a magical forest. Two paths appear before you.',
-        image: '/assets/generated/interactive-shorts-scene.dim_300x200.png',
+        id: "start",
+        text: "You enter a magical forest. Two paths appear before you.",
+        image: "/assets/generated/interactive-shorts-scene.dim_300x200.png",
         choices: [
-          { text: 'Take the sunny path', nextSceneId: 'sunny' },
-          { text: 'Take the mysterious path', nextSceneId: 'mysterious' },
+          { text: "Take the sunny path", nextSceneId: "sunny" },
+          { text: "Take the mysterious path", nextSceneId: "mysterious" },
         ],
       },
       {
-        id: 'sunny',
-        text: 'The sunny path leads to a beautiful meadow with friendly animals!',
-        image: '/assets/generated/interactive-shorts-scene.dim_300x200.png',
+        id: "sunny",
+        text: "The sunny path leads to a beautiful meadow with friendly animals!",
+        image: "/assets/generated/interactive-shorts-scene.dim_300x200.png",
         choices: [
-          { text: 'Play with the animals', nextSceneId: 'play' },
-          { text: 'Continue exploring', nextSceneId: 'explore' },
+          { text: "Play with the animals", nextSceneId: "play" },
+          { text: "Continue exploring", nextSceneId: "explore" },
         ],
       },
       {
-        id: 'mysterious',
-        text: 'The mysterious path leads to a cave with glowing crystals!',
-        image: '/assets/generated/interactive-shorts-scene.dim_300x200.png',
+        id: "mysterious",
+        text: "The mysterious path leads to a cave with glowing crystals!",
+        image: "/assets/generated/interactive-shorts-scene.dim_300x200.png",
         choices: [
-          { text: 'Enter the cave', nextSceneId: 'cave' },
-          { text: 'Go back', nextSceneId: 'start' },
+          { text: "Enter the cave", nextSceneId: "cave" },
+          { text: "Go back", nextSceneId: "start" },
         ],
       },
       {
-        id: 'play',
-        text: 'The animals show you a secret treasure chest! You win!',
-        image: '/assets/generated/interactive-shorts-scene.dim_300x200.png',
+        id: "play",
+        text: "The animals show you a secret treasure chest! You win!",
+        image: "/assets/generated/interactive-shorts-scene.dim_300x200.png",
         isEnding: true,
       },
       {
-        id: 'explore',
-        text: 'You find a magical fountain that grants wishes! You win!',
-        image: '/assets/generated/interactive-shorts-scene.dim_300x200.png',
+        id: "explore",
+        text: "You find a magical fountain that grants wishes! You win!",
+        image: "/assets/generated/interactive-shorts-scene.dim_300x200.png",
         isEnding: true,
       },
       {
-        id: 'cave',
-        text: 'Inside the cave, you discover ancient treasure! You win!',
-        image: '/assets/generated/interactive-shorts-scene.dim_300x200.png',
+        id: "cave",
+        text: "Inside the cave, you discover ancient treasure! You win!",
+        image: "/assets/generated/interactive-shorts-scene.dim_300x200.png",
         isEnding: true,
       },
     ],
   },
 ];
 
-export default function InteractiveShortsPage({ onNavigate }: InteractiveShortsPageProps) {
+export default function InteractiveShortsPage({
+  onNavigate,
+}: InteractiveShortsPageProps) {
   const [selectedStory, setSelectedStory] = useState<Story | null>(null);
-  const [currentSceneId, setCurrentSceneId] = useState<string>('start');
+  const [currentSceneId, setCurrentSceneId] = useState<string>("start");
 
-  const currentScene = selectedStory?.scenes.find(s => s.id === currentSceneId);
+  const currentScene = selectedStory?.scenes.find(
+    (s) => s.id === currentSceneId,
+  );
 
   const handleStorySelect = (story: Story) => {
     setSelectedStory(story);
-    setCurrentSceneId('start');
+    setCurrentSceneId("start");
   };
 
   const handleChoice = (nextSceneId: string) => {
@@ -102,12 +112,12 @@ export default function InteractiveShortsPage({ onNavigate }: InteractiveShortsP
   };
 
   const handleRestart = () => {
-    setCurrentSceneId('start');
+    setCurrentSceneId("start");
   };
 
   const handleBackToList = () => {
     setSelectedStory(null);
-    setCurrentSceneId('start');
+    setCurrentSceneId("start");
   };
 
   if (!selectedStory) {
@@ -117,7 +127,10 @@ export default function InteractiveShortsPage({ onNavigate }: InteractiveShortsP
           <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
             Interactive Shorts
           </h1>
-          <Button variant="outline" onClick={() => onNavigate('creative-fun-hub')}>
+          <Button
+            variant="outline"
+            onClick={() => onNavigate("creative-fun-hub")}
+          >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Hub
           </Button>
@@ -159,7 +172,9 @@ export default function InteractiveShortsPage({ onNavigate }: InteractiveShortsP
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-purple-600">{selectedStory.title}</h1>
+        <h1 className="text-3xl font-bold text-purple-600">
+          {selectedStory.title}
+        </h1>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={handleRestart}>
             <RotateCcw className="mr-2 h-4 w-4" />
@@ -182,7 +197,9 @@ export default function InteractiveShortsPage({ onNavigate }: InteractiveShortsP
             />
 
             <div className="bg-gradient-to-r from-purple-100 to-pink-100 p-6 rounded-lg">
-              <p className="text-xl text-gray-800 leading-relaxed">{currentScene.text}</p>
+              <p className="text-xl text-gray-800 leading-relaxed">
+                {currentScene.text}
+              </p>
             </div>
 
             {currentScene.isEnding ? (
@@ -193,20 +210,26 @@ export default function InteractiveShortsPage({ onNavigate }: InteractiveShortsP
                     <RotateCcw className="mr-2 h-4 w-4" />
                     Play Again
                   </Button>
-                  <Button onClick={handleBackToList} variant="outline" className="flex-1">
+                  <Button
+                    onClick={handleBackToList}
+                    variant="outline"
+                    className="flex-1"
+                  >
                     Choose Another Story
                   </Button>
                 </div>
               </div>
             ) : (
               <div className="space-y-3">
-                <p className="text-lg font-semibold text-gray-700">What do you do?</p>
+                <p className="text-lg font-semibold text-gray-700">
+                  What do you do?
+                </p>
                 {currentScene.choices?.map((choice, index) => (
                   <Button
                     key={index}
                     onClick={() => handleChoice(choice.nextSceneId)}
                     className="w-full text-lg py-6"
-                    variant={index === 0 ? 'default' : 'outline'}
+                    variant={index === 0 ? "default" : "outline"}
                   >
                     {choice.text}
                   </Button>

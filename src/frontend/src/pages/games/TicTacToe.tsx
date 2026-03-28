@@ -1,35 +1,42 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, RotateCcw } from 'lucide-react';
-import { toast } from 'sonner';
-import { ModulePage } from '../../App';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft, RotateCcw } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import type { ModulePage } from "../../App";
 
 interface TicTacToeProps {
   onNavigate: (page: ModulePage) => void;
 }
 
-type Player = 'X' | 'O' | null;
-type GameMode = 'pvp' | 'ai' | null;
+type Player = "X" | "O" | null;
+type GameMode = "pvp" | "ai" | null;
 type Board = Player[];
 
 const WINNING_COMBINATIONS = [
-  [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
-  [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
-  [0, 4, 8], [2, 4, 6], // Diagonals
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8], // Rows
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8], // Columns
+  [0, 4, 8],
+  [2, 4, 6], // Diagonals
 ];
 
 export default function TicTacToe({ onNavigate }: TicTacToeProps) {
   const [gameMode, setGameMode] = useState<GameMode>(null);
   const [board, setBoard] = useState<Board>(Array(9).fill(null));
-  const [currentPlayer, setCurrentPlayer] = useState<'X' | 'O'>('X');
+  const [currentPlayer, setCurrentPlayer] = useState<"X" | "O">("X");
   const [winner, setWinner] = useState<Player>(null);
   const [winningLine, setWinningLine] = useState<number[]>([]);
   const [isDraw, setIsDraw] = useState(false);
   const [isAiThinking, setIsAiThinking] = useState(false);
 
   // Check for winner
-  const checkWinner = (currentBoard: Board): { winner: Player; line: number[] } => {
+  const checkWinner = (
+    currentBoard: Board,
+  ): { winner: Player; line: number[] } => {
     for (const combination of WINNING_COMBINATIONS) {
       const [a, b, c] = combination;
       if (
@@ -45,20 +52,23 @@ export default function TicTacToe({ onNavigate }: TicTacToeProps) {
 
   // Check for draw
   const checkDraw = (currentBoard: Board): boolean => {
-    return currentBoard.every(cell => cell !== null) && !checkWinner(currentBoard).winner;
+    return (
+      currentBoard.every((cell) => cell !== null) &&
+      !checkWinner(currentBoard).winner
+    );
   };
 
   // AI move logic
   const makeAiMove = (currentBoard: Board) => {
     setIsAiThinking(true);
-    
+
     setTimeout(() => {
       // Try to win
       for (let i = 0; i < 9; i++) {
         if (currentBoard[i] === null) {
           const testBoard = [...currentBoard];
-          testBoard[i] = 'O';
-          if (checkWinner(testBoard).winner === 'O') {
+          testBoard[i] = "O";
+          if (checkWinner(testBoard).winner === "O") {
             handleCellClick(i, testBoard);
             setIsAiThinking(false);
             return;
@@ -70,8 +80,8 @@ export default function TicTacToe({ onNavigate }: TicTacToeProps) {
       for (let i = 0; i < 9; i++) {
         if (currentBoard[i] === null) {
           const testBoard = [...currentBoard];
-          testBoard[i] = 'X';
-          if (checkWinner(testBoard).winner === 'X') {
+          testBoard[i] = "X";
+          if (checkWinner(testBoard).winner === "X") {
             handleCellClick(i, currentBoard);
             setIsAiThinking(false);
             return;
@@ -88,9 +98,10 @@ export default function TicTacToe({ onNavigate }: TicTacToeProps) {
 
       // Take a corner
       const corners = [0, 2, 6, 8];
-      const availableCorners = corners.filter(i => currentBoard[i] === null);
+      const availableCorners = corners.filter((i) => currentBoard[i] === null);
       if (availableCorners.length > 0) {
-        const randomCorner = availableCorners[Math.floor(Math.random() * availableCorners.length)];
+        const randomCorner =
+          availableCorners[Math.floor(Math.random() * availableCorners.length)];
         handleCellClick(randomCorner, currentBoard);
         setIsAiThinking(false);
         return;
@@ -99,13 +110,14 @@ export default function TicTacToe({ onNavigate }: TicTacToeProps) {
       // Take any available space
       const availableSpaces = currentBoard
         .map((cell, index) => (cell === null ? index : null))
-        .filter(index => index !== null) as number[];
-      
+        .filter((index) => index !== null) as number[];
+
       if (availableSpaces.length > 0) {
-        const randomSpace = availableSpaces[Math.floor(Math.random() * availableSpaces.length)];
+        const randomSpace =
+          availableSpaces[Math.floor(Math.random() * availableSpaces.length)];
         handleCellClick(randomSpace, currentBoard);
       }
-      
+
       setIsAiThinking(false);
     }, 500);
   };
@@ -119,32 +131,32 @@ export default function TicTacToe({ onNavigate }: TicTacToeProps) {
     setBoard(newBoard);
 
     const { winner: gameWinner, line } = checkWinner(newBoard);
-    
+
     if (gameWinner) {
       setWinner(gameWinner);
       setWinningLine(line);
-      
+
       toast.success(`🎉 ${gameWinner} Wins!`, {
-        description: gameWinner === 'X' ? 'Great job!' : 'AI wins this round!',
+        description: gameWinner === "X" ? "Great job!" : "AI wins this round!",
       });
       return;
     }
 
     if (checkDraw(newBoard)) {
       setIsDraw(true);
-      
+
       toast.info("It's a Draw!", {
-        description: 'Well played by both sides!',
+        description: "Well played by both sides!",
       });
       return;
     }
 
     // Switch player
-    const nextPlayer = currentPlayer === 'X' ? 'O' : 'X';
+    const nextPlayer = currentPlayer === "X" ? "O" : "X";
     setCurrentPlayer(nextPlayer);
 
     // AI move in AI mode
-    if (gameMode === 'ai' && nextPlayer === 'O') {
+    if (gameMode === "ai" && nextPlayer === "O") {
       makeAiMove(newBoard);
     }
   };
@@ -152,7 +164,7 @@ export default function TicTacToe({ onNavigate }: TicTacToeProps) {
   // Reset game
   const resetGame = () => {
     setBoard(Array(9).fill(null));
-    setCurrentPlayer('X');
+    setCurrentPlayer("X");
     setWinner(null);
     setWinningLine([]);
     setIsDraw(false);
@@ -175,7 +187,7 @@ export default function TicTacToe({ onNavigate }: TicTacToeProps) {
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => onNavigate('games')}
+                onClick={() => onNavigate("games")}
                 className="border-3 border-neon-cyan"
               >
                 <ArrowLeft className="w-5 h-5" />
@@ -184,42 +196,53 @@ export default function TicTacToe({ onNavigate }: TicTacToeProps) {
                 Tic Tac Toe
               </CardTitle>
             </div>
-            <p className="text-xl text-gray-700 text-center">Choose your game mode</p>
+            <p className="text-xl text-gray-700 text-center">
+              Choose your game mode
+            </p>
           </CardHeader>
           <CardContent className="space-y-6 p-8">
             <div className="grid md:grid-cols-2 gap-6">
               <Card
                 className="border-4 border-neon-pink hover:shadow-neon-lg transition-all cursor-pointer hover:scale-105"
-                onClick={() => setGameMode('pvp')}
+                onClick={() => setGameMode("pvp")}
               >
                 <CardContent className="p-8 text-center space-y-4">
                   <div className="text-6xl">👥</div>
                   <h3 className="text-2xl font-bold text-neon-pink text-shadow-neon-md">
                     Player vs Player
                   </h3>
-                  <p className="text-gray-600">Play with a friend on the same device</p>
+                  <p className="text-gray-600">
+                    Play with a friend on the same device
+                  </p>
                 </CardContent>
               </Card>
 
               <Card
                 className="border-4 border-neon-green hover:shadow-neon-lg transition-all cursor-pointer hover:scale-105"
-                onClick={() => setGameMode('ai')}
+                onClick={() => setGameMode("ai")}
               >
                 <CardContent className="p-8 text-center space-y-4">
                   <div className="text-6xl">🤖</div>
                   <h3 className="text-2xl font-bold text-neon-green text-shadow-neon-md">
                     Player vs AI
                   </h3>
-                  <p className="text-gray-600">Challenge the computer opponent</p>
+                  <p className="text-gray-600">
+                    Challenge the computer opponent
+                  </p>
                 </CardContent>
               </Card>
             </div>
 
             <div className="bg-neon-cyan/10 border-4 border-neon-cyan rounded-lg p-6">
-              <h4 className="text-xl font-bold text-neon-cyan mb-3 text-shadow-neon-sm">How to Play:</h4>
+              <h4 className="text-xl font-bold text-neon-cyan mb-3 text-shadow-neon-sm">
+                How to Play:
+              </h4>
               <ul className="space-y-2 text-gray-700">
                 <li>• Players take turns placing X or O on the grid</li>
-                <li>• Get three in a row (horizontal, vertical, or diagonal) to win</li>
+                <li>
+                  • Get three in a row (horizontal, vertical, or diagonal) to
+                  win
+                </li>
                 <li>• If all squares are filled with no winner, it's a draw</li>
                 <li>• Have fun and play fair! 🎮</li>
               </ul>
@@ -248,10 +271,11 @@ export default function TicTacToe({ onNavigate }: TicTacToeProps) {
                   <ArrowLeft className="w-5 h-5" />
                 </Button>
                 <CardTitle className="text-2xl md:text-3xl font-bold text-neon-purple text-shadow-neon-md">
-                  Tic Tac Toe - {gameMode === 'pvp' ? 'Player vs Player' : 'Player vs AI'}
+                  Tic Tac Toe -{" "}
+                  {gameMode === "pvp" ? "Player vs Player" : "Player vs AI"}
                 </CardTitle>
               </div>
-              
+
               <Button
                 variant="outline"
                 size="icon"
@@ -281,7 +305,10 @@ export default function TicTacToe({ onNavigate }: TicTacToeProps) {
               </div>
             ) : (
               <div className="text-2xl font-bold text-neon-green text-shadow-neon-md">
-                Current Player: <span className="text-neon-purple text-shadow-neon-lg">{currentPlayer}</span>
+                Current Player:{" "}
+                <span className="text-neon-purple text-shadow-neon-lg">
+                  {currentPlayer}
+                </span>
               </div>
             )}
           </CardContent>
@@ -298,11 +325,11 @@ export default function TicTacToe({ onNavigate }: TicTacToeProps) {
                   disabled={!!cell || !!winner || isDraw || isAiThinking}
                   className={`
                     aspect-square text-6xl font-bold rounded-lg border-4 transition-all
-                    ${cell === 'X' ? 'text-neon-pink border-neon-pink bg-neon-pink/10' : ''}
-                    ${cell === 'O' ? 'text-neon-green border-neon-green bg-neon-green/10' : ''}
-                    ${!cell ? 'border-neon-purple hover:bg-neon-purple/10 hover:border-neon-cyan' : ''}
-                    ${winningLine.includes(index) ? 'bg-neon-orange/30 border-neon-orange shadow-neon-lg animate-neon-pulse' : ''}
-                    ${!cell && !winner && !isDraw && !isAiThinking ? 'cursor-pointer hover:scale-105' : 'cursor-not-allowed'}
+                    ${cell === "X" ? "text-neon-pink border-neon-pink bg-neon-pink/10" : ""}
+                    ${cell === "O" ? "text-neon-green border-neon-green bg-neon-green/10" : ""}
+                    ${!cell ? "border-neon-purple hover:bg-neon-purple/10 hover:border-neon-cyan" : ""}
+                    ${winningLine.includes(index) ? "bg-neon-orange/30 border-neon-orange shadow-neon-lg animate-neon-pulse" : ""}
+                    ${!cell && !winner && !isDraw && !isAiThinking ? "cursor-pointer hover:scale-105" : "cursor-not-allowed"}
                     disabled:opacity-50
                   `}
                 >
@@ -337,4 +364,3 @@ export default function TicTacToe({ onNavigate }: TicTacToeProps) {
     </div>
   );
 }
-

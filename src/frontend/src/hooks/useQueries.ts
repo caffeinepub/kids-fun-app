@@ -1,153 +1,36 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useActor } from './useActor';
-import { useInternetIdentity } from './useInternetIdentity';
-import type { UserApprovalInfo, ApprovalStatus, UserProfile as BackendUserProfile, ActivityEvent, StoryProject as BackendStoryProject, VirtualPetHub as BackendVirtualPetHub, Prop as BackendProp } from '../backend';
-import { Principal } from '@icp-sdk/core/principal';
+import type { Principal } from "@icp-sdk/core/principal";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type {
+  ApprovalStatus,
+  UserProfile as BackendUserProfile,
+  VirtualPetHub as BackendVirtualPetHub,
+  UserApprovalInfo,
+} from "../backend";
+import { useActor } from "./useActor";
+import { useInternetIdentity } from "./useInternetIdentity";
 
-// Local type definitions for features not yet in backend interface
-export interface Badge {
-  name: string;
-  description: string;
-  category: string;
-  requirement: string;
-  rewardPoints: bigint;
-}
+// Re-export backend types
+export type { BackendUserProfile as UserProfile };
+export type { BackendVirtualPetHub as VirtualPetHub };
+export type { UserApprovalInfo, ApprovalStatus };
 
-export interface BadgeProof {
-  badge: Badge;
-  proof: string;
-  timestamp: bigint;
-}
-
-export interface AvatarConfig {
-  body: string;
-  head: string;
-  hair: string;
-  pants: string;
-  headwear: string;
-  shoes: string;
-}
-
-export interface AdminDashboardSection {
-  overview: AdminDashboardOverview;
-  manageUsers: UserProfile[];
-  restrictions: AdminFeatureRestriction[];
-  settings: { adminPreferences: string };
-  safetyAlerts: string[];
-}
-
-export interface AdminDashboardOverview {
-  activeUsers: Principal[];
-  userStats: { total: bigint; active: bigint; restricted: bigint; suspended: bigint; banned: bigint };
-  activitySummary: { recentActivities: bigint; systemEvents: bigint };
-}
-
-export enum AdminUserStatus {
-  active = 'active',
-  restricted = 'restricted',
-  suspended = 'suspended',
-  banned = 'banned',
-}
-
-export interface AdminFeatureRestriction {
-  userId: Principal;
-  feature: string;
-  restrictedBy: Principal;
-  reason?: string;
-  createdAt: bigint;
-  updatedAt?: bigint;
-}
-
-export interface Joke {
-  id: string;
-  category: string;
-  content: string;
-  submittedBy?: Principal;
-  approved: boolean;
-  rating: bigint;
-}
-
-export interface OnlineUser {
-  userId: Principal;
-  lastSeen: bigint;
-  isOnline: boolean;
-}
-
-export interface ChatMessage {
-  id: string;
-  sender: Principal;
-  recipient: Principal;
-  content: string;
-  timestamp: bigint;
-  isGroupChat: boolean;
-  groupId?: string;
-}
-
-export interface UserProfile {
-  name: string;
-  age: bigint;
-  parentPrincipal: Principal;
-  approvedContacts: Principal[];
-  screenTimeLimit: bigint;
-  contentFilterLevel: string;
-  avatarUrl: string;
-  theme: string;
-  mascotPreference: string;
-  accessibilitySettings: {
-    readAloudEnabled: boolean;
-    highContrastMode: boolean;
-    largeText: boolean;
+// Local type definitions for types not in backend interface
+export interface ActivityEvent {
+  id: number;
+  userId: string;
+  activityType: {
+    game_played?: { gameId: string; gameName: string };
+    user_created?: null;
   };
-  avatarConfig?: AvatarConfig;
-}
-
-export interface GameState {
-  id: bigint;
-  gameName: string;
-  progress: bigint;
-  player: Principal;
-  score: bigint;
-  highScore: bigint;
-  isMultiplayer: boolean;
-  achievements: string[];
-  rewards: string[];
-  difficulty: string;
-  lastPlayed: bigint;
-}
-
-export enum FeedbackType {
-  bugReport = 'bugReport',
-  featureRequest = 'featureRequest',
-  generalFeedback = 'generalFeedback',
-  safetyConcern = 'safetyConcern',
-  parentFeedback = 'parentFeedback',
-}
-
-export interface Feedback {
-  id: bigint;
-  feedbackType: FeedbackType;
-  text: string;
-  author: Principal;
-  timestamp: bigint;
-  isResolved: boolean;
-}
-
-export interface SeasonalEvent {
-  id: string;
-  name: string;
-  startDate: bigint;
-  endDate: bigint;
-  theme: string;
-  activities: string[];
-  isActive: boolean;
+  timestamp: number;
 }
 
 export interface StoryProject {
   id: string;
-  owner: Principal;
+  owner: string;
   title: string;
   scenes: Scene[];
-  createdAt: bigint;
+  createdAt: number;
   published: boolean;
   approved: boolean;
 }
@@ -169,7 +52,7 @@ export interface Character {
 export interface Prop {
   name: string;
   position: { x: number; y: number };
-  type_: string;
+  type: string;
 }
 
 export interface TextBubble {
@@ -179,35 +62,126 @@ export interface TextBubble {
   style: string;
 }
 
-export interface CraftProject {
-  id: string;
-  category: string;
-  title: string;
-  difficulty: string;
-  steps: string[];
-  materials: string[];
-  safetyTips: string[];
-  completedBy: Principal[];
-  badges: string[];
-}
-
-export interface ArtGallerySubmission {
-  id: string;
-  owner: Principal;
-  title: string;
-  artworkUrl: string;
-  category: string;
-  createdAt: bigint;
-  isPublic: boolean;
+export interface VideoChannel {
+  channelId: string;
+  name: string;
+  description: string;
+  playlistUrl: string;
+  iconUrl: string;
+  categoryId: string;
+  safe: boolean;
   approved: boolean;
+  createdAt: bigint;
+  lastUpdated?: bigint;
+  lastPlayed?: bigint;
+  isFavorite: boolean;
+  totalVideos: bigint;
+  views: bigint;
 }
 
-export interface Reward {
-  userId: Principal;
-  points: number;
-  badges: string[];
+export interface ScaryHubGameEntry {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  isScary: boolean;
+  difficulty: string;
+  theme: string;
+  instructions: string;
+  assets: string[];
+  highScore: bigint;
+  lastPlayed: bigint;
+  isFavorite: boolean;
+}
+
+export interface BadgeProof {
+  badge: {
+    name: string;
+    description: string;
+    category: string;
+    requirement: string;
+    rewardPoints: bigint;
+  };
+  proof: string;
+  timestamp: bigint;
+}
+
+export interface MusicRemixStudio {
+  id: string;
+  creator: Principal;
+  title: string;
+  tempo: bigint;
+  pitch: bigint;
+  volume: bigint;
+  reverb: bigint;
+  delay: bigint;
+}
+
+export interface AvatarConfig {
+  body: string;
+  head: string;
+  hair: string;
+  pants: string;
+  headwear: string;
+  shoes: string;
+}
+
+export interface GameState {
+  id: string;
+  gameName: string;
+  score: number;
+  highScore: number;
   achievements: string[];
-  virtualPetLevel: number;
+  lastPlayed: number;
+}
+
+export enum FeedbackType {
+  generalFeedback = "general",
+  bugReport = "bug",
+  featureRequest = "feature",
+  safetyConcern = "safety",
+  parentFeedback = "parent",
+}
+
+export interface Feedback {
+  id: string;
+  submitter: string;
+  feedbackType: FeedbackType;
+  content: string;
+  timestamp: number;
+  response?: string;
+  anonymous: boolean;
+  resolved?: boolean;
+}
+
+export interface OnlineUser {
+  userId: string;
+  lastSeen: number;
+  isOnline: boolean;
+}
+
+export interface ChatMessage {
+  id: string;
+  sender: string;
+  recipient: string;
+  content: string;
+  timestamp: number;
+  isGroupChat: boolean;
+  groupId?: string;
+}
+
+export interface Event {
+  id: string;
+  owner: string;
+  eventType: string;
+  title: string;
+  date: number;
+  description: string;
+  rsvps: string[];
+  photos: string[];
+  checklist: string[];
+  isSeasonal: boolean;
+  seasonalType?: string;
 }
 
 export interface SpinReward {
@@ -216,23 +190,18 @@ export interface SpinReward {
   timestamp: number;
 }
 
-export interface SpinRewardUpdate {
-  spinReward: SpinReward;
-  badgesEarned: BadgeProof[];
-  pointsAwarded: number;
-  extraSpin: boolean;
-}
-
-export interface Certificate {
+export interface LocalSticker {
   id: string;
-  userId: Principal;
-  achievement: string;
-  date: number;
+  creator: string;
+  name: string;
+  imageDataUrl: string;
+  isModerated: boolean;
+  approved: boolean;
 }
 
 export interface Sticker {
   id: string;
-  creator: Principal;
+  creator: string;
   name: string;
   image: {
     getDirectURL: () => string;
@@ -243,7 +212,7 @@ export interface Sticker {
 
 export interface MusicRemix {
   id: string;
-  creator: Principal;
+  creator: string;
   title: string;
   audio: {
     getDirectURL: () => string;
@@ -253,121 +222,85 @@ export interface MusicRemix {
   approved: boolean;
 }
 
-export interface VirtualPetHub {
-  userId: Principal;
-  petName: string;
-  happinessLevel: bigint;
-  growthStage: bigint;
-  accessories: string[];
-  decorations: string[];
-  homeStyle: string;
-  warnedAboutExtremeChanges: boolean;
-  trophies: bigint;
-}
-
 export interface InventionStory {
   id: string;
   title: string;
   content: string;
   author: string;
-  visualAssets: string[];
-  narrationAudio?: string;
-  recommendedAge: number;
-  discoveryLevel: string;
   category: string;
-  visualStyle: {
-    colorPalette: string[];
-    animationType: string;
-    transitionEffects: string[];
-    sceneryType: string;
-  };
-  narrationStyle: string;
-  backgroundMusic?: string;
-  interactiveElements: string[];
-  achievementBadge: string;
-  certificateId?: string;
+  discoveryLevel: string;
   funFacts: string[];
-  mascotCommentary: string[];
 }
 
-export interface Event {
+export interface Reward {
+  userId: string;
+  points: number;
+  badges: string[];
+  achievements: string[];
+  virtualPetLevel: number;
+}
+
+export interface Certificate {
   id: string;
-  owner: Principal;
-  eventType: string;
+  userId: string;
+  achievement: string;
+  date: number;
+}
+
+export enum AdminUserStatus {
+  active = "active",
+  restricted = "restricted",
+  suspended = "suspended",
+  banned = "banned",
+}
+
+export interface AdminDashboardData {
+  totalUsers: number;
+  activeUsers: number;
+  pendingApprovals: number;
+  recentActivity: any[];
+  overview: {
+    userStats: {
+      total: number;
+      active: number;
+      restricted: number;
+      suspended: number;
+      banned: number;
+    };
+  };
+  manageUsers: BackendUserProfile[];
+  safetyAlerts: string[];
+}
+
+export interface Joke {
+  id: string;
+  category: string;
+  content: string;
+  submittedBy?: string;
+  approved: boolean;
+  rating: number;
+}
+
+export interface ArtworkSubmission {
+  id: string;
+  owner: string;
   title: string;
-  date: bigint;
-  description: string;
-  rsvps: Principal[];
-  photos: string[];
-  checklist: string[];
-  isSeasonal: boolean;
-  seasonalType?: string;
+  artworkUrl: string;
+  category: string;
+  createdAt: number;
+  isPublic: boolean;
+  approved: boolean;
 }
 
-// Re-export ActivityEvent from backend
-export type { ActivityEvent };
-
-// Helper function to convert backend StoryProject to frontend StoryProject
-function convertBackendStoryProject(backendStory: BackendStoryProject): StoryProject {
-  return {
-    ...backendStory,
-    scenes: backendStory.scenes.map(scene => ({
-      ...scene,
-      characters: scene.characters.map(char => ({
-        ...char,
-        position: { x: Number(char.position.x), y: Number(char.position.y) }
-      })),
-      props: scene.props.map(prop => ({
-        name: prop.name,
-        position: { x: Number(prop.position.x), y: Number(prop.position.y) },
-        type_: prop.type
-      })),
-      textBubbles: scene.textBubbles.map(bubble => ({
-        ...bubble,
-        position: { x: Number(bubble.position.x), y: Number(bubble.position.y) }
-      }))
-    }))
-  };
-}
-
-// Helper function to convert frontend StoryProject to backend StoryProject
-function convertToBackendStoryProject(story: StoryProject): BackendStoryProject {
-  return {
-    ...story,
-    scenes: story.scenes.map(scene => ({
-      ...scene,
-      characters: scene.characters.map(char => ({
-        ...char,
-        position: { x: BigInt(char.position.x), y: BigInt(char.position.y) }
-      })),
-      props: scene.props.map(prop => ({
-        name: prop.name,
-        position: { x: BigInt(prop.position.x), y: BigInt(prop.position.y) },
-        type: prop.type_
-      })),
-      textBubbles: scene.textBubbles.map(bubble => ({
-        ...bubble,
-        position: { x: BigInt(bubble.position.x), y: BigInt(bubble.position.y) }
-      }))
-    }))
-  };
-}
-
-// User Profile Queries
+// User Profile Hooks
 export function useGetCallerUserProfile() {
   const { actor, isFetching: actorFetching } = useActor();
 
-  const query = useQuery<UserProfile | null>({
-    queryKey: ['currentUserProfile'],
+  const query = useQuery<BackendUserProfile | null>({
+    queryKey: ["currentUserProfile"],
     queryFn: async () => {
-      if (!actor) return null;
-      try {
-        const result = await actor.getCallerUserProfile();
-        return result || null;
-      } catch (error) {
-        console.error('Error fetching user profile:', error);
-        return null;
-      }
+      if (!actor) throw new Error("Actor not available");
+      return actor.getCallerUserProfile();
     },
     enabled: !!actor && !actorFetching,
     retry: false,
@@ -385,1155 +318,62 @@ export function useSaveCallerUserProfile() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (profile: UserProfile) => {
-      if (!actor) throw new Error('Actor not available');
-      await actor.saveCallerUserProfile(profile);
+    mutationFn: async (profile: BackendUserProfile) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.saveCallerUserProfile(profile);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
+      queryClient.invalidateQueries({ queryKey: ["currentUserProfile"] });
     },
   });
 }
 
+// Avatar Config Hook
 export function useSaveAvatarConfig() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (avatarConfig: AvatarConfig) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       const profile = await actor.getCallerUserProfile();
-      if (!profile) throw new Error('Profile not found');
-      
-      const updatedProfile = { ...profile, avatarConfig };
-      await actor.saveCallerUserProfile(updatedProfile);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
-    },
-  });
-}
+      if (!profile) throw new Error("Profile not found");
 
-// Real-Time Chat Queries
-export function useGetOnlineUsers() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<OnlineUser[]>({
-    queryKey: ['onlineUsers'],
-    queryFn: async () => {
-      if (!actor) return [];
-      const stored = localStorage.getItem('onlineUsers');
-      return stored ? JSON.parse(stored) : [];
-    },
-    enabled: !!actor && !isFetching,
-    refetchInterval: 3000,
-  });
-}
-
-export function useUpdateOnlineStatus() {
-  const { actor } = useActor();
-  const { identity } = useInternetIdentity();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (isOnline: boolean) => {
-      if (!actor || !identity) return;
-      const stored = localStorage.getItem('onlineUsers');
-      const users: OnlineUser[] = stored ? JSON.parse(stored) : [];
-      const userId = identity.getPrincipal();
-      const userIndex = users.findIndex(u => u.userId.toText() === userId.toText());
-      
-      if (isOnline) {
-        const user: OnlineUser = {
-          userId,
-          lastSeen: BigInt(Date.now()),
-          isOnline: true,
-        };
-        if (userIndex >= 0) {
-          users[userIndex] = user;
-        } else {
-          users.push(user);
-        }
-      } else {
-        if (userIndex >= 0) {
-          users.splice(userIndex, 1);
-        }
-      }
-      
-      localStorage.setItem('onlineUsers', JSON.stringify(users));
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['onlineUsers'] });
-    },
-  });
-}
-
-export function useSendChatMessage() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (message: ChatMessage) => {
-      if (!actor) throw new Error('Actor not available');
-      const stored = localStorage.getItem('chatMessages');
-      const messages: ChatMessage[] = stored ? JSON.parse(stored) : [];
-      messages.push(message);
-      localStorage.setItem('chatMessages', JSON.stringify(messages));
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['chatMessages'] });
-    },
-  });
-}
-
-export function useGetChatMessages(otherUserId: string | null) {
-  const { actor, isFetching } = useActor();
-  const { identity } = useInternetIdentity();
-
-  return useQuery<ChatMessage[]>({
-    queryKey: ['chatMessages', otherUserId],
-    queryFn: async () => {
-      if (!actor || !otherUserId || !identity) return [];
-      const stored = localStorage.getItem('chatMessages');
-      const allMessages: ChatMessage[] = stored ? JSON.parse(stored) : [];
-      const currentUserId = identity.getPrincipal().toText();
-      
-      return allMessages.filter(msg => 
-        (msg.sender.toText() === currentUserId && msg.recipient.toText() === otherUserId) ||
-        (msg.sender.toText() === otherUserId && msg.recipient.toText() === currentUserId)
-      );
-    },
-    enabled: !!actor && !isFetching && !!otherUserId,
-    refetchInterval: 2000,
-  });
-}
-
-export function useGetMyMessages() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<ChatMessage[]>({
-    queryKey: ['myMessages'],
-    queryFn: async () => {
-      if (!actor) return [];
-      const stored = localStorage.getItem('chatMessages');
-      return stored ? JSON.parse(stored) : [];
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
-
-export function useIsUserOnline() {
-  const { actor } = useActor();
-
-  return useMutation({
-    mutationFn: async (userId: Principal) => {
-      if (!actor) throw new Error('Actor not available');
-      const stored = localStorage.getItem('onlineUsers');
-      const users: OnlineUser[] = stored ? JSON.parse(stored) : [];
-      return users.some(u => u.userId.toText() === userId.toText() && u.isOnline);
-    },
-  });
-}
-
-// Game State Queries
-export function useGetMyGameStates() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<GameState[]>({
-    queryKey: ['myGameStates'],
-    queryFn: async () => {
-      const stored = localStorage.getItem('gameStates');
-      return stored ? JSON.parse(stored) : [];
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
-
-export function useGetMyGameStatesByName(gameName: string) {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<GameState[]>({
-    queryKey: ['myGameStates', gameName],
-    queryFn: async () => {
-      const stored = localStorage.getItem('gameStates');
-      const allStates: GameState[] = stored ? JSON.parse(stored) : [];
-      return allStates.filter(gs => gs.gameName === gameName);
-    },
-    enabled: !!actor && !isFetching && !!gameName,
-  });
-}
-
-export function useGetMyHighScore(gameName: string) {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<bigint>({
-    queryKey: ['myHighScore', gameName],
-    queryFn: async () => {
-      const stored = localStorage.getItem('gameStates');
-      const allStates: GameState[] = stored ? JSON.parse(stored) : [];
-      const gameStates = allStates.filter(gs => gs.gameName === gameName);
-      if (gameStates.length === 0) return BigInt(0);
-      return BigInt(Math.max(...gameStates.map(gs => Number(gs.highScore))));
-    },
-    enabled: !!actor && !isFetching && !!gameName,
-  });
-}
-
-export function useAddGameState() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (gameState: GameState) => {
-      const stored = localStorage.getItem('gameStates');
-      const allStates: GameState[] = stored ? JSON.parse(stored) : [];
-      allStates.push(gameState);
-      localStorage.setItem('gameStates', JSON.stringify(allStates));
-
-      // Record game play activity (non-blocking)
-      if (actor) {
-        try {
-          const gameId = gameState.id.toString();
-          const gameName = gameState.gameName;
-          await actor.recordGamePlay(gameId, gameName);
-        } catch (error) {
-          console.error('Failed to record game play activity:', error);
-          // Don't throw - activity tracking failure should not block game save
-        }
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['myGameStates'] });
-      queryClient.invalidateQueries({ queryKey: ['myHighScore'] });
-      queryClient.invalidateQueries({ queryKey: ['userRewards'] });
-      queryClient.invalidateQueries({ queryKey: ['virtualPetHub'] });
-      queryClient.invalidateQueries({ queryKey: ['userTrophies'] });
-      queryClient.invalidateQueries({ queryKey: ['recentActivityEvents'] });
-    },
-  });
-}
-
-export function useUpdateGameState() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ gameId, gameState }: { gameId: bigint; gameState: GameState }) => {
-      const stored = localStorage.getItem('gameStates');
-      const allStates: GameState[] = stored ? JSON.parse(stored) : [];
-      const index = allStates.findIndex(gs => gs.id === gameId);
-      if (index !== -1) {
-        allStates[index] = gameState;
-        localStorage.setItem('gameStates', JSON.stringify(allStates));
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['myGameStates'] });
-      queryClient.invalidateQueries({ queryKey: ['myHighScore'] });
-      queryClient.invalidateQueries({ queryKey: ['userRewards'] });
-      queryClient.invalidateQueries({ queryKey: ['virtualPetHub'] });
-      queryClient.invalidateQueries({ queryKey: ['userTrophies'] });
-    },
-  });
-}
-
-export function useGetLeaderboard(gameName: string, limit: number = 10) {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<Array<[Principal, bigint]>>({
-    queryKey: ['leaderboard', gameName, limit],
-    queryFn: async () => {
-      return [];
-    },
-    enabled: !!actor && !isFetching && !!gameName,
-  });
-}
-
-// Trophy System Queries
-export function useGetUserTrophies() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<number>({
-    queryKey: ['userTrophies'],
-    queryFn: async () => {
-      if (!actor) return 70;
-      try {
-        const stored = localStorage.getItem('virtualPetHub');
-        if (stored) {
-          const petHub: VirtualPetHub = JSON.parse(stored);
-          return petHub.trophies ? Number(petHub.trophies) : 70;
-        }
-        return 70;
-      } catch (error) {
-        console.error('Error fetching trophies:', error);
-        return 70;
-      }
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
-
-export function useUpdateGamesTrophies() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (): Promise<number> => {
-      if (!actor) throw new Error('Actor not available');
-      
-      try {
-        const result = await actor.updateGamesTrophies();
-        return Number(result);
-      } catch (error: any) {
-        if (error.message && error.message.includes('Not enough trophies')) {
-          throw new Error('Not enough trophies to play a game');
-        }
-        throw error;
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['userTrophies'] });
-      queryClient.invalidateQueries({ queryKey: ['virtualPetHub'] });
-    },
-  });
-}
-
-export function useWelcomeBackReward() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      await actor.welcomeBackReward();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['userTrophies'] });
-      queryClient.invalidateQueries({ queryKey: ['virtualPetHub'] });
-    },
-  });
-}
-
-// Activity Events Queries (Admin-only)
-export function useGetRecentActivityEvents(limit: number = 50) {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<ActivityEvent[]>({
-    queryKey: ['recentActivityEvents', limit],
-    queryFn: async () => {
-      if (!actor) return [];
-      try {
-        const events = await actor.getRecentActivityEvents(BigInt(limit));
-        return events;
-      } catch (error) {
-        console.error('Error fetching activity events:', error);
-        return [];
-      }
-    },
-    enabled: !!actor && !isFetching,
-    refetchInterval: 5000,
-  });
-}
-
-// Jokes Queries
-export function useGetAllJokes() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<Joke[]>({
-    queryKey: ['allJokes'],
-    queryFn: async () => {
-      if (!actor) return [];
-      const stored = localStorage.getItem('jokes');
-      return stored ? JSON.parse(stored) : [];
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
-
-export function useGetJokesByCategory(category?: string) {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<Joke[]>({
-    queryKey: ['jokesByCategory', category],
-    queryFn: async () => {
-      if (!actor || !category) return [];
-      const stored = localStorage.getItem('jokes');
-      const allJokes: Joke[] = stored ? JSON.parse(stored) : [];
-      return allJokes.filter(joke => joke.category === category);
-    },
-    enabled: !!actor && !isFetching && !!category,
-  });
-}
-
-export function useSubmitJoke() {
-  const { actor } = useActor();
-  const { identity } = useInternetIdentity();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (jokeData: { category: string; content: string }) => {
-      if (!actor || !identity) throw new Error('Actor not available');
-      const stored = localStorage.getItem('jokes');
-      const jokes: Joke[] = stored ? JSON.parse(stored) : [];
-      const newJoke: Joke = {
-        id: `joke_${Date.now()}`,
-        category: jokeData.category,
-        content: jokeData.content,
-        submittedBy: identity.getPrincipal(),
-        approved: false,
-        rating: BigInt(0),
+      const updatedProfile = {
+        ...profile,
+        avatarConfig,
       };
-      jokes.push(newJoke);
-      localStorage.setItem('jokes', JSON.stringify(jokes));
+
+      return actor.saveCallerUserProfile(updatedProfile);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['allJokes'] });
+      queryClient.invalidateQueries({ queryKey: ["currentUserProfile"] });
     },
   });
 }
 
-export function useRateJoke() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ jokeId, rating }: { jokeId: string; rating: bigint }) => {
-      if (!actor) throw new Error('Actor not available');
-      const stored = localStorage.getItem('jokes');
-      const jokes: Joke[] = stored ? JSON.parse(stored) : [];
-      const jokeIndex = jokes.findIndex(j => j.id === jokeId);
-      if (jokeIndex !== -1) {
-        jokes[jokeIndex].rating = rating;
-        localStorage.setItem('jokes', JSON.stringify(jokes));
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['allJokes'] });
-    },
-  });
-}
-
-export function useToggleFavoriteJoke() {
-  const { actor } = useActor();
-  const { identity } = useInternetIdentity();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (jokeId: string) => {
-      if (!actor || !identity) throw new Error('Actor not available');
-      const userId = identity.getPrincipal().toText();
-      const stored = localStorage.getItem(`favorites_${userId}`);
-      const favorites: string[] = stored ? JSON.parse(stored) : [];
-      
-      const index = favorites.indexOf(jokeId);
-      if (index > -1) {
-        favorites.splice(index, 1);
-      } else {
-        favorites.push(jokeId);
-      }
-      
-      localStorage.setItem(`favorites_${userId}`, JSON.stringify(favorites));
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['favoriteJokes'] });
-    },
-  });
-}
-
-export function useGetFavoriteJokes() {
-  const { actor, isFetching } = useActor();
-  const { identity } = useInternetIdentity();
-
-  return useQuery<Joke[]>({
-    queryKey: ['favoriteJokes'],
-    queryFn: async () => {
-      if (!actor || !identity) return [];
-      const userId = identity.getPrincipal().toText();
-      const stored = localStorage.getItem(`favorites_${userId}`);
-      const favoriteIds: string[] = stored ? JSON.parse(stored) : [];
-      
-      // Get all jokes and filter by favorite IDs
-      const jokesStored = localStorage.getItem('jokes');
-      const allJokes: Joke[] = jokesStored ? JSON.parse(jokesStored) : [];
-      return allJokes.filter(joke => favoriteIds.includes(joke.id));
-    },
-    enabled: !!actor && !isFetching && !!identity,
-  });
-}
-
-// Aliases for compatibility
-export const useAddJokeToFavorites = useToggleFavoriteJoke;
-export const useRemoveJokeFromFavorites = useToggleFavoriteJoke;
-export const useGetMyFavoriteJokes = useGetFavoriteJokes;
-
-// Feedback Queries
-export function useSubmitFeedback() {
-  const { actor } = useActor();
-  const { identity } = useInternetIdentity();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (feedbackData: { feedbackType: FeedbackType; text: string }) => {
-      if (!actor || !identity) throw new Error('Actor not available');
-      const stored = localStorage.getItem('feedback');
-      const allFeedback: Feedback[] = stored ? JSON.parse(stored) : [];
-      const newFeedback: Feedback = {
-        id: BigInt(Date.now()),
-        feedbackType: feedbackData.feedbackType,
-        text: feedbackData.text,
-        author: identity.getPrincipal(),
-        timestamp: BigInt(Date.now()),
-        isResolved: false,
-      };
-      allFeedback.push(newFeedback);
-      localStorage.setItem('feedback', JSON.stringify(allFeedback));
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['myFeedback'] });
-    },
-  });
-}
-
-export function useGetMyFeedback() {
-  const { actor, isFetching } = useActor();
-  const { identity } = useInternetIdentity();
-
-  return useQuery<Feedback[]>({
-    queryKey: ['myFeedback'],
-    queryFn: async () => {
-      if (!actor || !identity) return [];
-      const stored = localStorage.getItem('feedback');
-      const allFeedback: Feedback[] = stored ? JSON.parse(stored) : [];
-      const userId = identity.getPrincipal().toText();
-      return allFeedback.filter(f => f.author.toText() === userId);
-    },
-    enabled: !!actor && !isFetching && !!identity,
-  });
-}
-
-// Rewards Queries
-export function useGetUserRewards() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<Reward>({
-    queryKey: ['userRewards'],
-    queryFn: async () => {
-      if (!actor) return { userId: Principal.anonymous(), points: 0, badges: [], achievements: [], virtualPetLevel: 0 };
-      const stored = localStorage.getItem('rewards');
-      return stored ? JSON.parse(stored) : { userId: Principal.anonymous(), points: 0, badges: [], achievements: [], virtualPetLevel: 0 };
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
-
-export function useUpdateUserRewards() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (reward: Reward) => {
-      if (!actor) throw new Error('Actor not available');
-      localStorage.setItem('rewards', JSON.stringify(reward));
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['userRewards'] });
-    },
-  });
-}
-
-export function useGetUserBadgeProofs() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<BadgeProof[]>({
-    queryKey: ['userBadgeProofs'],
-    queryFn: async () => {
-      if (!actor) return [];
-      const stored = localStorage.getItem('badgeProofs');
-      return stored ? JSON.parse(stored) : [];
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
-
-// Story Builder Queries
-export function useGetCallerStoryProjects() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<StoryProject[]>({
-    queryKey: ['callerStoryProjects'],
-    queryFn: async () => {
-      if (!actor) return [];
-      try {
-        const projects = await actor.getCallerStoryProjects();
-        return projects.map(convertBackendStoryProject);
-      } catch (error) {
-        console.error('Error fetching story projects:', error);
-        return [];
-      }
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
-
-export function useSaveStoryProject() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (story: StoryProject) => {
-      if (!actor) throw new Error('Actor not available');
-      const backendStory = convertToBackendStoryProject(story);
-      await actor.saveStoryProject(backendStory);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['callerStoryProjects'] });
-    },
-  });
-}
-
-// Virtual Pet Hub Queries
-export function useGetCallerVirtualPet() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<VirtualPetHub | null>({
-    queryKey: ['virtualPetHub'],
-    queryFn: async () => {
-      if (!actor) return null;
-      try {
-        const pet = await actor.getCallerVirtualPet();
-        return pet || null;
-      } catch (error) {
-        console.error('Error fetching virtual pet:', error);
-        return null;
-      }
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
-
-export function useSaveCallerVirtualPet() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (pet: VirtualPetHub) => {
-      if (!actor) throw new Error('Actor not available');
-      const backendPet: BackendVirtualPetHub = {
-        ...pet,
-        trophies: pet.trophies || BigInt(70),
-      };
-      await actor.saveCallerVirtualPet(backendPet);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['virtualPetHub'] });
-      queryClient.invalidateQueries({ queryKey: ['userTrophies'] });
-    },
-  });
-}
-
-// Aliases for compatibility
-export const useGetVirtualPetHub = useGetCallerVirtualPet;
-export const useSaveVirtualPetHub = useSaveCallerVirtualPet;
-
-// Art Gallery Queries
-export function useGetCallerArtwork() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<ArtGallerySubmission[]>({
-    queryKey: ['callerArtwork'],
-    queryFn: async () => {
-      if (!actor) return [];
-      const stored = localStorage.getItem('artGallery');
-      const allArt: ArtGallerySubmission[] = stored ? JSON.parse(stored) : [];
-      return allArt;
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
-
-export function useGetPublicArtwork() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<ArtGallerySubmission[]>({
-    queryKey: ['publicArtwork'],
-    queryFn: async () => {
-      if (!actor) return [];
-      const stored = localStorage.getItem('artGallery');
-      const allArt: ArtGallerySubmission[] = stored ? JSON.parse(stored) : [];
-      return allArt.filter(art => art.isPublic && art.approved);
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
-
-export function useSubmitArtwork() {
-  const { actor } = useActor();
-  const { identity } = useInternetIdentity();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (artworkData: { title: string; artworkUrl: string; category: string; isPublic: boolean }) => {
-      if (!actor || !identity) throw new Error('Actor not available');
-      const stored = localStorage.getItem('artGallery');
-      const allArt: ArtGallerySubmission[] = stored ? JSON.parse(stored) : [];
-      const newArt: ArtGallerySubmission = {
-        id: `art_${Date.now()}`,
-        owner: identity.getPrincipal(),
-        title: artworkData.title,
-        artworkUrl: artworkData.artworkUrl,
-        category: artworkData.category,
-        createdAt: BigInt(Date.now()),
-        isPublic: artworkData.isPublic,
-        approved: false,
-      };
-      allArt.push(newArt);
-      localStorage.setItem('artGallery', JSON.stringify(allArt));
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['callerArtwork'] });
-      queryClient.invalidateQueries({ queryKey: ['publicArtwork'] });
-    },
-  });
-}
-
-// Craft Projects Queries
-export function useGetAllCraftProjects() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<CraftProject[]>({
-    queryKey: ['allCraftProjects'],
-    queryFn: async () => {
-      if (!actor) return [];
-      const stored = localStorage.getItem('craftProjects');
-      return stored ? JSON.parse(stored) : [];
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
-
-export function useMarkCraftProjectCompleted() {
-  const { actor } = useActor();
-  const { identity } = useInternetIdentity();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (projectId: string) => {
-      if (!actor || !identity) throw new Error('Actor not available');
-      const stored = localStorage.getItem('craftProjects');
-      const projects: CraftProject[] = stored ? JSON.parse(stored) : [];
-      const projectIndex = projects.findIndex(p => p.id === projectId);
-      if (projectIndex !== -1) {
-        const userId = identity.getPrincipal();
-        if (!projects[projectIndex].completedBy.some(p => p.toText() === userId.toText())) {
-          projects[projectIndex].completedBy.push(userId);
-        }
-        localStorage.setItem('craftProjects', JSON.stringify(projects));
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['allCraftProjects'] });
-    },
-  });
-}
-
-// Certificates Queries
-export function useCreateCertificate() {
-  const { actor } = useActor();
-  const { identity } = useInternetIdentity();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (certificateData: { achievement: string }) => {
-      if (!actor || !identity) throw new Error('Actor not available');
-      const stored = localStorage.getItem('certificates');
-      const certificates: Certificate[] = stored ? JSON.parse(stored) : [];
-      const newCert: Certificate = {
-        id: `cert_${Date.now()}`,
-        userId: identity.getPrincipal(),
-        achievement: certificateData.achievement,
-        date: Date.now(),
-      };
-      certificates.push(newCert);
-      localStorage.setItem('certificates', JSON.stringify(certificates));
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['userCertificates'] });
-    },
-  });
-}
-
-export function useGetUserCertificates() {
-  const { actor, isFetching } = useActor();
-  const { identity } = useInternetIdentity();
-
-  return useQuery<Certificate[]>({
-    queryKey: ['userCertificates'],
-    queryFn: async () => {
-      if (!actor || !identity) return [];
-      const stored = localStorage.getItem('certificates');
-      const allCerts: Certificate[] = stored ? JSON.parse(stored) : [];
-      const userId = identity.getPrincipal().toText();
-      return allCerts.filter(cert => cert.userId.toText() === userId);
-    },
-    enabled: !!actor && !isFetching && !!identity,
-  });
-}
-
-// Sticker Queries
-export function useCreateSticker() {
-  const { actor } = useActor();
-  const { identity } = useInternetIdentity();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (stickerData: { name: string; image: any }) => {
-      if (!actor || !identity) throw new Error('Actor not available');
-      const stored = localStorage.getItem('stickers');
-      const stickers: Sticker[] = stored ? JSON.parse(stored) : [];
-      const newSticker: Sticker = {
-        id: `sticker_${Date.now()}`,
-        creator: identity.getPrincipal(),
-        name: stickerData.name,
-        image: stickerData.image,
-        isModerated: false,
-        approved: false,
-      };
-      stickers.push(newSticker);
-      localStorage.setItem('stickers', JSON.stringify(stickers));
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['approvedStickers'] });
-    },
-  });
-}
-
-export function useGetApprovedStickers() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<Sticker[]>({
-    queryKey: ['approvedStickers'],
-    queryFn: async () => {
-      if (!actor) return [];
-      const stored = localStorage.getItem('stickers');
-      const allStickers: Sticker[] = stored ? JSON.parse(stored) : [];
-      return allStickers.filter(s => s.approved);
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
-
-// Music Remix Queries
-export function useCreateMusicRemix() {
-  const { actor } = useActor();
-  const { identity } = useInternetIdentity();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (remixData: { title: string; audio: any; duration: number; isPublic: boolean }) => {
-      if (!actor || !identity) throw new Error('Actor not available');
-      const stored = localStorage.getItem('musicRemixes');
-      const remixes: MusicRemix[] = stored ? JSON.parse(stored) : [];
-      const newRemix: MusicRemix = {
-        id: `remix_${Date.now()}`,
-        creator: identity.getPrincipal(),
-        title: remixData.title,
-        audio: remixData.audio,
-        duration: BigInt(remixData.duration),
-        isPublic: remixData.isPublic,
-        approved: false,
-      };
-      remixes.push(newRemix);
-      localStorage.setItem('musicRemixes', JSON.stringify(remixes));
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['approvedRemixes'] });
-    },
-  });
-}
-
-export function useGetApprovedRemixes() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<MusicRemix[]>({
-    queryKey: ['approvedRemixes'],
-    queryFn: async () => {
-      if (!actor) return [];
-      const stored = localStorage.getItem('musicRemixes');
-      const allRemixes: MusicRemix[] = stored ? JSON.parse(stored) : [];
-      return allRemixes.filter(r => r.approved);
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
-
-// Spin Wheel Queries
-export function useSpinWheel() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (): Promise<SpinRewardUpdate> => {
-      if (!actor) throw new Error('Actor not available');
-      const reward: SpinReward = {
-        rewardType: 'points',
-        value: '100',
-        timestamp: Date.now(),
-      };
-      const stored = localStorage.getItem('spinRewards');
-      const rewards: SpinReward[] = stored ? JSON.parse(stored) : [];
-      rewards.push(reward);
-      localStorage.setItem('spinRewards', JSON.stringify(rewards));
-      
-      // Return SpinRewardUpdate with all required fields
-      return {
-        spinReward: reward,
-        badgesEarned: [],
-        pointsAwarded: 100,
-        extraSpin: false,
-      };
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['spinRewardHistory'] });
-    },
-  });
-}
-
-export function useGetSpinRewardHistory() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<SpinReward[]>({
-    queryKey: ['spinRewardHistory'],
-    queryFn: async () => {
-      if (!actor) return [];
-      const stored = localStorage.getItem('spinRewards');
-      return stored ? JSON.parse(stored) : [];
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
-
-// Seasonal Events Queries
-export function useGetActiveSeasonalEvents() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<SeasonalEvent[]>({
-    queryKey: ['activeSeasonalEvents'],
-    queryFn: async () => {
-      if (!actor) return [];
-      const stored = localStorage.getItem('seasonalEvents');
-      const allEvents: SeasonalEvent[] = stored ? JSON.parse(stored) : [];
-      return allEvents.filter(e => e.isActive);
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
-
-// Events Queries
-export function useGetTodaysEvents() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<Event[]>({
-    queryKey: ['todaysEvents'],
-    queryFn: async () => {
-      if (!actor) return [];
-      const stored = localStorage.getItem('events');
-      const allEvents: Event[] = stored ? JSON.parse(stored) : [];
-      const today = new Date().toDateString();
-      return allEvents.filter(e => new Date(Number(e.date)).toDateString() === today);
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
-
-export function useDismissEventNotification() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (eventId: string) => {
-      if (!actor) throw new Error('Actor not available');
-      const stored = localStorage.getItem('dismissedEvents');
-      const dismissed: string[] = stored ? JSON.parse(stored) : [];
-      if (!dismissed.includes(eventId)) {
-        dismissed.push(eventId);
-      }
-      localStorage.setItem('dismissedEvents', JSON.stringify(dismissed));
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['todaysEvents'] });
-    },
-  });
-}
-
-// Invention Stories Queries
-export function useGetAllInventionStories() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<InventionStory[]>({
-    queryKey: ['allInventionStories'],
-    queryFn: async () => {
-      if (!actor) return [];
-      const stored = localStorage.getItem('inventionStories');
-      return stored ? JSON.parse(stored) : [];
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
-
-// Admin Dashboard Queries
-export function useGetAdminDashboard() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<AdminDashboardSection>({
-    queryKey: ['adminDashboard'],
-    queryFn: async () => {
-      if (!actor) {
-        return {
-          overview: {
-            activeUsers: [],
-            userStats: { total: BigInt(0), active: BigInt(0), restricted: BigInt(0), suspended: BigInt(0), banned: BigInt(0) },
-            activitySummary: { recentActivities: BigInt(0), systemEvents: BigInt(0) },
-          },
-          manageUsers: [],
-          restrictions: [],
-          settings: { adminPreferences: '' },
-          safetyAlerts: [],
-        };
-      }
-      const stored = localStorage.getItem('adminDashboard');
-      return stored ? JSON.parse(stored) : {
-        overview: {
-          activeUsers: [],
-          userStats: { total: BigInt(0), active: BigInt(0), restricted: BigInt(0), suspended: BigInt(0), banned: BigInt(0) },
-          activitySummary: { recentActivities: BigInt(0), systemEvents: BigInt(0) },
-        },
-        manageUsers: [],
-        restrictions: [],
-        settings: { adminPreferences: '' },
-        safetyAlerts: [],
-      };
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
-
-export function useSetUserStatus() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ userId, status, reason }: { userId: Principal; status: AdminUserStatus; reason: string }) => {
-      if (!actor) throw new Error('Actor not available');
-      const stored = localStorage.getItem('adminDashboard');
-      const dashboard: AdminDashboardSection = stored ? JSON.parse(stored) : {
-        overview: {
-          activeUsers: [],
-          userStats: { total: BigInt(0), active: BigInt(0), restricted: BigInt(0), suspended: BigInt(0), banned: BigInt(0) },
-          activitySummary: { recentActivities: BigInt(0), systemEvents: BigInt(0) },
-        },
-        manageUsers: [],
-        restrictions: [],
-        settings: { adminPreferences: '' },
-        safetyAlerts: [],
-      };
-      
-      localStorage.setItem('adminDashboard', JSON.stringify(dashboard));
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['adminDashboard'] });
-    },
-  });
-}
-
-export function useAddRestriction() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ userId, feature, reason }: { userId: Principal; feature: string; reason: string }) => {
-      if (!actor) throw new Error('Actor not available');
-      const stored = localStorage.getItem('adminDashboard');
-      const dashboard: AdminDashboardSection = stored ? JSON.parse(stored) : {
-        overview: {
-          activeUsers: [],
-          userStats: { total: BigInt(0), active: BigInt(0), restricted: BigInt(0), suspended: BigInt(0), banned: BigInt(0) },
-          activitySummary: { recentActivities: BigInt(0), systemEvents: BigInt(0) },
-        },
-        manageUsers: [],
-        restrictions: [],
-        settings: { adminPreferences: '' },
-        safetyAlerts: [],
-      };
-      
-      localStorage.setItem('adminDashboard', JSON.stringify(dashboard));
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['adminDashboard'] });
-    },
-  });
-}
-
-export function useRemoveRestriction() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ userId, feature }: { userId: Principal; feature: string }) => {
-      if (!actor) throw new Error('Actor not available');
-      const stored = localStorage.getItem('adminDashboard');
-      const dashboard: AdminDashboardSection = stored ? JSON.parse(stored) : {
-        overview: {
-          activeUsers: [],
-          userStats: { total: BigInt(0), active: BigInt(0), restricted: BigInt(0), suspended: BigInt(0), banned: BigInt(0) },
-          activitySummary: { recentActivities: BigInt(0), systemEvents: BigInt(0) },
-        },
-        manageUsers: [],
-        restrictions: [],
-        settings: { adminPreferences: '' },
-        safetyAlerts: [],
-      };
-      
-      localStorage.setItem('adminDashboard', JSON.stringify(dashboard));
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['adminDashboard'] });
-    },
-  });
-}
-
+// Authorization Hooks
 export function useIsCallerAdmin() {
   const { actor, isFetching } = useActor();
 
   return useQuery<boolean>({
-    queryKey: ['isCallerAdmin'],
+    queryKey: ["isAdmin"],
     queryFn: async () => {
       if (!actor) return false;
-      try {
-        const isAdmin = await actor.isCallerAdmin();
-        return isAdmin;
-      } catch (error) {
-        console.error('Error checking admin status:', error);
-        return false;
-      }
+      return actor.isCallerAdmin();
     },
     enabled: !!actor && !isFetching,
   });
 }
 
-// User Approval Queries
 export function useIsCallerApproved() {
   const { actor, isFetching } = useActor();
 
   return useQuery<boolean>({
-    queryKey: ['isCallerApproved'],
+    queryKey: ["isApproved"],
     queryFn: async () => {
       if (!actor) return false;
-      try {
-        const isApproved = await actor.isCallerApproved();
-        return isApproved;
-      } catch (error) {
-        console.error('Error checking approval status:', error);
-        return false;
-      }
+      return actor.isCallerApproved();
     },
     enabled: !!actor && !isFetching,
   });
@@ -1545,11 +385,11 @@ export function useRequestApproval() {
 
   return useMutation({
     mutationFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      await actor.requestApproval();
+      if (!actor) throw new Error("Actor not available");
+      return actor.requestApproval();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['isCallerApproved'] });
+      queryClient.invalidateQueries({ queryKey: ["isApproved"] });
     },
   });
 }
@@ -1558,16 +398,10 @@ export function useListApprovals() {
   const { actor, isFetching } = useActor();
 
   return useQuery<UserApprovalInfo[]>({
-    queryKey: ['approvalsList'],
+    queryKey: ["approvals"],
     queryFn: async () => {
       if (!actor) return [];
-      try {
-        const approvals = await actor.listApprovals();
-        return approvals;
-      } catch (error) {
-        console.error('Error fetching approvals:', error);
-        return [];
-      }
+      return actor.listApprovals();
     },
     enabled: !!actor && !isFetching,
   });
@@ -1578,12 +412,1064 @@ export function useSetApproval() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ user, status }: { user: Principal; status: ApprovalStatus }) => {
-      if (!actor) throw new Error('Actor not available');
-      await actor.setApproval(user, status);
+    mutationFn: async ({
+      user,
+      status,
+    }: { user: Principal; status: ApprovalStatus }) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.setApproval(user, status);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['approvalsList'] });
+      queryClient.invalidateQueries({ queryKey: ["approvals"] });
+    },
+  });
+}
+
+// Story Builder Hooks - localStorage based (backend methods not available)
+export function useGetCallerStoryProjects() {
+  return useQuery<StoryProject[]>({
+    queryKey: ["callerStoryProjects"],
+    queryFn: async () => {
+      try {
+        const stored = localStorage.getItem("storyProjects");
+        return stored ? JSON.parse(stored) : [];
+      } catch {
+        return [];
+      }
+    },
+  });
+}
+
+export function useSaveStoryProject() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (story: StoryProject) => {
+      const existing: StoryProject[] = JSON.parse(
+        localStorage.getItem("storyProjects") || "[]",
+      );
+      const idx = existing.findIndex((s) => s.id === story.id);
+      if (idx >= 0) {
+        existing[idx] = story;
+      } else {
+        existing.push(story);
+      }
+      localStorage.setItem("storyProjects", JSON.stringify(existing));
+      return story;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["callerStoryProjects"] });
+    },
+  });
+}
+
+// Virtual Pet Hooks
+export function useGetCallerVirtualPet() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<BackendVirtualPetHub | null>({
+    queryKey: ["callerVirtualPet"],
+    queryFn: async () => {
+      if (!actor) return null;
+      return actor.getVirtualPetHub();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export const useGetVirtualPetHub = useGetCallerVirtualPet;
+
+export function useSaveCallerVirtualPet() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (pet: BackendVirtualPetHub) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.saveVirtualPetHub(pet);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["callerVirtualPet"] });
+    },
+  });
+}
+
+export const useSaveVirtualPetHub = useSaveCallerVirtualPet;
+
+export function useGetUserTrophies() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<number>({
+    queryKey: ["userTrophies"],
+    queryFn: async () => {
+      if (!actor) return 70;
+      const pet = await actor.getVirtualPetHub();
+      return pet ? Number(pet.trophies) : 70;
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useUpdateGamesTrophies() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      // No-op: backend method not available
+      return;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["callerVirtualPet"] });
+      queryClient.invalidateQueries({ queryKey: ["userTrophies"] });
+    },
+  });
+}
+
+export function useWelcomeBackReward() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      // No-op: backend method not available
+      return;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["callerVirtualPet"] });
+      queryClient.invalidateQueries({ queryKey: ["userTrophies"] });
+    },
+  });
+}
+
+// Game States Hook - localStorage based
+export function useGetMyGameStates() {
+  return useQuery<GameState[]>({
+    queryKey: ["myGameStates"],
+    queryFn: async () => {
+      try {
+        const stored = localStorage.getItem("gameStates");
+        return stored ? JSON.parse(stored) : [];
+      } catch {
+        return [];
+      }
+    },
+  });
+}
+
+// Alias for backward compatibility
+export const useGetMyGameStatesAlias = useGetMyGameStates;
+
+// User Rewards Hook - uses backend getCallerRewards
+export function useGetUserRewards() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<Reward | null>({
+    queryKey: ["userRewards"],
+    queryFn: async () => {
+      if (!actor) return null;
+      const backendReward = await actor.getCallerRewards();
+      if (!backendReward) return null;
+      return {
+        userId: backendReward.userId.toString(),
+        points: Number(backendReward.points),
+        badges: backendReward.badges,
+        achievements: backendReward.achievements,
+        virtualPetLevel: Number(backendReward.virtualPetLevel),
+      };
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+// Craft Project Hooks - localStorage based
+export function useMarkCraftProjectCompleted() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (projectId: string) => {
+      const completed: string[] = JSON.parse(
+        localStorage.getItem("completedCraftProjects") || "[]",
+      );
+      if (!completed.includes(projectId)) {
+        completed.push(projectId);
+        localStorage.setItem(
+          "completedCraftProjects",
+          JSON.stringify(completed),
+        );
+      }
+      return [true, []] as [boolean, BadgeProof[]];
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["userBadgeProofs"] });
+    },
+  });
+}
+
+export function useGetUserBadgeProofs() {
+  return useQuery<BadgeProof[]>({
+    queryKey: ["userBadgeProofs"],
+    queryFn: async () => {
+      const proofs = localStorage.getItem("badgeProofs");
+      return proofs ? JSON.parse(proofs) : [];
+    },
+  });
+}
+
+// Video Channel Hooks - localStorage based
+export function useGetVideoChannels() {
+  return useQuery<VideoChannel[]>({
+    queryKey: ["videoChannels"],
+    queryFn: async () => {
+      try {
+        const stored = localStorage.getItem("videoChannels");
+        return stored ? JSON.parse(stored) : [];
+      } catch {
+        return [];
+      }
+    },
+  });
+}
+
+export function useUpdateVideoChannelViews() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (channelId: string) => {
+      const channels: VideoChannel[] = JSON.parse(
+        localStorage.getItem("videoChannels") || "[]",
+      );
+      const idx = channels.findIndex((c) => c.channelId === channelId);
+      if (idx >= 0) {
+        channels[idx] = {
+          ...channels[idx],
+          views: channels[idx].views + BigInt(1),
+        };
+        localStorage.setItem("videoChannels", JSON.stringify(channels));
+      }
+      return channelId;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["videoChannels"] });
+    },
+  });
+}
+
+// Admin Activity Hooks - localStorage based
+export function useGetRecentActivityEvents() {
+  return useQuery<ActivityEvent[]>({
+    queryKey: ["recentActivityEvents"],
+    queryFn: async () => {
+      try {
+        const stored = localStorage.getItem("activityEvents");
+        return stored ? JSON.parse(stored) : [];
+      } catch {
+        return [];
+      }
+    },
+    refetchInterval: 5000,
+  });
+}
+
+export function useRecordGamePlay() {
+  return useMutation({
+    mutationFn: async ({
+      gameId,
+      gameName,
+    }: { gameId: string; gameName: string }) => {
+      const events: ActivityEvent[] = JSON.parse(
+        localStorage.getItem("activityEvents") || "[]",
+      );
+      const newEvent: ActivityEvent = {
+        id: Date.now(),
+        userId: "local",
+        activityType: { game_played: { gameId, gameName } },
+        timestamp: Date.now(),
+      };
+      events.unshift(newEvent);
+      localStorage.setItem(
+        "activityEvents",
+        JSON.stringify(events.slice(0, 50)),
+      );
+      return newEvent;
+    },
+  });
+}
+
+// Admin User Management Hooks
+export function useSetUserStatus() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      userId,
+      status,
+    }: { userId: Principal; status: AdminUserStatus }) => {
+      const statuses = JSON.parse(localStorage.getItem("userStatuses") || "{}");
+      statuses[userId.toString()] = status;
+      localStorage.setItem("userStatuses", JSON.stringify(statuses));
+      return status;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["adminDashboard"] });
+    },
+  });
+}
+
+export function useAddRestriction() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      userId,
+      feature,
+      reason,
+    }: { userId: Principal; feature: string; reason: string }) => {
+      const restrictions = JSON.parse(
+        localStorage.getItem("userRestrictions") || "{}",
+      );
+      if (!restrictions[userId.toString()]) {
+        restrictions[userId.toString()] = [];
+      }
+      restrictions[userId.toString()].push({
+        feature,
+        reason,
+        timestamp: Date.now(),
+      });
+      localStorage.setItem("userRestrictions", JSON.stringify(restrictions));
+      return { userId, feature, reason };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["adminDashboard"] });
+    },
+  });
+}
+
+export function useRemoveRestriction() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      userId,
+      feature,
+    }: { userId: Principal; feature: string }) => {
+      const restrictions = JSON.parse(
+        localStorage.getItem("userRestrictions") || "{}",
+      );
+      if (restrictions[userId.toString()]) {
+        restrictions[userId.toString()] = restrictions[
+          userId.toString()
+        ].filter((r: { feature: string }) => r.feature !== feature);
+        localStorage.setItem("userRestrictions", JSON.stringify(restrictions));
+      }
+      return { userId, feature };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["adminDashboard"] });
+    },
+  });
+}
+
+export function useGetAdminDashboard() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<AdminDashboardData>({
+    queryKey: ["adminDashboard"],
+    queryFn: async () => {
+      const statuses = JSON.parse(localStorage.getItem("userStatuses") || "{}");
+      const statusValues = Object.values(statuses) as AdminUserStatus[];
+
+      let manageUsers: BackendUserProfile[] = [];
+      if (actor) {
+        try {
+          const approvals = await actor.listApprovals();
+          manageUsers = [];
+          void approvals;
+        } catch {
+          manageUsers = [];
+        }
+      }
+
+      return {
+        totalUsers: statusValues.length,
+        activeUsers: statusValues.filter((s) => s === AdminUserStatus.active)
+          .length,
+        pendingApprovals: 0,
+        recentActivity: [],
+        overview: {
+          userStats: {
+            total: statusValues.length,
+            active: statusValues.filter((s) => s === AdminUserStatus.active)
+              .length,
+            restricted: statusValues.filter(
+              (s) => s === AdminUserStatus.restricted,
+            ).length,
+            suspended: statusValues.filter(
+              (s) => s === AdminUserStatus.suspended,
+            ).length,
+            banned: statusValues.filter((s) => s === AdminUserStatus.banned)
+              .length,
+          },
+        },
+        manageUsers,
+        safetyAlerts: [],
+      };
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+// Spin Wheel Hooks
+export function useGetSpinRewards() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<SpinReward[]>({
+    queryKey: ["spinRewards"],
+    queryFn: async () => {
+      if (!actor) return [];
+      const rewards = await actor.getSpinRewards();
+      return rewards.map((r) => ({
+        rewardType: r.rewardType,
+        value: r.value,
+        timestamp: Number(r.timestamp),
+      }));
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useRecordSpinReward() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (reward: {
+      rewardType: string;
+      value: string;
+      timestamp: bigint;
+    }) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.recordSpinReward(reward);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["spinRewards"] });
+    },
+  });
+}
+
+// claimSpinReward: adds points to Virtual Pet and enforces 20-min cooldown
+export function useClaimSpinReward() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (points: number) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.claimSpinReward(BigInt(points));
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["virtualPetHub"] });
+      queryClient.invalidateQueries({ queryKey: ["callerVirtualPet"] });
+      queryClient.invalidateQueries({ queryKey: ["spinCooldown"] });
+    },
+  });
+}
+
+// addTrophiesFromSpin: no-op (backend method removed; trophies are tracked locally)
+export function useAddTrophiesFromSpin() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (_trophies: number) => {
+      // No-op: addTrophiesFromSpin is not available in the backend interface.
+      return;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["callerVirtualPet"] });
+      queryClient.invalidateQueries({ queryKey: ["userTrophies"] });
+    },
+  });
+}
+
+// addPointsFromSpin: no-op (use useClaimSpinReward instead)
+export function useAddPointsFromSpin() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (_points: number) => {
+      // No-op: use useClaimSpinReward (actor.claimSpinReward) to add points to Virtual Pet.
+      return;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["callerVirtualPet"] });
+      queryClient.invalidateQueries({ queryKey: ["virtualPetHub"] });
+    },
+  });
+}
+
+// Feedback Hooks - localStorage based
+export function useGetMyFeedback() {
+  return useQuery<Feedback[]>({
+    queryKey: ["myFeedback"],
+    queryFn: async () => {
+      try {
+        const stored = localStorage.getItem("myFeedback");
+        return stored ? JSON.parse(stored) : [];
+      } catch {
+        return [];
+      }
+    },
+  });
+}
+
+export function useSubmitFeedback() {
+  const queryClient = useQueryClient();
+  const { identity } = useInternetIdentity();
+
+  return useMutation({
+    mutationFn: async (feedback: Omit<Feedback, "id" | "timestamp">) => {
+      const newFeedback: Feedback = {
+        ...feedback,
+        id: `feedback_${Date.now()}`,
+        timestamp: Date.now(),
+        submitter: identity?.getPrincipal().toString() || "anonymous",
+      };
+      const existing: Feedback[] = JSON.parse(
+        localStorage.getItem("myFeedback") || "[]",
+      );
+      existing.unshift(newFeedback);
+      localStorage.setItem("myFeedback", JSON.stringify(existing));
+      return newFeedback;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["myFeedback"] });
+    },
+  });
+}
+
+// Chat Hooks - localStorage based
+export function useGetChatMessages() {
+  return useQuery<ChatMessage[]>({
+    queryKey: ["chatMessages"],
+    queryFn: async () => {
+      try {
+        const stored = localStorage.getItem("chatMessages");
+        return stored ? JSON.parse(stored) : [];
+      } catch {
+        return [];
+      }
+    },
+    refetchInterval: 2000,
+  });
+}
+
+export function useSendChatMessage() {
+  const queryClient = useQueryClient();
+  const { identity } = useInternetIdentity();
+
+  return useMutation({
+    mutationFn: async (
+      message: Omit<ChatMessage, "id" | "timestamp" | "sender">,
+    ) => {
+      const newMessage: ChatMessage = {
+        ...message,
+        id: `msg_${Date.now()}`,
+        timestamp: Date.now(),
+        sender: identity?.getPrincipal().toString() || "anonymous",
+      };
+      const existing: ChatMessage[] = JSON.parse(
+        localStorage.getItem("chatMessages") || "[]",
+      );
+      existing.push(newMessage);
+      localStorage.setItem(
+        "chatMessages",
+        JSON.stringify(existing.slice(-100)),
+      );
+      return newMessage;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["chatMessages"] });
+    },
+  });
+}
+
+export function useGetOnlineUsers() {
+  return useQuery<OnlineUser[]>({
+    queryKey: ["onlineUsers"],
+    queryFn: async () => {
+      try {
+        const stored = localStorage.getItem("onlineUsers");
+        return stored ? JSON.parse(stored) : [];
+      } catch {
+        return [];
+      }
+    },
+    refetchInterval: 5000,
+  });
+}
+
+export function useUpdateOnlineStatus() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      userId,
+      isOnline,
+    }: { userId: string; isOnline: boolean }) => {
+      const users: OnlineUser[] = JSON.parse(
+        localStorage.getItem("onlineUsers") || "[]",
+      );
+      const idx = users.findIndex((u) => u.userId === userId);
+      const updatedUser: OnlineUser = {
+        userId,
+        isOnline,
+        lastSeen: Date.now(),
+      };
+      if (idx >= 0) {
+        users[idx] = updatedUser;
+      } else {
+        users.push(updatedUser);
+      }
+      localStorage.setItem("onlineUsers", JSON.stringify(users));
+      return updatedUser;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["onlineUsers"] });
+    },
+  });
+}
+
+// Events Hooks - localStorage based
+export function useGetTodaysEvents() {
+  return useQuery<Event[]>({
+    queryKey: ["todaysEvents"],
+    queryFn: async () => {
+      try {
+        const stored = localStorage.getItem("events");
+        const events: Event[] = stored ? JSON.parse(stored) : [];
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        return events.filter(
+          (e) => e.date >= today.getTime() && e.date < tomorrow.getTime(),
+        );
+      } catch {
+        return [];
+      }
+    },
+  });
+}
+
+export function useDismissEventNotification() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (eventId: string) => {
+      const dismissed: string[] = JSON.parse(
+        localStorage.getItem("dismissedEvents") || "[]",
+      );
+      if (!dismissed.includes(eventId)) {
+        dismissed.push(eventId);
+        localStorage.setItem("dismissedEvents", JSON.stringify(dismissed));
+      }
+      return eventId;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["todaysEvents"] });
+    },
+  });
+}
+
+export function useGetActiveSeasonalEvents() {
+  return useQuery<Event[]>({
+    queryKey: ["activeSeasonalEvents"],
+    queryFn: async () => {
+      try {
+        const stored = localStorage.getItem("seasonalEvents");
+        const events: Event[] = stored ? JSON.parse(stored) : [];
+        const now = Date.now();
+        return events.filter((e) => e.isSeasonal && e.date >= now);
+      } catch {
+        return [];
+      }
+    },
+  });
+}
+
+// Jokes Hooks - localStorage based
+export function useGetAllJokes() {
+  return useQuery<Joke[]>({
+    queryKey: ["allJokes"],
+    queryFn: async () => {
+      try {
+        const stored = localStorage.getItem("jokes");
+        return stored ? JSON.parse(stored) : getDefaultJokes();
+      } catch {
+        return getDefaultJokes();
+      }
+    },
+  });
+}
+
+function getDefaultJokes(): Joke[] {
+  return [
+    {
+      id: "1",
+      category: "animals",
+      content:
+        "Why don't scientists trust atoms? Because they make up everything!",
+      approved: true,
+      rating: 5,
+    },
+    {
+      id: "2",
+      category: "food",
+      content: "What do you call a fake noodle? An impasta!",
+      approved: true,
+      rating: 4,
+    },
+    {
+      id: "3",
+      category: "school",
+      content:
+        "Why did the math book look so sad? Because it had too many problems!",
+      approved: true,
+      rating: 5,
+    },
+    {
+      id: "4",
+      category: "animals",
+      content: "What do you call a sleeping dinosaur? A dino-snore!",
+      approved: true,
+      rating: 4,
+    },
+    {
+      id: "5",
+      category: "food",
+      content:
+        "Why did the banana go to the doctor? Because it wasn't peeling well!",
+      approved: true,
+      rating: 3,
+    },
+  ];
+}
+
+export function useSubmitJoke() {
+  const queryClient = useQueryClient();
+  const { identity } = useInternetIdentity();
+
+  return useMutation({
+    mutationFn: async (joke: Omit<Joke, "id" | "approved">) => {
+      const newJoke: Joke = {
+        ...joke,
+        id: `joke_${Date.now()}`,
+        approved: false,
+        submittedBy: identity?.getPrincipal().toString(),
+      };
+      const existing: Joke[] = JSON.parse(
+        localStorage.getItem("jokes") || JSON.stringify(getDefaultJokes()),
+      );
+      existing.push(newJoke);
+      localStorage.setItem("jokes", JSON.stringify(existing));
+      return newJoke;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["allJokes"] });
+    },
+  });
+}
+
+export function useRateJoke() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      jokeId,
+      rating,
+    }: { jokeId: string; rating: number }) => {
+      const jokes: Joke[] = JSON.parse(
+        localStorage.getItem("jokes") || JSON.stringify(getDefaultJokes()),
+      );
+      const idx = jokes.findIndex((j) => j.id === jokeId);
+      if (idx >= 0) {
+        jokes[idx] = { ...jokes[idx], rating };
+        localStorage.setItem("jokes", JSON.stringify(jokes));
+      }
+      return { jokeId, rating };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["allJokes"] });
+    },
+  });
+}
+
+export function useGetJokeFavorites() {
+  return useQuery<string[]>({
+    queryKey: ["jokeFavorites"],
+    queryFn: async () => {
+      try {
+        const stored = localStorage.getItem("jokeFavorites");
+        return stored ? JSON.parse(stored) : [];
+      } catch {
+        return [];
+      }
+    },
+  });
+}
+
+export function useAddJokeToFavorites() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (jokeId: string) => {
+      const favorites: string[] = JSON.parse(
+        localStorage.getItem("jokeFavorites") || "[]",
+      );
+      if (!favorites.includes(jokeId)) {
+        favorites.push(jokeId);
+        localStorage.setItem("jokeFavorites", JSON.stringify(favorites));
+      }
+      return jokeId;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["jokeFavorites"] });
+    },
+  });
+}
+
+export function useRemoveJokeFromFavorites() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (jokeId: string) => {
+      const favorites: string[] = JSON.parse(
+        localStorage.getItem("jokeFavorites") || "[]",
+      );
+      const updated = favorites.filter((id) => id !== jokeId);
+      localStorage.setItem("jokeFavorites", JSON.stringify(updated));
+      return jokeId;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["jokeFavorites"] });
+    },
+  });
+}
+
+// Art Gallery Hooks
+export function useGetCallerArtwork() {
+  const { identity } = useInternetIdentity();
+
+  return useQuery<ArtworkSubmission[]>({
+    queryKey: ["callerArtwork"],
+    queryFn: async () => {
+      try {
+        const stored = localStorage.getItem("artGallery");
+        const all: ArtworkSubmission[] = stored ? JSON.parse(stored) : [];
+        const callerId = identity?.getPrincipal().toString();
+        return callerId ? all.filter((a) => a.owner === callerId) : [];
+      } catch {
+        return [];
+      }
+    },
+    enabled: !!identity,
+  });
+}
+
+export function useGetPublicArtwork() {
+  return useQuery<ArtworkSubmission[]>({
+    queryKey: ["publicArtwork"],
+    queryFn: async () => {
+      try {
+        const stored = localStorage.getItem("artGallery");
+        const all: ArtworkSubmission[] = stored ? JSON.parse(stored) : [];
+        return all.filter((a) => a.isPublic && a.approved);
+      } catch {
+        return [];
+      }
+    },
+  });
+}
+
+export function useSubmitArtwork() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (artwork: ArtworkSubmission) => {
+      const existing: ArtworkSubmission[] = JSON.parse(
+        localStorage.getItem("artGallery") || "[]",
+      );
+      existing.push(artwork);
+      localStorage.setItem("artGallery", JSON.stringify(existing));
+      return artwork;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["callerArtwork"] });
+      queryClient.invalidateQueries({ queryKey: ["publicArtwork"] });
+    },
+  });
+}
+
+// Music Remix Hooks - localStorage based
+export function useGetMusicRemixStudios() {
+  return useQuery<MusicRemixStudio[]>({
+    queryKey: ["musicRemixStudios"],
+    queryFn: async () => {
+      try {
+        const stored = localStorage.getItem("musicRemixStudios");
+        return stored ? JSON.parse(stored) : [];
+      } catch {
+        return [];
+      }
+    },
+  });
+}
+
+// Alias for backward compatibility
+export const useGetSavedRemixStudios = useGetMusicRemixStudios;
+
+export function useSaveRemixStudio() {
+  const queryClient = useQueryClient();
+  const { identity } = useInternetIdentity();
+
+  return useMutation({
+    mutationFn: async (studio: Omit<MusicRemixStudio, "id" | "creator">) => {
+      const newStudio: MusicRemixStudio = {
+        ...studio,
+        id: `studio_${Date.now()}`,
+        creator: identity?.getPrincipal() as Principal,
+      };
+      const existing: MusicRemixStudio[] = JSON.parse(
+        localStorage.getItem("musicRemixStudios") || "[]",
+      );
+      existing.push(newStudio);
+      localStorage.setItem("musicRemixStudios", JSON.stringify(existing));
+      return newStudio;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["musicRemixStudios"] });
+    },
+  });
+}
+
+// Sticker Hooks - localStorage based
+export function useGetApprovedStickers() {
+  return useQuery<Sticker[]>({
+    queryKey: ["approvedStickers"],
+    queryFn: async () => {
+      try {
+        const stored = localStorage.getItem("stickers");
+        const stickers: LocalSticker[] = stored ? JSON.parse(stored) : [];
+        return stickers
+          .filter((s) => s.approved)
+          .map((s) => ({
+            id: s.id,
+            creator: s.creator,
+            name: s.name,
+            image: {
+              getDirectURL: () => s.imageDataUrl,
+            },
+            isModerated: s.isModerated,
+            approved: s.approved,
+          }));
+      } catch {
+        return [];
+      }
+    },
+  });
+}
+
+export function useCreateSticker() {
+  const queryClient = useQueryClient();
+  const { identity } = useInternetIdentity();
+
+  return useMutation({
+    mutationFn: async ({
+      name,
+      image,
+    }: { name: string; image: Uint8Array }) => {
+      // Cast to Uint8Array<ArrayBuffer> to satisfy the Blob constructor's BlobPart type requirement
+      const safeImage =
+        image.buffer instanceof ArrayBuffer
+          ? (image as Uint8Array<ArrayBuffer>)
+          : (new Uint8Array(image) as Uint8Array<ArrayBuffer>);
+
+      const blob = new Blob([safeImage], { type: "image/png" });
+      const dataUrl = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.readAsDataURL(blob);
+      });
+
+      const newSticker: LocalSticker = {
+        id: `sticker_${Date.now()}`,
+        creator: identity?.getPrincipal().toString() || "anonymous",
+        name,
+        imageDataUrl: dataUrl,
+        isModerated: false,
+        approved: false,
+      };
+
+      const existing: LocalSticker[] = JSON.parse(
+        localStorage.getItem("stickers") || "[]",
+      );
+      existing.push(newSticker);
+      localStorage.setItem("stickers", JSON.stringify(existing));
+      return newSticker;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["approvedStickers"] });
+    },
+  });
+}
+
+// Certificate Hooks
+export function useGetUserCertificates() {
+  const { identity } = useInternetIdentity();
+
+  return useQuery<Certificate[]>({
+    queryKey: ["userCertificates"],
+    queryFn: async () => {
+      try {
+        const stored = localStorage.getItem("certificates");
+        const all: Certificate[] = stored ? JSON.parse(stored) : [];
+        const userId = identity?.getPrincipal().toString();
+        return userId ? all.filter((c) => c.userId === userId) : [];
+      } catch {
+        return [];
+      }
+    },
+    enabled: !!identity,
+  });
+}
+
+export function useCreateCertificate() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (certificate: Certificate) => {
+      const existing: Certificate[] = JSON.parse(
+        localStorage.getItem("certificates") || "[]",
+      );
+      existing.push(certificate);
+      localStorage.setItem("certificates", JSON.stringify(existing));
+      return certificate;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["userCertificates"] });
+    },
+  });
+}
+
+// Invention Stories Hooks - localStorage based
+export function useGetAllInventionStories() {
+  return useQuery<InventionStory[]>({
+    queryKey: ["inventionStories"],
+    queryFn: async () => {
+      try {
+        const stored = localStorage.getItem("inventionStories");
+        return stored ? JSON.parse(stored) : [];
+      } catch {
+        return [];
+      }
     },
   });
 }

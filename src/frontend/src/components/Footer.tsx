@@ -1,4 +1,4 @@
-import { Heart } from 'lucide-react';
+import { Heart } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -6,7 +6,8 @@ export default function Footer() {
       <div className="container mx-auto px-4 py-6">
         <div className="text-center text-sm text-gray-600">
           <p className="flex items-center justify-center gap-2">
-            © 2025. Built with <Heart className="w-4 h-4 text-red-500 fill-red-500" /> using{' '}
+            © 2025. Built with{" "}
+            <Heart className="w-4 h-4 text-red-500 fill-red-500" /> using{" "}
             <a
               href="https://caffeine.ai"
               target="_blank"

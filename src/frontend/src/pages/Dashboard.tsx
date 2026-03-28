@@ -1,28 +1,34 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { 
-  Gamepad2, 
-  Calendar, 
-  Video, 
-  MessageCircle, 
-  Mail, 
-  Laugh, 
-  Trophy, 
-  Palette, 
-  Music, 
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
   Award,
-  Sparkles,
+  Calendar,
+  Gamepad2,
   Ghost,
+  Laugh,
+  Mail,
+  MessageCircle,
+  Music,
+  Palette,
   Search,
+  Shield,
+  Sparkles,
+  Trophy,
+  Video,
   X,
   Youtube,
-  Shield,
-} from 'lucide-react';
-import { ModulePage } from '../App';
-import { useState, useMemo } from 'react';
-import { useIsCallerAdmin } from '../hooks/useQueries';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
+} from "lucide-react";
+import { useMemo, useState } from "react";
+import type { ModulePage } from "../App";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
+import { useIsCallerAdmin } from "../hooks/useQueries";
 
 interface DashboardProps {
   onNavigate: (page: ModulePage) => void;
@@ -38,7 +44,7 @@ interface ModuleCard {
 }
 
 export default function Dashboard({ onNavigate }: DashboardProps) {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const { identity } = useInternetIdentity();
   const { data: isAdmin, isLoading: isAdminLoading } = useIsCallerAdmin();
 
@@ -46,172 +52,172 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
 
   const allModules: ModuleCard[] = [
     {
-      id: 'games',
-      title: 'Games Hub 🎮',
-      description: '43 fun games to play!',
+      id: "games",
+      title: "Games Hub 🎮",
+      description: "43 fun games to play!",
       icon: <Gamepad2 className="w-8 h-8" />,
-      color: 'from-purple-500 to-pink-500',
+      color: "from-purple-500 to-pink-500",
     },
     {
-      id: 'scary-hub',
-      title: 'Scary Hub 👻',
-      description: 'Spooky fun with silly monsters!',
+      id: "scary-hub",
+      title: "Scary Hub 👻",
+      description: "Spooky fun with silly monsters!",
       icon: <Ghost className="w-8 h-8" />,
-      color: 'from-purple-700 to-orange-600',
+      color: "from-purple-700 to-orange-600",
     },
     {
-      id: 'funny-fart-hub',
-      title: 'Funny Fart Hub 💨',
-      description: 'Silly fart sounds for laughs!',
+      id: "funny-fart-hub",
+      title: "Funny Fart Hub 💨",
+      description: "Silly fart sounds for laughs!",
       icon: <span className="text-3xl">💨</span>,
-      color: 'from-yellow-500 to-green-500',
+      color: "from-yellow-500 to-green-500",
     },
     {
-      id: 'video-hub',
-      title: 'YouTube Videos Hub 📺',
-      description: 'Safe educational videos for kids!',
+      id: "video-hub",
+      title: "YouTube Videos Hub 📺",
+      description: "Safe educational videos for kids!",
       icon: <Youtube className="w-8 h-8" />,
-      color: 'from-red-500 to-pink-500',
+      color: "from-red-500 to-pink-500",
     },
     {
-      id: 'smart-hub',
-      title: 'Smart Hub 🧠',
-      description: 'Personalized recommendations',
+      id: "smart-hub",
+      title: "Smart Hub 🧠",
+      description: "Personalized recommendations",
       icon: <Sparkles className="w-8 h-8" />,
-      color: 'from-cyan-500 to-blue-500',
+      color: "from-cyan-500 to-blue-500",
     },
     {
-      id: 'virtual-pet-hub',
-      title: 'Virtual Pet Hub 🐾',
-      description: 'Take care of your pet!',
+      id: "virtual-pet-hub",
+      title: "Virtual Pet Hub 🐾",
+      description: "Take care of your pet!",
       icon: <span className="text-3xl">🐾</span>,
-      color: 'from-green-500 to-teal-500',
+      color: "from-green-500 to-teal-500",
     },
     {
-      id: 'learn-hub',
-      title: 'Learn Hub 📚',
-      description: 'Interactive lessons',
+      id: "learn-hub",
+      title: "Learn Hub 📚",
+      description: "Interactive lessons",
       icon: <span className="text-3xl">📚</span>,
-      color: 'from-blue-500 to-indigo-500',
+      color: "from-blue-500 to-indigo-500",
     },
     {
-      id: 'creative-fun-hub',
-      title: 'Creative Fun Hub 🎨',
-      description: 'Stories, karaoke, and more!',
+      id: "creative-fun-hub",
+      title: "Creative Fun Hub 🎨",
+      description: "Stories, karaoke, and more!",
       icon: <Palette className="w-8 h-8" />,
-      color: 'from-pink-500 to-rose-500',
+      color: "from-pink-500 to-rose-500",
     },
     {
-      id: 'events',
-      title: 'Events Calendar 📅',
-      description: 'Manage your special days',
+      id: "events",
+      title: "Events Calendar 📅",
+      description: "Manage your special days",
       icon: <Calendar className="w-8 h-8" />,
-      color: 'from-blue-500 to-cyan-500',
+      color: "from-blue-500 to-cyan-500",
     },
     {
-      id: 'video-generator',
-      title: 'Video Generator 🎬',
-      description: 'Create 2D animated videos',
+      id: "video-generator",
+      title: "Video Generator 🎬",
+      description: "Create 2D animated videos",
       icon: <Video className="w-8 h-8" />,
-      color: 'from-red-500 to-orange-500',
+      color: "from-red-500 to-orange-500",
     },
     {
-      id: 'chat',
-      title: 'Chat 💬',
-      description: 'Talk with friends safely',
+      id: "chat",
+      title: "Chat 💬",
+      description: "Talk with friends safely",
       icon: <MessageCircle className="w-8 h-8" />,
-      color: 'from-green-500 to-emerald-500',
+      color: "from-green-500 to-emerald-500",
     },
     {
-      id: 'event-cards',
-      title: 'Event Cards 💌',
-      description: 'Design beautiful cards',
+      id: "event-cards",
+      title: "Event Cards 💌",
+      description: "Design beautiful cards",
       icon: <Mail className="w-8 h-8" />,
-      color: 'from-pink-500 to-purple-500',
+      color: "from-pink-500 to-purple-500",
     },
     {
-      id: 'jokes',
-      title: 'Jokes 😂',
-      description: 'Funny jokes and riddles',
+      id: "jokes",
+      title: "Jokes 😂",
+      description: "Funny jokes and riddles",
       icon: <Laugh className="w-8 h-8" />,
-      color: 'from-yellow-500 to-orange-500',
+      color: "from-yellow-500 to-orange-500",
     },
     {
-      id: 'rewards',
-      title: 'Rewards 🏆',
-      description: 'Earn badges and trophies',
+      id: "rewards",
+      title: "Rewards 🏆",
+      description: "Earn badges and trophies",
       icon: <Trophy className="w-8 h-8" />,
-      color: 'from-yellow-500 to-amber-500',
+      color: "from-yellow-500 to-amber-500",
     },
     {
-      id: 'spin-wheel',
-      title: 'Spin the Wheel 🎡',
-      description: 'Win prizes every 20 minutes',
+      id: "spin-wheel",
+      title: "Spin the Wheel 🎡",
+      description: "Win prizes every 20 minutes",
       icon: <span className="text-3xl">🎡</span>,
-      color: 'from-purple-500 to-pink-500',
+      color: "from-purple-500 to-pink-500",
     },
     {
-      id: 'sticker-creator',
-      title: 'Sticker Creator 🎨',
-      description: 'Design custom stickers',
+      id: "sticker-creator",
+      title: "Sticker Creator 🎨",
+      description: "Design custom stickers",
       icon: <Palette className="w-8 h-8" />,
-      color: 'from-pink-500 to-red-500',
+      color: "from-pink-500 to-red-500",
     },
     {
-      id: 'music-remix',
-      title: 'Music Remix 🎵',
-      description: 'Mix beats and create music',
+      id: "music-remix",
+      title: "Music Remix 🎵",
+      description: "Mix beats and create music",
       icon: <Music className="w-8 h-8" />,
-      color: 'from-purple-500 to-indigo-500',
+      color: "from-purple-500 to-indigo-500",
     },
     {
-      id: 'certificates',
-      title: 'Certificates 📜',
-      description: 'Generate achievement certificates',
+      id: "certificates",
+      title: "Certificates 📜",
+      description: "Generate achievement certificates",
       icon: <Award className="w-8 h-8" />,
-      color: 'from-blue-500 to-cyan-500',
+      color: "from-blue-500 to-cyan-500",
     },
     {
-      id: 'seasonal-events',
-      title: 'Seasonal Events 🎃',
-      description: 'Holiday-themed activities',
+      id: "seasonal-events",
+      title: "Seasonal Events 🎃",
+      description: "Holiday-themed activities",
       icon: <span className="text-3xl">🎃</span>,
-      color: 'from-orange-500 to-red-500',
+      color: "from-orange-500 to-red-500",
     },
     {
-      id: 'avatar-creator',
-      title: 'Avatar Creator 👤',
-      description: 'Create your character',
+      id: "avatar-creator",
+      title: "Avatar Creator 👤",
+      description: "Create your character",
       icon: <span className="text-3xl">👤</span>,
-      color: 'from-cyan-500 to-blue-500',
+      color: "from-cyan-500 to-blue-500",
     },
     {
-      id: 'story-builder',
-      title: 'Story Builder 📖',
-      description: 'Build animated stories',
+      id: "story-builder",
+      title: "Story Builder 📖",
+      description: "Build animated stories",
       icon: <span className="text-3xl">📖</span>,
-      color: 'from-indigo-500 to-purple-500',
+      color: "from-indigo-500 to-purple-500",
     },
     {
-      id: 'craft-diy',
-      title: 'Craft & DIY 🎨',
-      description: 'Step-by-step creative projects',
+      id: "craft-diy",
+      title: "Craft & DIY 🎨",
+      description: "Step-by-step creative projects",
       icon: <Palette className="w-8 h-8" />,
-      color: 'from-green-500 to-teal-500',
+      color: "from-green-500 to-teal-500",
     },
     {
-      id: 'art-gallery',
-      title: 'Art Gallery 🖼️',
-      description: 'Share and explore artwork',
+      id: "art-gallery",
+      title: "Art Gallery 🖼️",
+      description: "Share and explore artwork",
       icon: <span className="text-3xl">🖼️</span>,
-      color: 'from-pink-500 to-purple-500',
+      color: "from-pink-500 to-purple-500",
     },
     {
-      id: 'admin-dashboard',
-      title: 'Admin Dashboard 🛡️',
-      description: 'Manage users and content',
+      id: "admin-dashboard",
+      title: "Admin Dashboard 🛡️",
+      description: "Manage users and content",
       icon: <Shield className="w-8 h-8" />,
-      color: 'from-red-600 to-orange-600',
+      color: "from-red-600 to-orange-600",
       adminOnly: true,
     },
   ];
@@ -221,10 +227,10 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     // If we're still checking admin status and user is authenticated, don't filter yet
     if (isAuthenticated && isAdminLoading) {
       // Return all non-admin modules while loading
-      return allModules.filter(module => !module.adminOnly);
+      return allModules.filter((module) => !module.adminOnly);
     }
 
-    return allModules.filter(module => {
+    return allModules.filter((module) => {
       // Show admin-only modules only if user is authenticated and is admin
       if (module.adminOnly) {
         return isAuthenticated && isAdmin === true;
@@ -235,16 +241,17 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
 
   const filteredModules = useMemo(() => {
     if (!searchQuery.trim()) return modules;
-    
+
     const query = searchQuery.toLowerCase();
-    return modules.filter(module => 
-      module.title.toLowerCase().includes(query) ||
-      module.description.toLowerCase().includes(query)
+    return modules.filter(
+      (module) =>
+        module.title.toLowerCase().includes(query) ||
+        module.description.toLowerCase().includes(query),
     );
   }, [searchQuery, modules]);
 
   const clearSearch = () => {
-    setSearchQuery('');
+    setSearchQuery("");
   };
 
   return (
@@ -282,7 +289,8 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         </div>
         {searchQuery && (
           <p className="mt-2 text-center text-neon-cyan text-shadow-neon-sm">
-            {filteredModules.length} module{filteredModules.length !== 1 ? 's' : ''} found
+            {filteredModules.length} module
+            {filteredModules.length !== 1 ? "s" : ""} found
           </p>
         )}
       </div>
@@ -316,10 +324,14 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
               onClick={() => onNavigate(module.id)}
             >
               <CardHeader className="pb-3">
-                <div className={`w-16 h-16 rounded-full bg-gradient-to-r ${module.color} flex items-center justify-center text-white mb-3 shadow-neon-md`}>
+                <div
+                  className={`w-16 h-16 rounded-full bg-gradient-to-r ${module.color} flex items-center justify-center text-white mb-3 shadow-neon-md`}
+                >
                   {module.icon}
                 </div>
-                <CardTitle className="font-section text-xl text-purple-900">{module.title}</CardTitle>
+                <CardTitle className="font-section text-xl text-purple-900">
+                  {module.title}
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-base text-purple-700">

@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import GameLayout from '../../components/GameLayout';
-import { Button } from '@/components/ui/button';
-import { ModulePage } from '../../App';
+import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import type { ModulePage } from "../../App";
+import GameLayout from "../../components/GameLayout";
 
 interface Question {
   place: string;
@@ -19,48 +19,48 @@ export default function FamousPlaces({ onNavigate }: FamousPlacesProps) {
   const [gameOver, setGameOver] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answered, setAnswered] = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState('');
+  const [selectedAnswer, setSelectedAnswer] = useState("");
 
   const questions: Question[] = [
     {
-      place: 'Eiffel Tower',
-      options: ['Paris', 'London', 'Rome', 'Berlin'],
-      correct: 'Paris',
+      place: "Eiffel Tower",
+      options: ["Paris", "London", "Rome", "Berlin"],
+      correct: "Paris",
     },
     {
-      place: 'Statue of Liberty',
-      options: ['New York', 'Los Angeles', 'Chicago', 'Miami'],
-      correct: 'New York',
+      place: "Statue of Liberty",
+      options: ["New York", "Los Angeles", "Chicago", "Miami"],
+      correct: "New York",
     },
     {
-      place: 'Big Ben',
-      options: ['London', 'Paris', 'Dublin', 'Edinburgh'],
-      correct: 'London',
+      place: "Big Ben",
+      options: ["London", "Paris", "Dublin", "Edinburgh"],
+      correct: "London",
     },
     {
-      place: 'Taj Mahal',
-      options: ['India', 'Pakistan', 'Bangladesh', 'Nepal'],
-      correct: 'India',
+      place: "Taj Mahal",
+      options: ["India", "Pakistan", "Bangladesh", "Nepal"],
+      correct: "India",
     },
     {
-      place: 'Great Wall',
-      options: ['China', 'Japan', 'Korea', 'Mongolia'],
-      correct: 'China',
+      place: "Great Wall",
+      options: ["China", "Japan", "Korea", "Mongolia"],
+      correct: "China",
     },
     {
-      place: 'Pyramids',
-      options: ['Egypt', 'Mexico', 'Peru', 'Sudan'],
-      correct: 'Egypt',
+      place: "Pyramids",
+      options: ["Egypt", "Mexico", "Peru", "Sudan"],
+      correct: "Egypt",
     },
     {
-      place: 'Sydney Opera House',
-      options: ['Australia', 'New Zealand', 'Singapore', 'Malaysia'],
-      correct: 'Australia',
+      place: "Sydney Opera House",
+      options: ["Australia", "New Zealand", "Singapore", "Malaysia"],
+      correct: "Australia",
     },
     {
-      place: 'Colosseum',
-      options: ['Rome', 'Athens', 'Istanbul', 'Cairo'],
-      correct: 'Rome',
+      place: "Colosseum",
+      options: ["Rome", "Athens", "Istanbul", "Cairo"],
+      correct: "Rome",
     },
   ];
 
@@ -69,7 +69,7 @@ export default function FamousPlaces({ onNavigate }: FamousPlacesProps) {
     setGameOver(false);
     setCurrentQuestion(0);
     setAnswered(false);
-    setSelectedAnswer('');
+    setSelectedAnswer("");
   };
 
   useEffect(() => {
@@ -85,14 +85,14 @@ export default function FamousPlaces({ onNavigate }: FamousPlacesProps) {
     setAnswered(true);
 
     if (answer === questions[currentQuestion].correct) {
-      setScore(prev => prev + 10);
+      setScore((prev) => prev + 10);
     }
 
     setTimeout(() => {
       if (currentQuestion < questions.length - 1) {
-        setCurrentQuestion(prev => prev + 1);
+        setCurrentQuestion((prev) => prev + 1);
         setAnswered(false);
-        setSelectedAnswer('');
+        setSelectedAnswer("");
       } else {
         setGameOver(true);
       }
@@ -123,13 +123,13 @@ export default function FamousPlaces({ onNavigate }: FamousPlacesProps) {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            {question.options.map(option => {
-              let buttonClass = 'h-24 text-2xl font-bold';
+            {question.options.map((option) => {
+              let buttonClass = "h-24 text-2xl font-bold";
               if (answered) {
                 if (option === question.correct) {
-                  buttonClass += ' bg-green-500 hover:bg-green-500';
+                  buttonClass += " bg-green-500 hover:bg-green-500";
                 } else if (option === selectedAnswer) {
-                  buttonClass += ' bg-red-500 hover:bg-red-500';
+                  buttonClass += " bg-red-500 hover:bg-red-500";
                 }
               }
 
@@ -152,7 +152,9 @@ export default function FamousPlaces({ onNavigate }: FamousPlacesProps) {
               {selectedAnswer === question.correct ? (
                 <span className="text-green-600">✓ Correct!</span>
               ) : (
-                <span className="text-red-600">✗ Wrong! It's {question.correct}</span>
+                <span className="text-red-600">
+                  ✗ Wrong! It's {question.correct}
+                </span>
               )}
             </div>
           )}

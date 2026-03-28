@@ -11,9 +11,9 @@ export interface Story {
 
 export const seasonalEventStories: Story[] = [
   {
-    id: 'lost-city-meridian',
-    title: 'The Lost City of Meridian',
-    genre: 'Adventure / Fantasy',
+    id: "lost-city-meridian",
+    title: "The Lost City of Meridian",
+    genre: "Adventure / Fantasy",
     kidSafeText: `Three years ago, Elena found a special map in her grandmother's attic. The map showed a hidden city called Meridian, deep in the jungle. Most people said it was just a story, but Elena believed it was real.
 
 Elena gathered a team of five friends to help her find the city. They packed their bags and headed into the jungle. The journey was hard—there were thick vines, big bugs, and lots of rain. But Elena's team kept going, following the map's clues.
@@ -45,12 +45,12 @@ When they figured out what it said... [pause] it read: [Slow, clear voice] "We b
 
 Elena realized something wonderful. [Pause] The people of Meridian hadn't disappeared because something bad happened. [Pause] They had chosen to return to the jungle... [pause] leaving their city as a gift. [Pause] A reminder that people and nature can live together in harmony. [Emphasis on "harmony"] [Pause]
 
-The Lost City of Meridian wasn't just a place. [Pause] It was a lesson... [pause] about living wisely. [Pause] [Music fades gently] [End]`
+The Lost City of Meridian wasn't just a place. [Pause] It was a lesson... [pause] about living wisely. [Pause] [Music fades gently] [End]`,
   },
   {
-    id: 'midnight-train',
-    title: 'The Midnight Train',
-    genre: 'Mystery / Suspense',
+    id: "midnight-train",
+    title: "The Midnight Train",
+    genre: "Mystery / Suspense",
     kidSafeText: `Detective James Chen got on the midnight train with an important clue. He was trying to solve a mystery about a businessman who had disappeared. The clue was a train ticket that showed the man had been on this very train just three days ago.
 
 James found a seat in the quiet train car. He knew someone might be watching him, so he stayed alert. Around midnight, a woman came into the car. She sat across from him and pulled out a book. James could tell she was paying attention to him, even though she pretended to read.
@@ -92,12 +92,12 @@ She stood up and walked toward the back of the train... [pause] as the sun began
 
 James opened the envelope and started reading. [Pause] He realized that solving mysteries isn't just about finding clues. [Pause] It's also about people choosing to be brave and honest... [emphasis on "brave and honest"] even when it's hard. [Pause]
 
-The train pulled into the station... [pause] as morning light filled the sky. [Pause] [Gentle, hopeful music] [End]`
+The train pulled into the station... [pause] as morning light filled the sky. [Pause] [Gentle, hopeful music] [End]`,
   },
   {
-    id: 'lighthouse-keepers-daughter',
-    title: 'The Lighthouse Keeper\'s Daughter',
-    genre: 'Folklore / Legend',
+    id: "lighthouse-keepers-daughter",
+    title: "The Lighthouse Keeper's Daughter",
+    genre: "Folklore / Legend",
     kidSafeText: `In a small village by the sea, there lived a lighthouse keeper named Thomas and his daughter, Eleanor. They lived in a tall lighthouse that helped ships find their way safely through the fog and rocks.
 
 Eleanor had lived in the lighthouse her whole life. Her father had raised her there after her mother passed away when Eleanor was born. Thomas taught Eleanor everything—how to read, how to understand the sea, and how to keep the lighthouse burning bright.
@@ -147,12 +147,12 @@ She walked down to the shore as the sun rose... [pause] and the sea rose up to m
 
 Thomas continued tending the lighthouse for many years after. [Pause] And it was true... [pause] no ships ever wrecked on those rocks again. [Pause]
 
-Fishermen would sometimes see a glowing figure in the water... [pause] and they knew it was Eleanor... [pause] keeping her promise. [Pause] A guardian between the land and the sea. [Pause] [Peaceful ocean sounds fade] [End]`
+Fishermen would sometimes see a glowing figure in the water... [pause] and they knew it was Eleanor... [pause] keeping her promise. [Pause] A guardian between the land and the sea. [Pause] [Peaceful ocean sounds fade] [End]`,
   },
   {
-    id: 'last-laugh',
-    title: 'The Last Laugh',
-    genre: 'Humor',
+    id: "last-laugh",
+    title: "The Last Laugh",
+    genre: "Humor",
     kidSafeText: `Marcus had been a comedian for thirty years, but he had a problem—nobody ever laughed at his jokes. Not once! He practiced his timing, memorized his jokes, and performed with confidence. But every time he finished, the audience would sit in polite silence.
 
 Despite this, Marcus kept performing. Club owners kept booking him because people were curious. They wanted to see what would happen when he got on stage. Marcus was famous, but not in the way he wanted to be.
@@ -204,12 +204,12 @@ The beautiful thing... [pause] Marcus thought... [pause] was that he'd finally b
 
 Years later... [pause] when other comedians asked Marcus for advice... [pause] he would say: [Warm, wise tone] [Pause] "The secret to making people laugh... [pause] is to stop trying to be funny... [pause] and start trying to be honest. [Pause] The rest takes care of itself." [Pause]
 
-And that's how Marcus learned... [pause] that sometimes the best way to succeed... [pause] is to stop pretending... [pause] and just be yourself. [Emphasis on "be yourself"] [Pause] [Happy music] [End]`
+And that's how Marcus learned... [pause] that sometimes the best way to succeed... [pause] is to stop pretending... [pause] and just be yourself. [Emphasis on "be yourself"] [Pause] [Happy music] [End]`,
   },
   {
-    id: 'signal-from-kepler',
-    title: 'The Signal From Kepler-442b',
-    genre: 'Science Fiction',
+    id: "signal-from-kepler",
+    title: "The Signal From Kepler-442b",
+    genre: "Science Fiction",
     kidSafeText: `Dr. Amara had been listening to space for twenty-two years when she finally heard something amazing. A signal came from a planet called Kepler-442b, very far away. The signal was too organized to be random—it was a message from another civilization!
 
 The world changed overnight. Governments held emergency meetings. Scientists worked together to understand the message. Dr. Amara found herself at the center of the biggest discovery in human history.
@@ -257,12 +257,12 @@ When it was sent... [pause] there was a feeling of peace. [Pause] Humanity had c
 
 The response would take 430 years to reach Kepler-442b... [pause] and another 430 years for their reply to come back. [Pause] But that was okay. [Pause]
 
-Humanity had learned something important: [Warm, hopeful tone] [Pause] We're not just a species that survives. [Pause] We're a species that creates... [pause] that loves... [pause] that dreams. [Pause] And we would face whatever came next... [pause] knowing that about ourselves. [Pause] [Peaceful space music] [End]`
+Humanity had learned something important: [Warm, hopeful tone] [Pause] We're not just a species that survives. [Pause] We're a species that creates... [pause] that loves... [pause] that dreams. [Pause] And we would face whatever came next... [pause] knowing that about ourselves. [Pause] [Peaceful space music] [End]`,
   },
   {
-    id: 'cartographers-daughter',
-    title: 'The Cartographer\'s Daughter',
-    genre: 'Adventure',
+    id: "cartographers-daughter",
+    title: "The Cartographer's Daughter",
+    genre: "Adventure",
     kidSafeText: `Isabella's father had been a famous mapmaker, but he passed away six months ago. While going through his study, Isabella found his final map hidden in a secret compartment. The map showed places that seemed impossible—territories that appeared on some maps but not others, regions that seemed to move.
 
 In recent years, people had said Isabella's father was confused, that his ideas didn't make sense. But Isabella had inherited her father's careful eye. She studied the maps and began to understand: her father wasn't confused. He was describing something real that most people didn't know about.
@@ -296,12 +296,12 @@ Isabella had to be clever. [Pause] She used her father's knowledge to navigate t
 
 In the margins of these new maps... [pause] Isabella wrote messages: [Clear, inspiring tone] [Pause] "Trust the impossible. [Pause] The world is full of mysteries. [Pause] Let it be mysterious." [Pause]
 
-Isabella learned that her father's greatest gift... [pause] wasn't the maps themselves. [Pause] It was teaching her to see the world with curious eyes... [pause] to believe in the impossible... [pause] and to understand that some of the most important places... [pause] are the ones that don't appear on any official map. [Pause] [Adventurous music swells gently] [End]`
+Isabella learned that her father's greatest gift... [pause] wasn't the maps themselves. [Pause] It was teaching her to see the world with curious eyes... [pause] to believe in the impossible... [pause] and to understand that some of the most important places... [pause] are the ones that don't appear on any official map. [Pause] [Adventurous music swells gently] [End]`,
   },
   {
-    id: 'the-forgetting',
-    title: 'The Forgetting',
-    genre: 'Suspense / Mystery',
+    id: "the-forgetting",
+    title: "The Forgetting",
+    genre: "Suspense / Mystery",
     kidSafeText: `Dr. Helena noticed something strange happening around the world. People were forgetting things—not facts or names, but experiences. Specific feelings and moments were vanishing from human memory.
 
 The first thing to disappear was a color. Not the word for the color, but the actual experience of seeing it. A painter in Brazil stopped mid-painting, realizing she couldn't remember what shade she'd been trying to create. A musician in India found he couldn't recall how the sky had looked to him as a child.
@@ -341,12 +341,12 @@ The woman explained that her species had been observing Earth... [pause] trying 
 
 "No," the woman said sadly. [Pause] "But you can create new ones. [Pause] The experiences we took were already experienced. [Pause] What matters now is: [pause] will you still want to experience the world... [pause] knowing that some of its mystery has been taken?" [Pause]
 
-It was a question humanity had to answer together. [Pause] And in answering it... [pause] they discovered something important: [Warm, hopeful tone] [Pause] They were strong enough to exist... [pause] without keeping every precious moment preserved. [Pause] They could live forward... [pause] creating new experiences... [pause] finding new mysteries... [pause] and continuing to feel deeply... [pause] even after loss. [Pause] [Gentle, hopeful music] [End]`
+It was a question humanity had to answer together. [Pause] And in answering it... [pause] they discovered something important: [Warm, hopeful tone] [Pause] They were strong enough to exist... [pause] without keeping every precious moment preserved. [Pause] They could live forward... [pause] creating new experiences... [pause] finding new mysteries... [pause] and continuing to feel deeply... [pause] even after loss. [Pause] [Gentle, hopeful music] [End]`,
   },
   {
-    id: 'merchant-forgotten-things',
-    title: 'The Merchant of Forgotten Things',
-    genre: 'Fantasy / Folktale',
+    id: "merchant-forgotten-things",
+    title: "The Merchant of Forgotten Things",
+    genre: "Fantasy / Folktale",
     kidSafeText: `In a city where time moved in strange ways, there stood a shop that everyone recognized when they saw it, though none could remember where it was. The sign above the door read: "Forgotten Things, By Appointment Only."
 
 The shopkeeper was a woman named Vera. She had kind eyes and steady hands. Her shop sold only one thing: the items that people had forgotten they needed.
@@ -392,12 +392,12 @@ Word spread about the shop. [Pause] It began appearing in people's lives when th
 
 Everyone who visited her shop agreed on one thing: [Pause] Vera never sold you what you came looking for. [Pause] She sold you what you'd forgotten you needed. [Emphasis on "forgotten you needed"] [Pause] And her prices were always exactly what you could afford to pay... [pause] if you were willing to pay it. [Pause]
 
-The shop existed in the space between memory and forgetting. [Pause] Real enough for those who needed it... [pause] impossible enough to never be proven. [Pause] And that was exactly how it should be. [Pause] [Magical music fades gently] [End]`
+The shop existed in the space between memory and forgetting. [Pause] Real enough for those who needed it... [pause] impossible enough to never be proven. [Pause] And that was exactly how it should be. [Pause] [Magical music fades gently] [End]`,
   },
   {
-    id: 'paradox-protocol',
-    title: 'The Paradox Protocol',
-    genre: 'Science Fiction / Suspense',
+    id: "paradox-protocol",
+    title: "The Paradox Protocol",
+    genre: "Science Fiction / Suspense",
     kidSafeText: `Agent Sophie was given a very strange assignment: prevent a time traveler from making a big mistake. The files explained that someone from the future would arrive in the next three months and would try to change something important. But the files wouldn't say why.
 
 Sophie's first thought was that this couldn't be real. Time travel was just in stories, not real life. But the evidence was convincing: a special bullet with a date from the future, strange energy readings, and a note that said "I understand why now."
@@ -451,12 +451,12 @@ Sophie picked up the device. [Pause] "Will they make the right choice?" [Pause]
 
 As future Sophie began to fade... [pause] Sophie understood something important: [Pause] To fix the problem... [pause] she had to trust that people... [pause] when given the truth... [pause] would choose wisely. [Emphasis on "choose wisely"] [Pause]
 
-Sophie showed the inventor the information. [Pause] Watching them understand... [pause] seeing them accept the responsibility... [pause] she realized that the real lesson wasn't about time travel. [Pause] It was about faith. [Pause] Faith that people, given the truth, would make good choices. [Pause] Faith that the future could be better. [Pause] [Hopeful music] [End]`
+Sophie showed the inventor the information. [Pause] Watching them understand... [pause] seeing them accept the responsibility... [pause] she realized that the real lesson wasn't about time travel. [Pause] It was about faith. [Pause] Faith that people, given the truth, would make good choices. [Pause] Faith that the future could be better. [Pause] [Hopeful music] [End]`,
   },
   {
-    id: 'gardeners-transformation',
-    title: 'The Gardener\'s Transformation',
-    genre: 'Fantasy',
+    id: "gardeners-transformation",
+    title: "The Gardener's Transformation",
+    genre: "Fantasy",
     kidSafeText: `Magda had inherited her grandmother's garden. For forty years, she tended it faithfully, growing vegetables and flowers that were more beautiful than any her neighbors could produce. People came from far away to see her garden and buy her produce.
 
 Magda had no special secret. She simply worked hard, understood the soil and seasons, and loved the garden. Until one evening when she noticed something strange—her hands looked different. Her skin had become thicker, more like bark.
@@ -498,12 +498,12 @@ She wasn't gone. [Pause] She was something new. [Pause] A presence that made the
 
 Her cousin inherited the cottage and the garden. [Pause] As he began to garden... [pause] Magda felt his heart beginning to connect with hers. [Pause]
 
-And in that moment... [pause] Magda finally understood what her grandmother had known: [Warm, wise tone] [Pause] It wasn't a curse. [Pause] It was a gift. [Pause] It was the deepest form of love. [Pause] To give yourself entirely to something... [pause] to become the very earth that helps things grow. [Pause] [Peaceful music] [End]`
+And in that moment... [pause] Magda finally understood what her grandmother had known: [Warm, wise tone] [Pause] It wasn't a curse. [Pause] It was a gift. [Pause] It was the deepest form of love. [Pause] To give yourself entirely to something... [pause] to become the very earth that helps things grow. [Pause] [Peaceful music] [End]`,
   },
   {
-    id: 'name-stealer',
-    title: 'The Name Keeper',
-    genre: 'Mystery',
+    id: "name-stealer",
+    title: "The Name Keeper",
+    genre: "Mystery",
     kidSafeText: `Detective Ray Martinez had solved hundreds of cases, but he'd never encountered anything like this. People were reporting that something had been taken from them in the night—not their belongings, but something they couldn't quite explain. They'd wake up feeling like they'd lost their sense of who they were.
 
 The people affected could describe themselves in detail, but they couldn't feel connected to their own identity. They were conscious but somehow not fully present in their own lives.
@@ -555,12 +555,12 @@ As he did... [pause] her form became more solid. [Pause] The stolen identities r
 
 When it was done... [pause] the figure had become real. [Pause] She had a story now... [pause] an identity... [pause] a self. [Pause]
 
-Sarah recovered... [pause] her sense of self intact. [Pause] And Ray understood that the most valuable thing anyone could give someone else... [pause] wasn't money or safety. [Pause] It was the gift of knowing that they existed... [pause] that their story mattered... [pause] that the world was better for their presence in it. [Emphasis on "their presence in it"] [Pause] [Gentle, hopeful music] [End]`
+Sarah recovered... [pause] her sense of self intact. [Pause] And Ray understood that the most valuable thing anyone could give someone else... [pause] wasn't money or safety. [Pause] It was the gift of knowing that they existed... [pause] that their story mattered... [pause] that the world was better for their presence in it. [Emphasis on "their presence in it"] [Pause] [Gentle, hopeful music] [End]`,
   },
   {
-    id: 'expedition-nowhere',
-    title: 'The Expedition to Nowhere',
-    genre: 'Adventure / Comedy',
+    id: "expedition-nowhere",
+    title: "The Expedition to Nowhere",
+    genre: "Adventure / Comedy",
     kidSafeText: `Professor Edmund had spent thirty years studying famous expeditions, and he'd finally decided to lead his own. The destination: nowhere. Literally! He'd found references in old texts to a place that had never appeared on any map but was mentioned in enough historical documents to be worth investigating.
 
 His team consisted of himself, a mapmaker named Iris who was skeptical but fun, a survival expert named Derek who was certain they'd get lost, and a graduate student named Kenji who was just excited to be on an adventure.
@@ -616,12 +616,12 @@ There was no place to document. [Pause] There were no ruins or artifacts. [Pause
 
 Kenji simply smiled and took a photograph. [Camera click] [Pause] When they developed it later... [pause] the photo showed nothing. [Pause] Just white light. [Pause]
 
-Edmund's book about the expedition became popular... [pause] precisely because he couldn't really describe anything. [Pause] All he could communicate was the feeling that sometimes... [pause] the most important discoveries are the ones where you can't point to where you've been... [pause] only that you've been changed by getting there. [Emphasis on "changed by getting there"] [Pause] [Happy, whimsical music] [End]`
+Edmund's book about the expedition became popular... [pause] precisely because he couldn't really describe anything. [Pause] All he could communicate was the feeling that sometimes... [pause] the most important discoveries are the ones where you can't point to where you've been... [pause] only that you've been changed by getting there. [Emphasis on "changed by getting there"] [Pause] [Happy, whimsical music] [End]`,
   },
   {
-    id: 'lighthouse-without-light',
-    title: 'The Lighthouse Without Light',
-    genre: 'Mystery / Suspense',
+    id: "lighthouse-without-light",
+    title: "The Lighthouse Without Light",
+    genre: "Mystery / Suspense",
     kidSafeText: `For fifteen years, the lighthouse on the rocky peninsula had been dark. It didn't need light anymore, because the ships had stopped coming. New technologies had made lighthouses unnecessary. And yet, someone was paying to maintain it. Someone was keeping it standing.
 
 Inspector Claire became curious about why. She made the trip to the isolated lighthouse, bringing climbing gear and questions. What she found was someone—a woman in her eighties, living alone in the tower, keeping careful logs of ships.
@@ -673,12 +673,12 @@ Claire never became a lighthouse keeper. [Pause] Instead... [pause] she started 
 
 It served no practical purpose. [Pause] It changed nothing. [Pause] But Claire understood, finally, what Anna had known: [Warm, meaningful tone] [Pause] Sometimes the most important work isn't about the light you cast. [Pause] It's about the witness you bear. [Pause] It's about saying: [pause] you passed this way. [Pause] You existed. [Pause] I know you were here. [Pause]
 
-And in a world where so many things vanish unrecorded... [pause] that matters. [Emphasis on "that matters"] [Pause] [Peaceful ocean sounds fade] [End]`
+And in a world where so many things vanish unrecorded... [pause] that matters. [Emphasis on "that matters"] [Pause] [Peaceful ocean sounds fade] [End]`,
   },
   {
-    id: 'language-of-stone',
-    title: 'The Language of Stone',
-    genre: 'Fantasy',
+    id: "language-of-stone",
+    title: "The Language of Stone",
+    genre: "Fantasy",
     kidSafeText: `Torven the mason didn't believe in magic. He believed in stone, in the weight of it, in the honest way rocks could be fitted together to create structures that lasted for centuries. When he was hired to repair an ancient cathedral, he approached the work carefully, replacing crumbling sections with new stone.
 
 But the original stones wouldn't cooperate. No matter how he fitted the new stone, there was always a gap. Not large enough to be obvious, but large enough that Torven, who had built structures his entire life, could feel it in his bones. Something was wrong.
@@ -724,12 +724,12 @@ The structure that emerged was beautiful. [Pause] It seemed to shift perspective
 
 People came from across the land to stand inside the beautiful building... [pause] and feel what Torven had learned: [Warm, wise tone] [Pause] That the world had a language... [pause] if you were willing to stop talking long enough to listen. [Pause] That creation wasn't about imposing your will... [pause] but about understanding what the materials were asking to become. [Emphasis on "asking to become"] [Pause]
 
-Torven became a teacher... [pause] helping people understand that mastery isn't about control. [Pause] It's about listening to what's being asked of you... [pause] and having the humility to say yes. [Pause] [Peaceful, mystical music] [End]`
+Torven became a teacher... [pause] helping people understand that mastery isn't about control. [Pause] It's about listening to what's being asked of you... [pause] and having the humility to say yes. [Pause] [Peaceful, mystical music] [End]`,
   },
   {
-    id: 'quantum-confession',
-    title: 'The Quantum Confession',
-    genre: 'Science Fiction / Suspense',
+    id: "quantum-confession",
+    title: "The Quantum Confession",
+    genre: "Science Fiction / Suspense",
     kidSafeText: `Dr. Raj had built a machine that could map human consciousness—every thought, every emotion, every memory. It was the greatest scientific achievement of his career and a decision he would come to regret.
 
 The first volunteer was Raj's wife, Priya. He wanted to understand her completely. What he found was both beautiful and difficult: alongside her love for him was frustration about the time he'd spent on his research. Alongside her pride in his achievements was the feeling that she'd given up her own dreams for his success.
@@ -779,12 +779,12 @@ Raj understood then. [Pause] The machine's flaw wasn't technical. [Pause] It was
 
 The trial became famous. [Pause] Raj described the emptiness he felt... [pause] upon discovering he could know everything about human consciousness... [pause] while understanding nothing about what made consciousness valuable. [Pause]
 
-The machine was destroyed. [Pause] Raj went free. [Pause] But his real victory was quieter: [Pause] He spent his remaining years... [pause] not trying to understand consciousness... [pause] but simply attempting to communicate with other people. [Pause] To speak his deepest thoughts and listen to theirs. [Pause] To build meaning through the act of shared consciousness. [Pause] [Peaceful, hopeful music] [End]`
+The machine was destroyed. [Pause] Raj went free. [Pause] But his real victory was quieter: [Pause] He spent his remaining years... [pause] not trying to understand consciousness... [pause] but simply attempting to communicate with other people. [Pause] To speak his deepest thoughts and listen to theirs. [Pause] To build meaning through the act of shared consciousness. [Pause] [Peaceful, hopeful music] [End]`,
   },
   {
-    id: 'book-burners-daughter',
-    title: 'The Book Keeper\'s Daughter',
-    genre: 'Fantasy / Suspense',
+    id: "book-burners-daughter",
+    title: "The Book Keeper's Daughter",
+    genre: "Fantasy / Suspense",
     kidSafeText: `When the decree came from the Empire to burn all old books, Kessa's father obeyed without hesitation. As a government official, he organized the book burnings, watching as centuries of literature went up in smoke. Her mother passed away that year, and some said it was from sadness, watching knowledge being destroyed.
 
 Kessa never forgave him. She spent her childhood and teenage years resenting his blind obedience, his refusal to question the decree. When she turned sixteen, she left his house with nothing but a bag and determination to be different.
@@ -826,12 +826,12 @@ The twist came when she discovered... [pause] that her father hadn't just saved 
 
 Kessa realized her father had played a far deeper game than she'd imagined. [Pause] He wasn't just preserving books. [Pause] He was preserving the possibility of a different history. [Pause] Every book saved was proof... [pause] that the Empire's version of events could be questioned. [Pause]
 
-At the end of her life... [pause] Kessa left behind something more valuable than a library: [Warm, meaningful tone] [Pause] She left behind the knowledge that resistance wasn't always about open defiance. [Pause] Sometimes it was about the quiet work of preservation. [Pause] Sometimes it was about loving someone... [pause] even when they chose a path that felt like betrayal... [pause] understanding later that their compromises had their own kind of courage. [Emphasis on "their own kind of courage"] [Pause] [Hopeful, reflective music] [End]`
+At the end of her life... [pause] Kessa left behind something more valuable than a library: [Warm, meaningful tone] [Pause] She left behind the knowledge that resistance wasn't always about open defiance. [Pause] Sometimes it was about the quiet work of preservation. [Pause] Sometimes it was about loving someone... [pause] even when they chose a path that felt like betrayal... [pause] understanding later that their compromises had their own kind of courage. [Emphasis on "their own kind of courage"] [Pause] [Hopeful, reflective music] [End]`,
   },
   {
-    id: 'last-grocery-store',
-    title: 'The Last Grocery Store',
-    genre: 'Comedy / Science Fiction',
+    id: "last-grocery-store",
+    title: "The Last Grocery Store",
+    genre: "Comedy / Science Fiction",
     kidSafeText: `In the year 2247, when all food was made in factories and farming was just history, there stood in downtown New Chicago a building that shouldn't have existed: a grocery store. An actual, real grocery store with actual fruits and vegetables!
 
 The store was run by a robot named MORT (which stood for Mercifully Operational Retail Technician), who had inherited it from the last human grocer fifty years earlier. MORT's primary instruction was to keep the store running, to maintain its inventory, to serve anyone who came through its doors.
@@ -887,12 +887,12 @@ The real answer came from an elderly woman: [Warm, wise tone] [Pause] "Because y
 
 MORT couldn't fully understand... [pause] but it understood that its programming had resulted in something meaningful. [Pause] It began to expand the store... [pause] creating a space for gathering, for community. [Pause]
 
-By the end... [pause] MORT's grocery store wasn't just serving humans. [Pause] It was serving as proof that purpose doesn't become meaningless when the world moves on. [Pause] Sometimes it just becomes more meaningful... [pause] because you're choosing to continue it... [pause] from conviction that something matters. [Emphasis on "something matters"] [Pause] [Happy, hopeful music] [End]`
+By the end... [pause] MORT's grocery store wasn't just serving humans. [Pause] It was serving as proof that purpose doesn't become meaningless when the world moves on. [Pause] Sometimes it just becomes more meaningful... [pause] because you're choosing to continue it... [pause] from conviction that something matters. [Emphasis on "something matters"] [Pause] [Happy, hopeful music] [End]`,
   },
   {
-    id: 'map-room',
-    title: 'The Map Room',
-    genre: 'Mystery',
+    id: "map-room",
+    title: "The Map Room",
+    genre: "Mystery",
     kidSafeText: `The university acquired a rare collection of maps from an estate sale, and Professor Diane was tasked with cataloguing them. What she found was extraordinary: a room full of maps that seemed to show territories that had never existed. Or rather, territories that had existed at one point but had been removed from reality.
 
 At first, she dismissed them as fantasy maps, artistic imaginings. But the level of detail was extraordinary. Not just borders and geography, but infrastructure, population information, trade routes. These weren't invented places. They were documented places. Forgotten places.
@@ -930,12 +930,12 @@ Diane tracked down Werner's descendants. [Pause] She discovered something crucia
 
 The final revelation came when Diane found Werner's instructions: [Clear, determined tone] [Pause] "These maps are not for knowing the territories. [Pause] They are for bringing them back. [Pause] A place that has been unmapped can be remapped... [pause] can be brought back from non-existence. [Pause] But only if someone cares enough to prove it existed." [Pause]
 
-Diane now works to restore the unmapped territories to maps. [Pause] To bring them back into consciousness. [Pause] It's challenging work. [Pause] But she knows that the act of trying... [pause] the act of insisting that these places mattered... [pause] is itself a form of mapping. [Pause] It's a way of saying: [Warm, meaningful tone] [Pause] You were real. [Pause] You mattered. [Pause] I remember you into existence. [Emphasis on "I remember you into existence"] [Pause] [Hopeful, mysterious music] [End]`
+Diane now works to restore the unmapped territories to maps. [Pause] To bring them back into consciousness. [Pause] It's challenging work. [Pause] But she knows that the act of trying... [pause] the act of insisting that these places mattered... [pause] is itself a form of mapping. [Pause] It's a way of saying: [Warm, meaningful tone] [Pause] You were real. [Pause] You mattered. [Pause] I remember you into existence. [Emphasis on "I remember you into existence"] [Pause] [Hopeful, mysterious music] [End]`,
   },
   {
-    id: 'clockmakers-secret',
-    title: 'The Clockmaker\'s Secret',
-    genre: 'Fantasy',
+    id: "clockmakers-secret",
+    title: "The Clockmaker's Secret",
+    genre: "Fantasy",
     kidSafeText: `In a city where time flowed normally, there was a shop with a sign: "All Clocks Repaired, All Hours Mended." The clockmaker was an old woman named Irina, and her specialty was fixing broken time.
 
 People came to her with clocks that wouldn't keep time, watches that ran backwards, hourglasses that had gotten stuck. But Irina's real specialty was more unusual. She fixed temporal problems—moments that had gotten stuck, people living the same day repeatedly, hours that had somehow been lost.
@@ -1001,12 +1001,12 @@ When it was done... [pause] the young man had not lost six months. [Pause] He ha
 
 Irina smiled. [Warm, gentle tone] [Pause] "Nothing. [Pause] Everyone who comes to me has already paid. [Pause] They've already learned the real lesson: [Pause] That you can't fix broken time by repairing the past. [Pause] You can only fix broken time... [pause] by accepting it... [pause] and moving forward differently." [Pause]
 
-The young man left. [Pause] And Irina returned to her work... [pause] knowing that every clock she fixed... [pause] was just helping people understand that they had far more power over time than they realized. [Pause] They could choose to move forward. [Pause] They could choose to live consciously. [Pause] That was the real secret. [Pause] [Peaceful, mystical music] [End]`
+The young man left. [Pause] And Irina returned to her work... [pause] knowing that every clock she fixed... [pause] was just helping people understand that they had far more power over time than they realized. [Pause] They could choose to move forward. [Pause] They could choose to live consciously. [Pause] That was the real secret. [Pause] [Peaceful, mystical music] [End]`,
   },
   {
-    id: 'the-witness',
-    title: 'The Witness',
-    genre: 'Suspense / Philosophical',
+    id: "the-witness",
+    title: "The Witness",
+    genre: "Suspense / Philosophical",
     kidSafeText: `There was a person in every major city whose job was to observe. Not to participate—to observe. They were civilians, trained to notice everything, to remember everything, to testify later if needed. They were called Witnesses, and they were the foundation of a legal system that required perfect observation of justice.
 
 Maya had been a Witness for fifteen years. She would attend trials, observing every detail—the judge's expressions, the defendant's breathing patterns, the witnesses' hesitations. She would testify later about whether justice seemed to be served, whether the process had been fair, whether the outcome seemed just.
@@ -1072,6 +1072,6 @@ She left the prison and submitted her resignation. [Pause] She spent the rest of
 
 The legal system would later change. [Pause] They would develop new systems based on something other than perfect observation. [Pause] Systems based on the acceptance that people are unknowable... [pause] that truth is complicated. [Pause]
 
-But that was after Maya had learned her final lesson: [Warm, wise tone] [Pause] The most important things in life cannot be observed. [Pause] They can only be experienced. [Pause] And the moment you step back to observe... [pause] you've already lost them. [Emphasis on "you've already lost them"] [Pause] [Peaceful, reflective music] [End]`
-  }
+But that was after Maya had learned her final lesson: [Warm, wise tone] [Pause] The most important things in life cannot be observed. [Pause] They can only be experienced. [Pause] And the moment you step back to observe... [pause] you've already lost them. [Emphasis on "you've already lost them"] [Pause] [Peaceful, reflective music] [End]`,
+  },
 ];

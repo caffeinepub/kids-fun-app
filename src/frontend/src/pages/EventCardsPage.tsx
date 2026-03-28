@@ -1,45 +1,51 @@
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Palette, Download, Sparkles, Heart, Cake, Gift } from 'lucide-react';
-import { toast } from 'sonner';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { Cake, Download, Gift, Heart, Palette, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function EventCardsPage() {
-  const [cardTitle, setCardTitle] = useState('');
-  const [cardMessage, setCardMessage] = useState('');
-  const [selectedTemplate, setSelectedTemplate] = useState('');
-  const [selectedColor, setSelectedColor] = useState('purple');
+  const [cardTitle, setCardTitle] = useState("");
+  const [cardMessage, setCardMessage] = useState("");
+  const [selectedTemplate, setSelectedTemplate] = useState("");
+  const [selectedColor, setSelectedColor] = useState("purple");
 
   const templates = [
-    { id: 'birthday', name: 'Birthday', icon: Cake, emoji: '🎂' },
-    { id: 'thank-you', name: 'Thank You', icon: Heart, emoji: '💝' },
-    { id: 'celebration', name: 'Celebration', icon: Sparkles, emoji: '🎉' },
-    { id: 'gift', name: 'Gift Card', icon: Gift, emoji: '🎁' },
+    { id: "birthday", name: "Birthday", icon: Cake, emoji: "🎂" },
+    { id: "thank-you", name: "Thank You", icon: Heart, emoji: "💝" },
+    { id: "celebration", name: "Celebration", icon: Sparkles, emoji: "🎉" },
+    { id: "gift", name: "Gift Card", icon: Gift, emoji: "🎁" },
   ];
 
   const colors = [
-    { id: 'purple', name: 'Purple', class: 'from-purple-400 to-purple-600' },
-    { id: 'pink', name: 'Pink', class: 'from-pink-400 to-pink-600' },
-    { id: 'blue', name: 'Blue', class: 'from-blue-400 to-blue-600' },
-    { id: 'green', name: 'Green', class: 'from-green-400 to-green-600' },
-    { id: 'yellow', name: 'Yellow', class: 'from-yellow-400 to-yellow-600' },
-    { id: 'red', name: 'Red', class: 'from-red-400 to-red-600' },
+    { id: "purple", name: "Purple", class: "from-purple-400 to-purple-600" },
+    { id: "pink", name: "Pink", class: "from-pink-400 to-pink-600" },
+    { id: "blue", name: "Blue", class: "from-blue-400 to-blue-600" },
+    { id: "green", name: "Green", class: "from-green-400 to-green-600" },
+    { id: "yellow", name: "Yellow", class: "from-yellow-400 to-yellow-600" },
+    { id: "red", name: "Red", class: "from-red-400 to-red-600" },
   ];
 
   const handleDownload = () => {
     if (!cardTitle.trim() || !selectedTemplate) {
-      toast.error('Please fill in all fields and select a template');
+      toast.error("Please fill in all fields and select a template");
       return;
     }
-    toast.success('Card downloaded! 📥');
+    toast.success("Card downloaded! 📥");
   };
 
-  const selectedTemplateData = templates.find(t => t.id === selectedTemplate);
-  const selectedColorData = colors.find(c => c.id === selectedColor);
+  const selectedTemplateData = templates.find((t) => t.id === selectedTemplate);
+  const selectedColorData = colors.find((c) => c.id === selectedColor);
 
   return (
     <div className="space-y-6">
@@ -47,7 +53,9 @@ export default function EventCardsPage() {
         <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
           Event Cards Designer 🎨
         </h1>
-        <p className="text-lg text-gray-700">Create beautiful cards for any occasion</p>
+        <p className="text-lg text-gray-700">
+          Create beautiful cards for any occasion
+        </p>
       </div>
 
       <Tabs defaultValue="create" className="w-full">
@@ -99,7 +107,11 @@ export default function EventCardsPage() {
                     {templates.map((template) => (
                       <Button
                         key={template.id}
-                        variant={selectedTemplate === template.id ? 'default' : 'outline'}
+                        variant={
+                          selectedTemplate === template.id
+                            ? "default"
+                            : "outline"
+                        }
                         className="h-24 flex flex-col gap-2"
                         onClick={() => setSelectedTemplate(template.id)}
                       >
@@ -120,18 +132,26 @@ export default function EventCardsPage() {
                     {colors.map((color) => (
                       <Button
                         key={color.id}
-                        variant={selectedColor === color.id ? 'default' : 'outline'}
+                        variant={
+                          selectedColor === color.id ? "default" : "outline"
+                        }
                         className="h-16"
                         onClick={() => setSelectedColor(color.id)}
                       >
-                        <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${color.class}`} />
+                        <div
+                          className={`w-8 h-8 rounded-full bg-gradient-to-br ${color.class}`}
+                        />
                       </Button>
                     ))}
                   </div>
                 </CardContent>
               </Card>
 
-              <Button onClick={handleDownload} size="lg" className="w-full gap-2">
+              <Button
+                onClick={handleDownload}
+                size="lg"
+                className="w-full gap-2"
+              >
                 <Download className="w-5 h-5" />
                 Download Card
               </Button>
@@ -141,15 +161,25 @@ export default function EventCardsPage() {
               <Card className="border-4 h-full">
                 <CardHeader>
                   <CardTitle>Preview</CardTitle>
-                  <CardDescription>Your card will look like this</CardDescription>
+                  <CardDescription>
+                    Your card will look like this
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className={`aspect-[3/4] bg-gradient-to-br ${selectedColorData?.class || 'from-gray-200 to-gray-300'} rounded-lg p-8 flex flex-col items-center justify-center text-white border-4`}>
+                  <div
+                    className={`aspect-[3/4] bg-gradient-to-br ${selectedColorData?.class || "from-gray-200 to-gray-300"} rounded-lg p-8 flex flex-col items-center justify-center text-white border-4`}
+                  >
                     {selectedTemplateData && (
                       <div className="text-center space-y-6">
-                        <div className="text-6xl">{selectedTemplateData.emoji}</div>
-                        <h2 className="text-3xl font-bold">{cardTitle || 'Your Title'}</h2>
-                        <p className="text-lg">{cardMessage || 'Your message will appear here...'}</p>
+                        <div className="text-6xl">
+                          {selectedTemplateData.emoji}
+                        </div>
+                        <h2 className="text-3xl font-bold">
+                          {cardTitle || "Your Title"}
+                        </h2>
+                        <p className="text-lg">
+                          {cardMessage || "Your message will appear here..."}
+                        </p>
                       </div>
                     )}
                     {!selectedTemplateData && (
@@ -175,7 +205,9 @@ export default function EventCardsPage() {
               <div className="text-center py-12">
                 <Palette className="w-16 h-16 mx-auto mb-4 text-gray-400" />
                 <p className="text-xl text-gray-500">No cards yet</p>
-                <p className="text-gray-400">Create your first card to see it here!</p>
+                <p className="text-gray-400">
+                  Create your first card to see it here!
+                </p>
               </div>
             </CardContent>
           </Card>

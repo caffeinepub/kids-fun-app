@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
-import GameLayout from '../../components/GameLayout';
-import { ModulePage } from '../../App';
+import { useCallback, useEffect, useState } from "react";
+import type { ModulePage } from "../../App";
+import GameLayout from "../../components/GameLayout";
 
 interface Coin {
   id: number;
@@ -39,7 +39,7 @@ export default function ForestNight({ onNavigate }: ForestNightProps) {
     if (gameOver || timeLeft <= 0) return;
 
     const interval = setInterval(() => {
-      setTimeLeft(prev => {
+      setTimeLeft((prev) => {
         if (prev <= 1) {
           setGameOver(true);
           return 0;
@@ -55,14 +55,17 @@ export default function ForestNight({ onNavigate }: ForestNightProps) {
     if (gameOver) return;
 
     const spawnInterval = setInterval(() => {
-      if (coins.filter(c => !c.collected).length < 5) {
-        setCoins(prev => [...prev, {
-          id: nextId,
-          x: Math.random() * 90 + 5,
-          y: Math.random() * 90 + 5,
-          collected: false,
-        }]);
-        setNextId(id => id + 1);
+      if (coins.filter((c) => !c.collected).length < 5) {
+        setCoins((prev) => [
+          ...prev,
+          {
+            id: nextId,
+            x: Math.random() * 90 + 5,
+            y: Math.random() * 90 + 5,
+            collected: false,
+          },
+        ]);
+        setNextId((id) => id + 1);
       }
     }, 2000);
 
@@ -75,39 +78,42 @@ export default function ForestNight({ onNavigate }: ForestNightProps) {
     }
   }, [gameOver, score, highScore]);
 
-  const handleKeyPress = useCallback((e: KeyboardEvent) => {
-    if (gameOver) return;
-    
-    const speed = 2;
-    if (e.key === 'ArrowUp') {
-      setPlayerY(prev => Math.max(5, prev - speed));
-    } else if (e.key === 'ArrowDown') {
-      setPlayerY(prev => Math.min(90, prev + speed));
-    } else if (e.key === 'ArrowLeft') {
-      setPlayerX(prev => Math.max(5, prev - speed));
-    } else if (e.key === 'ArrowRight') {
-      setPlayerX(prev => Math.min(90, prev + speed));
-    }
-  }, [gameOver]);
+  const handleKeyPress = useCallback(
+    (e: KeyboardEvent) => {
+      if (gameOver) return;
+
+      const speed = 2;
+      if (e.key === "ArrowUp") {
+        setPlayerY((prev) => Math.max(5, prev - speed));
+      } else if (e.key === "ArrowDown") {
+        setPlayerY((prev) => Math.min(90, prev + speed));
+      } else if (e.key === "ArrowLeft") {
+        setPlayerX((prev) => Math.max(5, prev - speed));
+      } else if (e.key === "ArrowRight") {
+        setPlayerX((prev) => Math.min(90, prev + speed));
+      }
+    },
+    [gameOver],
+  );
 
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
   }, [handleKeyPress]);
 
   useEffect(() => {
     // Check for coin collection
-    coins.forEach(coin => {
+    coins.forEach((coin) => {
       if (!coin.collected) {
         const distance = Math.sqrt(
-          Math.pow(playerX - coin.x, 2) + Math.pow(playerY - coin.y, 2)
+          (playerX - coin.x) ** 2 + (playerY - coin.y) ** 2,
         );
         if (distance < 8) {
-          setCoins(prev => prev.map(c => 
-            c.id === coin.id ? { ...c, collected: true } : c
-          ));
-          setScore(prev => prev + 10);
-          setVisibility(prev => Math.min(prev + 2, 40));
+          setCoins((prev) =>
+            prev.map((c) => (c.id === coin.id ? { ...c, collected: true } : c)),
+          );
+          setScore((prev) => prev + 10);
+          setVisibility((prev) => Math.min(prev + 2, 40));
         }
       }
     });
@@ -134,8 +140,9 @@ export default function ForestNight({ onNavigate }: ForestNightProps) {
             top: `${playerY}%`,
             width: `${visibility}%`,
             height: `${visibility}%`,
-            transform: 'translate(-50%, -50%)',
-            background: 'radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%)',
+            transform: "translate(-50%, -50%)",
+            background:
+              "radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%)",
           }}
         />
 
@@ -150,7 +157,9 @@ export default function ForestNight({ onNavigate }: ForestNightProps) {
             <div className="bg-white p-8 rounded-lg border-4 border-green-400 text-center">
               <h2 className="text-3xl font-bold mb-4">Find Your Way!</h2>
               <p className="text-lg mb-2">Use arrow keys to move</p>
-              <p className="text-lg">Collect coins 🪙 to increase visibility!</p>
+              <p className="text-lg">
+                Collect coins 🪙 to increase visibility!
+              </p>
             </div>
           </div>
         )}
@@ -161,29 +170,29 @@ export default function ForestNight({ onNavigate }: ForestNightProps) {
           style={{
             left: `${playerX}%`,
             top: `${playerY}%`,
-            transform: 'translate(-50%, -50%)',
+            transform: "translate(-50%, -50%)",
           }}
         >
           <div className="text-5xl">🧑</div>
         </div>
 
         {/* Coins */}
-        {coins.map(coin => {
+        {coins.map((coin) => {
           if (coin.collected) return null;
-          
+
           const distance = Math.sqrt(
-            Math.pow(playerX - coin.x, 2) + Math.pow(playerY - coin.y, 2)
+            (playerX - coin.x) ** 2 + (playerY - coin.y) ** 2,
           );
           const isVisible = distance < visibility / 2;
-          
+
           return (
             <div
               key={coin.id}
-              className={`absolute transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+              className={`absolute transition-opacity duration-300 ${isVisible ? "opacity-100" : "opacity-0"}`}
               style={{
                 left: `${coin.x}%`,
                 top: `${coin.y}%`,
-                transform: 'translate(-50%, -50%)',
+                transform: "translate(-50%, -50%)",
               }}
             >
               <div className="text-4xl animate-bounce">🪙</div>
@@ -193,7 +202,9 @@ export default function ForestNight({ onNavigate }: ForestNightProps) {
 
         {/* Visibility indicator */}
         <div className="absolute bottom-4 right-4 bg-white px-4 py-2 rounded-lg border-3 border-yellow-400 z-20">
-          <span className="font-bold">Visibility: {Math.floor(visibility)}%</span>
+          <span className="font-bold">
+            Visibility: {Math.floor(visibility)}%
+          </span>
         </div>
       </div>
     </GameLayout>

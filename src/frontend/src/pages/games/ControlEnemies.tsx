@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
-import GameLayout from '../../components/GameLayout';
-import { ModulePage } from '../../App';
+import { useEffect, useRef, useState } from "react";
+import type { ModulePage } from "../../App";
+import GameLayout from "../../components/GameLayout";
 
 interface ControlEnemiesProps {
   onNavigate: (page: ModulePage) => void;
@@ -12,7 +12,7 @@ export default function ControlEnemies({ onNavigate }: ControlEnemiesProps) {
   const [highScore, setHighScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [level, setLevel] = useState(1);
-  
+
   const gameStateRef = useRef({
     player: { x: 50, y: 500 },
     goal: { x: 750, y: 50 },
@@ -27,7 +27,7 @@ export default function ControlEnemies({ onNavigate }: ControlEnemiesProps) {
     state.goal = { x: 750, y: 50 };
     state.enemies = [];
     state.selectedEnemy = -1;
-    
+
     // Spawn enemies based on level
     const enemyCount = 3 + Math.floor(level / 2);
     for (let i = 0; i < enemyCount; i++) {
@@ -38,7 +38,7 @@ export default function ControlEnemies({ onNavigate }: ControlEnemiesProps) {
         vy: 0,
       });
     }
-    
+
     setGameOver(false);
   };
 
@@ -56,15 +56,15 @@ export default function ControlEnemies({ onNavigate }: ControlEnemiesProps) {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       gameStateRef.current.keys[e.key] = true;
-      
+
       // Select enemy with number keys
-      if (e.key >= '1' && e.key <= '9') {
-        const idx = parseInt(e.key) - 1;
+      if (e.key >= "1" && e.key <= "9") {
+        const idx = Number.parseInt(e.key) - 1;
         if (idx < gameStateRef.current.enemies.length) {
           gameStateRef.current.selectedEnemy = idx;
         }
@@ -75,8 +75,8 @@ export default function ControlEnemies({ onNavigate }: ControlEnemiesProps) {
       gameStateRef.current.keys[e.key] = false;
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
 
     let animationId: number;
 
@@ -85,30 +85,33 @@ export default function ControlEnemies({ onNavigate }: ControlEnemiesProps) {
 
       if (!gameOver) {
         // Move selected enemy
-        if (state.selectedEnemy >= 0 && state.selectedEnemy < state.enemies.length) {
+        if (
+          state.selectedEnemy >= 0 &&
+          state.selectedEnemy < state.enemies.length
+        ) {
           const enemy = state.enemies[state.selectedEnemy];
           const speed = 3;
-          
-          if (state.keys['ArrowLeft'] || state.keys['a']) enemy.vx = -speed;
-          else if (state.keys['ArrowRight'] || state.keys['d']) enemy.vx = speed;
+
+          if (state.keys.ArrowLeft || state.keys.a) enemy.vx = -speed;
+          else if (state.keys.ArrowRight || state.keys.d) enemy.vx = speed;
           else enemy.vx = 0;
-          
-          if (state.keys['ArrowUp'] || state.keys['w']) enemy.vy = -speed;
-          else if (state.keys['ArrowDown'] || state.keys['s']) enemy.vy = speed;
+
+          if (state.keys.ArrowUp || state.keys.w) enemy.vy = -speed;
+          else if (state.keys.ArrowDown || state.keys.s) enemy.vy = speed;
           else enemy.vy = 0;
         }
 
         // Update enemies
-        state.enemies.forEach(enemy => {
+        state.enemies.forEach((enemy) => {
           enemy.x += enemy.vx;
           enemy.y += enemy.vy;
-          
+
           enemy.x = Math.max(20, Math.min(780, enemy.x));
           enemy.y = Math.max(20, Math.min(580, enemy.y));
         });
 
         // Check if player touches enemy (game over)
-        state.enemies.forEach(enemy => {
+        state.enemies.forEach((enemy) => {
           const dx = enemy.x - state.player.x;
           const dy = enemy.y - state.player.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
@@ -123,8 +126,8 @@ export default function ControlEnemies({ onNavigate }: ControlEnemiesProps) {
         const dy = state.goal.y - state.player.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         if (dist < 40) {
-          setScore(s => s + level * 10);
-          setLevel(l => l + 1);
+          setScore((s) => s + level * 10);
+          setLevel((l) => l + 1);
         }
 
         // Player moves toward goal slowly
@@ -134,11 +137,11 @@ export default function ControlEnemies({ onNavigate }: ControlEnemiesProps) {
       }
 
       // Render
-      ctx.fillStyle = '#0f172a';
+      ctx.fillStyle = "#0f172a";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Grid
-      ctx.strokeStyle = '#1e293b';
+      ctx.strokeStyle = "#1e293b";
       ctx.lineWidth = 1;
       for (let i = 0; i < 800; i += 50) {
         ctx.beginPath();
@@ -154,60 +157,60 @@ export default function ControlEnemies({ onNavigate }: ControlEnemiesProps) {
       }
 
       // Goal
-      ctx.fillStyle = '#22c55e';
+      ctx.fillStyle = "#22c55e";
       ctx.beginPath();
       ctx.arc(state.goal.x, state.goal.y, 30, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = '#fff';
-      ctx.font = '32px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText('🎯', state.goal.x, state.goal.y + 10);
+      ctx.fillStyle = "#fff";
+      ctx.font = "32px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText("🎯", state.goal.x, state.goal.y + 10);
 
       // Player (passive)
-      ctx.fillStyle = '#3b82f6';
+      ctx.fillStyle = "#3b82f6";
       ctx.beginPath();
       ctx.arc(state.player.x, state.player.y, 20, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = '#fff';
-      ctx.font = '24px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText('😊', state.player.x, state.player.y + 8);
+      ctx.fillStyle = "#fff";
+      ctx.font = "24px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText("😊", state.player.x, state.player.y + 8);
 
       // Enemies
       state.enemies.forEach((enemy, idx) => {
         const isSelected = idx === state.selectedEnemy;
-        
-        ctx.fillStyle = isSelected ? '#f59e0b' : '#ef4444';
+
+        ctx.fillStyle = isSelected ? "#f59e0b" : "#ef4444";
         ctx.beginPath();
         ctx.arc(enemy.x, enemy.y, 25, 0, Math.PI * 2);
         ctx.fill();
-        
+
         if (isSelected) {
-          ctx.strokeStyle = '#fbbf24';
+          ctx.strokeStyle = "#fbbf24";
           ctx.lineWidth = 4;
           ctx.stroke();
         }
-        
-        ctx.fillStyle = '#fff';
-        ctx.font = '28px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('👾', enemy.x, enemy.y + 10);
-        
+
+        ctx.fillStyle = "#fff";
+        ctx.font = "28px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("👾", enemy.x, enemy.y + 10);
+
         // Number label
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold 16px Arial';
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 16px Arial";
         ctx.fillText((idx + 1).toString(), enemy.x, enemy.y - 30);
       });
 
       // Instructions
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
       ctx.fillRect(10, 10, 300, 100);
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 14px Arial';
-      ctx.textAlign = 'left';
-      ctx.fillText('Press 1-9 to select enemy', 20, 35);
-      ctx.fillText('Arrow keys/WASD to move enemy', 20, 60);
-      ctx.fillText('Guide player to goal!', 20, 85);
+      ctx.fillStyle = "#fff";
+      ctx.font = "bold 14px Arial";
+      ctx.textAlign = "left";
+      ctx.fillText("Press 1-9 to select enemy", 20, 35);
+      ctx.fillText("Arrow keys/WASD to move enemy", 20, 60);
+      ctx.fillText("Guide player to goal!", 20, 85);
       ctx.fillText(`Level: ${level}`, 20, 110);
 
       animationId = requestAnimationFrame(gameLoop);
@@ -217,8 +220,8 @@ export default function ControlEnemies({ onNavigate }: ControlEnemiesProps) {
 
     return () => {
       cancelAnimationFrame(animationId);
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
     };
   }, [gameOver, score, highScore, level]);
 
@@ -233,8 +236,12 @@ export default function ControlEnemies({ onNavigate }: ControlEnemiesProps) {
     >
       <div className="flex flex-col items-center justify-center p-4 bg-gradient-to-br from-slate-900 to-blue-900">
         <div className="mb-4 text-center text-white">
-          <p className="text-lg font-semibold">Control enemies to guide your character!</p>
-          <p className="text-sm">Press 1-9 to select • Move with arrows/WASD • Reach the goal</p>
+          <p className="text-lg font-semibold">
+            Control enemies to guide your character!
+          </p>
+          <p className="text-sm">
+            Press 1-9 to select • Move with arrows/WASD • Reach the goal
+          </p>
         </div>
         <canvas
           ref={canvasRef}

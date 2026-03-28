@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Bubblegum+Sans&family=Varela+Round&family=Poppins:wght@400;500;600;700&family=Baloo+2:wght@400;500;600;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Bubblegum+Sans&family=Varela+Round&family=Poppins:wght@400;500;600;700&family=Baloo+2:wght@400;500;600;700;800&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -18,7 +18,7 @@
     --secondary-foreground: oklch(20% 0 0);
     --muted: oklch(92% 0.02 264);
     --muted-foreground: oklch(50% 0.02 264);
-    --accent: oklch(75% 0.20 330);
+    --accent: oklch(75% 0.2 330);
     --accent-foreground: oklch(20% 0 0);
     --destructive: oklch(60% 0.25 25);
     --destructive-foreground: oklch(100% 0 0);
@@ -26,14 +26,14 @@
     --input: oklch(85% 0.02 264);
     --ring: oklch(90% 0.15 90);
     --radius: 0.5rem;
-    --neon-glow: oklch(70% 0.30 264);
+    --neon-glow: oklch(70% 0.3 264);
     --neon-pink: oklch(70% 0.25 330);
-    --neon-yellow: oklch(85% 0.20 90);
-    --neon-cyan: oklch(75% 0.20 200);
+    --neon-yellow: oklch(85% 0.2 90);
+    --neon-cyan: oklch(75% 0.2 200);
     --chart-1: oklch(60% 0.25 264);
     --chart-2: oklch(70% 0.25 330);
-    --chart-3: oklch(75% 0.20 200);
-    --chart-4: oklch(85% 0.20 90);
+    --chart-3: oklch(75% 0.2 200);
+    --chart-4: oklch(85% 0.2 90);
     --chart-5: oklch(65% 0.25 150);
   }
 
@@ -50,21 +50,21 @@
     --secondary-foreground: oklch(98% 0.01 264);
     --muted: oklch(25% 0.02 264);
     --muted-foreground: oklch(65% 0.02 264);
-    --accent: oklch(75% 0.20 330);
+    --accent: oklch(75% 0.2 330);
     --accent-foreground: oklch(98% 0.01 264);
     --destructive: oklch(60% 0.25 25);
     --destructive-foreground: oklch(98% 0.01 264);
     --border: oklch(30% 0.02 264);
     --input: oklch(30% 0.02 264);
     --ring: oklch(70% 0.25 264);
-    --neon-glow: oklch(75% 0.30 264);
+    --neon-glow: oklch(75% 0.3 264);
     --neon-pink: oklch(75% 0.25 330);
-    --neon-yellow: oklch(90% 0.20 90);
-    --neon-cyan: oklch(80% 0.20 200);
+    --neon-yellow: oklch(90% 0.2 90);
+    --neon-cyan: oklch(80% 0.2 200);
     --chart-1: oklch(70% 0.25 264);
     --chart-2: oklch(75% 0.25 330);
-    --chart-3: oklch(80% 0.20 200);
-    --chart-4: oklch(90% 0.20 90);
+    --chart-3: oklch(80% 0.2 200);
+    --chart-4: oklch(90% 0.2 90);
     --chart-5: oklch(70% 0.25 150);
   }
 }
@@ -75,18 +75,24 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Varela Round', 'Poppins', sans-serif;
+    font-family: "Varela Round", "Poppins", sans-serif;
   }
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply text-foreground;
   }
 }
 
 @layer utilities {
   .neon-glow {
-    text-shadow: 0 0 10px var(--neon-glow), 0 0 20px var(--neon-glow), 0 0 30px var(--neon-glow);
+    text-shadow: 0 0 10px var(--neon-glow), 0 0 20px var(--neon-glow), 0 0 30px
+      var(--neon-glow);
   }
-  
+
   .neon-border {
     box-shadow: 0 0 10px var(--neon-glow), 0 0 20px var(--neon-glow);
   }
@@ -96,11 +102,14 @@
   }
 
   @keyframes neon-pulse {
-    0%, 100% {
-      text-shadow: 0 0 10px var(--neon-glow), 0 0 20px var(--neon-glow), 0 0 30px var(--neon-glow);
+    0%,
+    100% {
+      text-shadow: 0 0 10px var(--neon-glow), 0 0 20px var(--neon-glow), 0 0
+        30px var(--neon-glow);
     }
     50% {
-      text-shadow: 0 0 20px var(--neon-glow), 0 0 30px var(--neon-glow), 0 0 40px var(--neon-glow), 0 0 50px var(--neon-glow);
+      text-shadow: 0 0 20px var(--neon-glow), 0 0 30px var(--neon-glow), 0 0
+        40px var(--neon-glow), 0 0 50px var(--neon-glow);
     }
   }
 
@@ -150,20 +159,25 @@
     left: 50%;
     transform: translateX(-50%);
     border-radius: 4px;
-    box-shadow: 
+    box-shadow:
       inset -3px -3px 8px rgba(0, 0, 0, 0.3),
       inset 3px 3px 8px rgba(255, 255, 255, 0.4),
       4px 4px 12px rgba(0, 0, 0, 0.25);
   }
 
   .avatar-part::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, transparent 50%, rgba(0, 0, 0, 0.2) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.3) 0%,
+      transparent 50%,
+      rgba(0, 0, 0, 0.2) 100%
+    );
     border-radius: inherit;
     pointer-events: none;
   }
@@ -197,11 +211,10 @@
   .eye {
     width: 8px;
     height: 8px;
-    background: #2C3E50;
+    background: #2c3e50;
     border-radius: 50%;
-    box-shadow: 
-      inset -1px -1px 2px rgba(0, 0, 0, 0.5),
-      1px 1px 2px rgba(255, 255, 255, 0.3);
+    box-shadow: inset -1px -1px 2px rgba(0, 0, 0, 0.5), 1px 1px 2px
+      rgba(255, 255, 255, 0.3);
   }
 
   .mouth {
@@ -211,7 +224,7 @@
     transform: translateX(-50%);
     width: 20px;
     height: 3px;
-    background: #2C3E50;
+    background: #2c3e50;
     border-radius: 2px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   }
@@ -378,7 +391,8 @@
   }
 
   @keyframes pet-bounce {
-    0%, 100% {
+    0%,
+    100% {
       transform: scale(1) translateY(0);
     }
     25% {
@@ -422,7 +436,8 @@
   }
 
   @keyframes pet-play-wiggle {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 0;
       transform: rotate(0deg) scale(0.5);
     }

@@ -1,13 +1,13 @@
-import { useState, useEffect, useCallback } from 'react';
-import GameLayout from '../../components/GameLayout';
-import { ModulePage } from '../../App';
+import { useCallback, useEffect, useState } from "react";
+import type { ModulePage } from "../../App";
+import GameLayout from "../../components/GameLayout";
 
 interface Room {
   id: number;
   x: number;
   y: number;
   color: string;
-  puzzle: 'color' | 'pattern' | 'sequence';
+  puzzle: "color" | "pattern" | "sequence";
   solved: boolean;
 }
 
@@ -21,19 +21,26 @@ export default function MindMazePuzzle({ onNavigate }: MindMazePuzzleProps) {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [gameOver, setGameOver] = useState(false);
   const [highScore, setHighScore] = useState(0);
-  const [puzzleAnswer, setPuzzleAnswer] = useState<string>('');
+  const [puzzleAnswer, setPuzzleAnswer] = useState<string>("");
   const [showPuzzle, setShowPuzzle] = useState(false);
 
-  const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#FFD93D'];
-  const patterns = ['⭐', '🔷', '🔶', '⚡', '💫', '🌟'];
+  const colors = [
+    "#FF6B6B",
+    "#4ECDC4",
+    "#45B7D1",
+    "#FFA07A",
+    "#98D8C8",
+    "#FFD93D",
+  ];
+  const patterns = ["⭐", "🔷", "🔶", "⚡", "💫", "🌟"];
 
   const startGame = () => {
     setScore(0);
     setCurrentRoom(0);
     setGameOver(false);
-    setPuzzleAnswer('');
+    setPuzzleAnswer("");
     setShowPuzzle(false);
-    
+
     const newRooms: Room[] = [];
     for (let i = 0; i < 6; i++) {
       newRooms.push({
@@ -41,7 +48,9 @@ export default function MindMazePuzzle({ onNavigate }: MindMazePuzzleProps) {
         x: (i % 3) * 33 + 16.5,
         y: Math.floor(i / 3) * 50 + 25,
         color: colors[i],
-        puzzle: ['color', 'pattern', 'sequence'][Math.floor(Math.random() * 3)] as 'color' | 'pattern' | 'sequence',
+        puzzle: ["color", "pattern", "sequence"][
+          Math.floor(Math.random() * 3)
+        ] as "color" | "pattern" | "sequence",
         solved: false,
       });
     }
@@ -55,7 +64,7 @@ export default function MindMazePuzzle({ onNavigate }: MindMazePuzzleProps) {
   }, [gameOver, score, highScore]);
 
   useEffect(() => {
-    const solvedCount = rooms.filter(r => r.solved).length;
+    const solvedCount = rooms.filter((r) => r.solved).length;
     if (solvedCount === rooms.length && rooms.length > 0) {
       setGameOver(true);
     }
@@ -64,58 +73,61 @@ export default function MindMazePuzzle({ onNavigate }: MindMazePuzzleProps) {
   const handleRoomClick = (roomId: number) => {
     const room = rooms[roomId];
     if (room.solved) return;
-    
+
     setCurrentRoom(roomId);
     setShowPuzzle(true);
-    setPuzzleAnswer('');
+    setPuzzleAnswer("");
   };
 
   const solvePuzzle = () => {
     const room = rooms[currentRoom];
     let correct = false;
 
-    if (room.puzzle === 'color') {
+    if (room.puzzle === "color") {
       correct = puzzleAnswer.toLowerCase() === room.color.toLowerCase();
-    } else if (room.puzzle === 'pattern') {
+    } else if (room.puzzle === "pattern") {
       correct = puzzleAnswer === patterns[currentRoom];
-    } else if (room.puzzle === 'sequence') {
+    } else if (room.puzzle === "sequence") {
       correct = puzzleAnswer === String(currentRoom + 1);
     }
 
     if (correct) {
-      setRooms(prev => prev.map(r => 
-        r.id === currentRoom ? { ...r, solved: true } : r
-      ));
-      setScore(prev => prev + 50);
+      setRooms((prev) =>
+        prev.map((r) => (r.id === currentRoom ? { ...r, solved: true } : r)),
+      );
+      setScore((prev) => prev + 50);
       setShowPuzzle(false);
-      setPuzzleAnswer('');
+      setPuzzleAnswer("");
     } else {
-      setScore(prev => Math.max(0, prev - 10));
+      setScore((prev) => Math.max(0, prev - 10));
     }
   };
 
-  const handleKeyPress = useCallback((e: KeyboardEvent) => {
-    if (!showPuzzle || gameOver) return;
-    
-    if (e.key === 'Enter') {
-      solvePuzzle();
-    }
-  }, [showPuzzle, gameOver, puzzleAnswer, currentRoom]);
+  const handleKeyPress = useCallback(
+    (e: KeyboardEvent) => {
+      if (!showPuzzle || gameOver) return;
+
+      if (e.key === "Enter") {
+        solvePuzzle();
+      }
+    },
+    [showPuzzle, gameOver, puzzleAnswer, currentRoom],
+  );
 
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
   }, [handleKeyPress]);
 
   const renderPuzzle = () => {
     const room = rooms[currentRoom];
     if (!room) return null;
 
-    if (room.puzzle === 'color') {
+    if (room.puzzle === "color") {
       return (
         <div className="space-y-4">
           <div className="text-xl font-bold">What color is this room?</div>
-          <div 
+          <div
             className="w-32 h-32 mx-auto rounded-lg border-4 border-white"
             style={{ backgroundColor: room.color }}
           />
@@ -125,11 +137,11 @@ export default function MindMazePuzzle({ onNavigate }: MindMazePuzzleProps) {
             onChange={(e) => setPuzzleAnswer(e.target.value)}
             placeholder="Type the color..."
             className="w-full px-4 py-2 border-3 border-purple-300 rounded-lg text-center"
-            autoFocus
           />
         </div>
       );
-    } else if (room.puzzle === 'pattern') {
+    }
+    if (room.puzzle === "pattern") {
       return (
         <div className="space-y-4">
           <div className="text-xl font-bold">Remember this pattern!</div>
@@ -140,26 +152,23 @@ export default function MindMazePuzzle({ onNavigate }: MindMazePuzzleProps) {
             onChange={(e) => setPuzzleAnswer(e.target.value)}
             placeholder="Type the emoji..."
             className="w-full px-4 py-2 border-3 border-purple-300 rounded-lg text-center"
-            autoFocus
-          />
-        </div>
-      );
-    } else {
-      return (
-        <div className="space-y-4">
-          <div className="text-xl font-bold">What room number is this?</div>
-          <div className="text-6xl">🚪</div>
-          <input
-            type="text"
-            value={puzzleAnswer}
-            onChange={(e) => setPuzzleAnswer(e.target.value)}
-            placeholder="Type the number..."
-            className="w-full px-4 py-2 border-3 border-purple-300 rounded-lg text-center"
-            autoFocus
           />
         </div>
       );
     }
+    return (
+      <div className="space-y-4">
+        <div className="text-xl font-bold">What room number is this?</div>
+        <div className="text-6xl">🚪</div>
+        <input
+          type="text"
+          value={puzzleAnswer}
+          onChange={(e) => setPuzzleAnswer(e.target.value)}
+          placeholder="Type the number..."
+          className="w-full px-4 py-2 border-3 border-purple-300 rounded-lg text-center"
+        />
+      </div>
+    );
   };
 
   return (
@@ -173,39 +182,38 @@ export default function MindMazePuzzle({ onNavigate }: MindMazePuzzleProps) {
     >
       <div className="relative w-full h-[600px] bg-gradient-to-br from-purple-400 via-pink-400 to-indigo-400 overflow-hidden">
         {/* Instructions */}
-        {rooms.filter(r => r.solved).length === 0 && !showPuzzle && (
+        {rooms.filter((r) => r.solved).length === 0 && !showPuzzle && (
           <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-white px-6 py-3 rounded-lg border-4 border-purple-300 z-20 text-center max-w-md">
             <p className="font-bold">Click rooms to solve puzzles!</p>
           </div>
         )}
 
         {/* Rooms */}
-        {!showPuzzle && rooms.map(room => (
-          <div
-            key={room.id}
-            onClick={() => handleRoomClick(room.id)}
-            className={`absolute cursor-pointer transition-all duration-300 hover:scale-110 ${
-              room.solved ? 'opacity-50' : ''
-            }`}
-            style={{
-              left: `${room.x}%`,
-              top: `${room.y}%`,
-              transform: 'translate(-50%, -50%)',
-            }}
-          >
-            <div 
-              className="w-32 h-32 rounded-lg border-4 border-white flex items-center justify-center shadow-2xl"
-              style={{ backgroundColor: room.color }}
+        {!showPuzzle &&
+          rooms.map((room) => (
+            <div
+              key={room.id}
+              onClick={() => handleRoomClick(room.id)}
+              className={`absolute cursor-pointer transition-all duration-300 hover:scale-110 ${
+                room.solved ? "opacity-50" : ""
+              }`}
+              style={{
+                left: `${room.x}%`,
+                top: `${room.y}%`,
+                transform: "translate(-50%, -50%)",
+              }}
             >
-              <div className="text-5xl">
-                {room.solved ? '✅' : '🚪'}
+              <div
+                className="w-32 h-32 rounded-lg border-4 border-white flex items-center justify-center shadow-2xl"
+                style={{ backgroundColor: room.color }}
+              >
+                <div className="text-5xl">{room.solved ? "✅" : "🚪"}</div>
+              </div>
+              <div className="text-center mt-2 font-bold text-white">
+                Room {room.id + 1}
               </div>
             </div>
-            <div className="text-center mt-2 font-bold text-white">
-              Room {room.id + 1}
-            </div>
-          </div>
-        ))}
+          ))}
 
         {/* Puzzle overlay */}
         {showPuzzle && (
@@ -222,7 +230,7 @@ export default function MindMazePuzzle({ onNavigate }: MindMazePuzzleProps) {
                 <button
                   onClick={() => {
                     setShowPuzzle(false);
-                    setPuzzleAnswer('');
+                    setPuzzleAnswer("");
                   }}
                   className="flex-1 px-6 py-3 bg-gray-500 text-white rounded-lg font-bold hover:bg-gray-600 transition-colors"
                 >
@@ -236,7 +244,7 @@ export default function MindMazePuzzle({ onNavigate }: MindMazePuzzleProps) {
         {/* Progress */}
         <div className="absolute bottom-4 right-4 bg-white px-4 py-2 rounded-lg border-3 border-purple-400 z-20">
           <span className="font-bold">
-            Solved: {rooms.filter(r => r.solved).length}/{rooms.length}
+            Solved: {rooms.filter((r) => r.solved).length}/{rooms.length}
           </span>
         </div>
       </div>

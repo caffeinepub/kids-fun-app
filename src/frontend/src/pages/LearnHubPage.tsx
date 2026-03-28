@@ -1,14 +1,31 @@
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { BookOpen, Microscope, Palette, Lightbulb, Star, Volume2, VolumeX, ArrowLeft, CheckCircle2, Play } from 'lucide-react';
-import { ModulePage } from '../App';
-import ReadingVocabularyActivity from '../components/learn-hub/ReadingVocabularyActivity';
-import ScienceNatureActivity from '../components/learn-hub/ScienceNatureActivity';
-import ArtsMusicActivity from '../components/learn-hub/ArtsMusicActivity';
-import DiscoveryZoneActivity from '../components/learn-hub/DiscoveryZoneActivity';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import {
+  ArrowLeft,
+  BookOpen,
+  CheckCircle2,
+  Lightbulb,
+  Microscope,
+  Palette,
+  Play,
+  Star,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import type { ModulePage } from "../App";
+import ArtsMusicActivity from "../components/learn-hub/ArtsMusicActivity";
+import DiscoveryZoneActivity from "../components/learn-hub/DiscoveryZoneActivity";
+import ReadingVocabularyActivity from "../components/learn-hub/ReadingVocabularyActivity";
+import ScienceNatureActivity from "../components/learn-hub/ScienceNatureActivity";
 
 interface LearnHubPageProps {
   onNavigate: (page: ModulePage) => void;
@@ -19,209 +36,209 @@ interface Lesson {
   title: string;
   description: string;
   duration: string;
-  difficulty: 'Easy' | 'Medium' | 'Hard';
+  difficulty: "Easy" | "Medium" | "Hard";
   completed: boolean;
   stars: number;
 }
 
 const categories = [
   {
-    id: 'reading',
-    title: 'Reading & Vocabulary',
-    description: 'Word stories, phonics, spelling mini-games',
+    id: "reading",
+    title: "Reading & Vocabulary",
+    description: "Word stories, phonics, spelling mini-games",
     icon: BookOpen,
-    color: 'from-blue-400 to-cyan-600',
-    image: '/assets/generated/reading-vocabulary-icon.dim_64x64.png',
+    color: "from-blue-400 to-cyan-600",
+    image: "/assets/generated/reading-vocabulary-icon.dim_64x64.png",
     lessons: [
       {
-        id: 'reading-1',
-        title: 'Phonics Fun',
-        description: 'Learn letter sounds and blend them into words',
-        duration: '10 min',
-        difficulty: 'Easy' as const,
+        id: "reading-1",
+        title: "Phonics Fun",
+        description: "Learn letter sounds and blend them into words",
+        duration: "10 min",
+        difficulty: "Easy" as const,
         completed: false,
         stars: 0,
       },
       {
-        id: 'reading-2',
-        title: 'Word Builder',
-        description: 'Create new words by combining letters',
-        duration: '12 min',
-        difficulty: 'Easy' as const,
+        id: "reading-2",
+        title: "Word Builder",
+        description: "Create new words by combining letters",
+        duration: "12 min",
+        difficulty: "Easy" as const,
         completed: false,
         stars: 0,
       },
       {
-        id: 'reading-3',
-        title: 'Story Time',
-        description: 'Read along with interactive stories',
-        duration: '15 min',
-        difficulty: 'Medium' as const,
+        id: "reading-3",
+        title: "Story Time",
+        description: "Read along with interactive stories",
+        duration: "15 min",
+        difficulty: "Medium" as const,
         completed: false,
         stars: 0,
       },
       {
-        id: 'reading-4',
-        title: 'Spelling Challenge',
-        description: 'Practice spelling common words',
-        duration: '10 min',
-        difficulty: 'Medium' as const,
+        id: "reading-4",
+        title: "Spelling Challenge",
+        description: "Practice spelling common words",
+        duration: "10 min",
+        difficulty: "Medium" as const,
         completed: false,
         stars: 0,
       },
       {
-        id: 'reading-5',
-        title: 'Vocabulary Quest',
-        description: 'Discover new words and their meanings',
-        duration: '15 min',
-        difficulty: 'Hard' as const,
+        id: "reading-5",
+        title: "Vocabulary Quest",
+        description: "Discover new words and their meanings",
+        duration: "15 min",
+        difficulty: "Hard" as const,
         completed: false,
         stars: 0,
       },
     ],
   },
   {
-    id: 'science',
-    title: 'Science & Nature',
-    description: 'Exploring weather, space, animals, plants',
+    id: "science",
+    title: "Science & Nature",
+    description: "Exploring weather, space, animals, plants",
     icon: Microscope,
-    color: 'from-green-400 to-emerald-600',
-    image: '/assets/generated/science-nature-icon.dim_64x64.png',
+    color: "from-green-400 to-emerald-600",
+    image: "/assets/generated/science-nature-icon.dim_64x64.png",
     lessons: [
       {
-        id: 'science-1',
-        title: 'Weather Wonders',
-        description: 'Learn about rain, sun, clouds, and storms',
-        duration: '12 min',
-        difficulty: 'Easy' as const,
+        id: "science-1",
+        title: "Weather Wonders",
+        description: "Learn about rain, sun, clouds, and storms",
+        duration: "12 min",
+        difficulty: "Easy" as const,
         completed: false,
         stars: 0,
       },
       {
-        id: 'science-2',
-        title: 'Space Adventure',
-        description: 'Explore planets, stars, and the moon',
-        duration: '15 min',
-        difficulty: 'Medium' as const,
+        id: "science-2",
+        title: "Space Adventure",
+        description: "Explore planets, stars, and the moon",
+        duration: "15 min",
+        difficulty: "Medium" as const,
         completed: false,
         stars: 0,
       },
       {
-        id: 'science-3',
-        title: 'Animal Habitats',
-        description: 'Discover where animals live and why',
-        duration: '12 min',
-        difficulty: 'Easy' as const,
+        id: "science-3",
+        title: "Animal Habitats",
+        description: "Discover where animals live and why",
+        duration: "12 min",
+        difficulty: "Easy" as const,
         completed: false,
         stars: 0,
       },
       {
-        id: 'science-4',
-        title: 'Plant Life Cycle',
-        description: 'Watch how plants grow from seeds',
-        duration: '10 min',
-        difficulty: 'Medium' as const,
+        id: "science-4",
+        title: "Plant Life Cycle",
+        description: "Watch how plants grow from seeds",
+        duration: "10 min",
+        difficulty: "Medium" as const,
         completed: false,
         stars: 0,
       },
     ],
   },
   {
-    id: 'arts',
-    title: 'Arts & Music',
-    description: 'Colors, drawing, rhythm, creative sounds',
+    id: "arts",
+    title: "Arts & Music",
+    description: "Colors, drawing, rhythm, creative sounds",
     icon: Palette,
-    color: 'from-pink-400 to-purple-600',
-    image: '/assets/generated/arts-music-icon.dim_64x64.png',
+    color: "from-pink-400 to-purple-600",
+    image: "/assets/generated/arts-music-icon.dim_64x64.png",
     lessons: [
       {
-        id: 'arts-1',
-        title: 'Color Mixing Magic',
-        description: 'Mix colors to create new ones',
-        duration: '10 min',
-        difficulty: 'Easy' as const,
+        id: "arts-1",
+        title: "Color Mixing Magic",
+        description: "Mix colors to create new ones",
+        duration: "10 min",
+        difficulty: "Easy" as const,
         completed: false,
         stars: 0,
       },
       {
-        id: 'arts-2',
-        title: 'Drawing Basics',
-        description: 'Learn to draw simple shapes and objects',
-        duration: '15 min',
-        difficulty: 'Easy' as const,
+        id: "arts-2",
+        title: "Drawing Basics",
+        description: "Learn to draw simple shapes and objects",
+        duration: "15 min",
+        difficulty: "Easy" as const,
         completed: false,
         stars: 0,
       },
       {
-        id: 'arts-3',
-        title: 'Rhythm Patterns',
-        description: 'Clap and tap to fun musical beats',
-        duration: '12 min',
-        difficulty: 'Medium' as const,
+        id: "arts-3",
+        title: "Rhythm Patterns",
+        description: "Clap and tap to fun musical beats",
+        duration: "12 min",
+        difficulty: "Medium" as const,
         completed: false,
         stars: 0,
       },
       {
-        id: 'arts-4',
-        title: 'Sound Explorer',
-        description: 'Discover different musical instruments',
-        duration: '10 min',
-        difficulty: 'Easy' as const,
+        id: "arts-4",
+        title: "Sound Explorer",
+        description: "Discover different musical instruments",
+        duration: "10 min",
+        difficulty: "Easy" as const,
         completed: false,
         stars: 0,
       },
       {
-        id: 'arts-5',
-        title: 'Creative Expression',
-        description: 'Express yourself through art and music',
-        duration: '15 min',
-        difficulty: 'Medium' as const,
+        id: "arts-5",
+        title: "Creative Expression",
+        description: "Express yourself through art and music",
+        duration: "15 min",
+        difficulty: "Medium" as const,
         completed: false,
         stars: 0,
       },
     ],
   },
   {
-    id: 'discovery',
-    title: 'Discovery Zone',
-    description: 'Fun facts, interactive stories, how things work',
+    id: "discovery",
+    title: "Discovery Zone",
+    description: "Fun facts, interactive stories, how things work",
     icon: Lightbulb,
-    color: 'from-yellow-400 to-orange-600',
-    image: '/assets/generated/discovery-zone-icon.dim_64x64.png',
+    color: "from-yellow-400 to-orange-600",
+    image: "/assets/generated/discovery-zone-icon.dim_64x64.png",
     lessons: [
       {
-        id: 'discovery-1',
-        title: 'Amazing Facts',
-        description: 'Learn surprising facts about the world',
-        duration: '10 min',
-        difficulty: 'Easy' as const,
+        id: "discovery-1",
+        title: "Amazing Facts",
+        description: "Learn surprising facts about the world",
+        duration: "10 min",
+        difficulty: "Easy" as const,
         completed: false,
         stars: 0,
       },
       {
-        id: 'discovery-2',
-        title: 'How Things Work',
-        description: 'Discover how everyday objects function',
-        duration: '12 min',
-        difficulty: 'Medium' as const,
+        id: "discovery-2",
+        title: "How Things Work",
+        description: "Discover how everyday objects function",
+        duration: "12 min",
+        difficulty: "Medium" as const,
         completed: false,
         stars: 0,
       },
       {
-        id: 'discovery-3',
-        title: 'World Explorer',
-        description: 'Travel to different countries and cultures',
-        duration: '15 min',
-        difficulty: 'Medium' as const,
+        id: "discovery-3",
+        title: "World Explorer",
+        description: "Travel to different countries and cultures",
+        duration: "15 min",
+        difficulty: "Medium" as const,
         completed: false,
         stars: 0,
       },
       {
-        id: 'discovery-4',
-        title: 'Invention Stories',
-        description: 'Learn about famous inventions',
-        duration: '12 min',
-        difficulty: 'Hard' as const,
+        id: "discovery-4",
+        title: "Invention Stories",
+        description: "Learn about famous inventions",
+        duration: "12 min",
+        difficulty: "Hard" as const,
         completed: false,
         stars: 0,
       },
@@ -233,17 +250,19 @@ export default function LearnHubPage({ onNavigate }: LearnHubPageProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   const [voiceEnabled, setVoiceEnabled] = useState(true);
-  const [completedLessons, setCompletedLessons] = useState<Record<string, { completed: boolean; stars: number }>>({});
+  const [completedLessons, setCompletedLessons] = useState<
+    Record<string, { completed: boolean; stars: number }>
+  >({});
 
   // Load completed lessons from localStorage
   useEffect(() => {
-    const stored = localStorage.getItem('learnHubProgress');
+    const stored = localStorage.getItem("learnHubProgress");
     if (stored) {
       setCompletedLessons(JSON.parse(stored));
     }
   }, []);
 
-  const currentCategory = categories.find(c => c.id === selectedCategory);
+  const currentCategory = categories.find((c) => c.id === selectedCategory);
 
   const handleStartLesson = (lesson: Lesson) => {
     setSelectedLesson(lesson);
@@ -256,7 +275,7 @@ export default function LearnHubPage({ onNavigate }: LearnHubPageProps) {
         [selectedLesson.id]: { completed: true, stars },
       };
       setCompletedLessons(updated);
-      localStorage.setItem('learnHubProgress', JSON.stringify(updated));
+      localStorage.setItem("learnHubProgress", JSON.stringify(updated));
       setSelectedLesson(null);
     }
   };
@@ -282,13 +301,13 @@ export default function LearnHubPage({ onNavigate }: LearnHubPageProps) {
     };
 
     switch (selectedCategory) {
-      case 'reading':
+      case "reading":
         return <ReadingVocabularyActivity {...props} />;
-      case 'science':
+      case "science":
         return <ScienceNatureActivity {...props} />;
-      case 'arts':
+      case "arts":
         return <ArtsMusicActivity {...props} />;
-      case 'discovery':
+      case "discovery":
         return <DiscoveryZoneActivity {...props} />;
       default:
         return null;
@@ -313,7 +332,11 @@ export default function LearnHubPage({ onNavigate }: LearnHubPageProps) {
             variant="outline"
             className="border-2 border-neon-cyan"
           >
-            {voiceEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+            {voiceEnabled ? (
+              <Volume2 className="h-5 w-5" />
+            ) : (
+              <VolumeX className="h-5 w-5" />
+            )}
           </Button>
         </div>
         {renderActivity()}
@@ -340,12 +363,18 @@ export default function LearnHubPage({ onNavigate }: LearnHubPageProps) {
             variant="outline"
             className="border-2 border-neon-cyan"
           >
-            {voiceEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+            {voiceEnabled ? (
+              <Volume2 className="h-5 w-5" />
+            ) : (
+              <VolumeX className="h-5 w-5" />
+            )}
           </Button>
         </div>
 
         <div className="text-center space-y-4">
-          <div className={`inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br ${currentCategory.color} shadow-neon-lg`}>
+          <div
+            className={`inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br ${currentCategory.color} shadow-neon-lg`}
+          >
             <CategoryIcon className="h-12 w-12 text-white" />
           </div>
           <h1 className="text-5xl font-bold text-neon-pink text-shadow-neon-lg">
@@ -368,15 +397,21 @@ export default function LearnHubPage({ onNavigate }: LearnHubPageProps) {
                 className="hover:shadow-2xl transition-all duration-300 border-4 hover:scale-105 cursor-pointer"
                 onClick={() => handleStartLesson(lesson)}
               >
-                <div className={`h-2 bg-gradient-to-r ${currentCategory.color}`}></div>
+                <div
+                  className={`h-2 bg-gradient-to-r ${currentCategory.color}`}
+                />
                 <CardHeader>
                   <div className="flex items-start justify-between mb-2">
-                    <CardTitle className="text-2xl font-bold flex-1">{lesson.title}</CardTitle>
+                    <CardTitle className="text-2xl font-bold flex-1">
+                      {lesson.title}
+                    </CardTitle>
                     {isCompleted && (
                       <CheckCircle2 className="h-6 w-6 text-green-500 flex-shrink-0" />
                     )}
                   </div>
-                  <CardDescription className="text-base">{lesson.description}</CardDescription>
+                  <CardDescription className="text-base">
+                    {lesson.description}
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between text-sm">
@@ -388,13 +423,16 @@ export default function LearnHubPage({ onNavigate }: LearnHubPageProps) {
                   {isCompleted && (
                     <div className="flex justify-center gap-1">
                       {[...Array(stars)].map((_, i) => (
-                        <Star key={i} className="h-5 w-5 text-yellow-400 fill-yellow-400" />
+                        <Star
+                          key={i}
+                          className="h-5 w-5 text-yellow-400 fill-yellow-400"
+                        />
                       ))}
                     </div>
                   )}
                   <Button className="w-full font-semibold" variant="outline">
                     <Play className="mr-2 h-4 w-4" />
-                    {isCompleted ? 'Review Lesson' : 'Start Lesson'}
+                    {isCompleted ? "Review Lesson" : "Start Lesson"}
                   </Button>
                 </CardContent>
               </Card>
@@ -410,7 +448,7 @@ export default function LearnHubPage({ onNavigate }: LearnHubPageProps) {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <Button
-          onClick={() => onNavigate('dashboard')}
+          onClick={() => onNavigate("dashboard")}
           variant="outline"
           className="border-2 border-neon-purple hover:bg-neon-purple/20"
         >
@@ -422,7 +460,11 @@ export default function LearnHubPage({ onNavigate }: LearnHubPageProps) {
           variant="outline"
           className="border-2 border-neon-cyan"
         >
-          {voiceEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+          {voiceEnabled ? (
+            <Volume2 className="h-5 w-5" />
+          ) : (
+            <VolumeX className="h-5 w-5" />
+          )}
         </Button>
       </div>
 
@@ -439,7 +481,9 @@ export default function LearnHubPage({ onNavigate }: LearnHubPageProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {categories.map((category) => {
           const CategoryIcon = category.icon;
-          const completedCount = category.lessons.filter(l => completedLessons[l.id]?.completed).length;
+          const completedCount = category.lessons.filter(
+            (l) => completedLessons[l.id]?.completed,
+          ).length;
           const totalLessons = category.lessons.length;
           const progressPercent = (completedCount / totalLessons) * 100;
 
@@ -449,9 +493,11 @@ export default function LearnHubPage({ onNavigate }: LearnHubPageProps) {
               className="hover:shadow-2xl transition-all duration-300 cursor-pointer border-4 hover:scale-105 overflow-hidden"
               onClick={() => setSelectedCategory(category.id)}
             >
-              <div className={`h-3 bg-gradient-to-r ${category.color}`}></div>
+              <div className={`h-3 bg-gradient-to-r ${category.color}`} />
               <CardHeader className="text-center pb-4">
-                <div className={`mx-auto mb-4 w-20 h-20 rounded-full bg-gradient-to-br ${category.color} flex items-center justify-center shadow-neon-md`}>
+                <div
+                  className={`mx-auto mb-4 w-20 h-20 rounded-full bg-gradient-to-br ${category.color} flex items-center justify-center shadow-neon-md`}
+                >
                   <CategoryIcon className="w-10 h-10 text-white" />
                 </div>
                 <CardTitle className="text-3xl font-bold text-shadow-neon-sm">
@@ -471,7 +517,10 @@ export default function LearnHubPage({ onNavigate }: LearnHubPageProps) {
                   </div>
                   <Progress value={progressPercent} className="h-3" />
                 </div>
-                <Button className="w-full font-semibold text-lg py-6" variant="outline">
+                <Button
+                  className="w-full font-semibold text-lg py-6"
+                  variant="outline"
+                >
                   <Play className="mr-2 h-5 w-5" />
                   Start Learning
                 </Button>
@@ -489,8 +538,9 @@ export default function LearnHubPage({ onNavigate }: LearnHubPageProps) {
         </CardHeader>
         <CardContent>
           <p className="text-center text-lg text-gray-700">
-            Complete lessons to earn stars and unlock achievements! Your mascot friend will guide you
-            through every step with cheerful encouragement and voice narration.
+            Complete lessons to earn stars and unlock achievements! Your mascot
+            friend will guide you through every step with cheerful encouragement
+            and voice narration.
           </p>
         </CardContent>
       </Card>

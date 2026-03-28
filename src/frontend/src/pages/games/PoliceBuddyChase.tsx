@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
-import GameLayout from '../../components/GameLayout';
-import { ModulePage } from '../../App';
+import { useCallback, useEffect, useState } from "react";
+import type { ModulePage } from "../../App";
+import GameLayout from "../../components/GameLayout";
 
 interface Criminal {
   id: number;
@@ -12,7 +12,9 @@ interface PoliceBuddyChaseProps {
   onNavigate: (page: ModulePage) => void;
 }
 
-export default function PoliceBuddyChase({ onNavigate }: PoliceBuddyChaseProps) {
+export default function PoliceBuddyChase({
+  onNavigate,
+}: PoliceBuddyChaseProps) {
   const [score, setScore] = useState(0);
   const [policeLane, setPoliceLane] = useState(1);
   const [criminals, setCriminals] = useState<Criminal[]>([]);
@@ -35,8 +37,8 @@ export default function PoliceBuddyChase({ onNavigate }: PoliceBuddyChaseProps) 
 
     const spawnInterval = setInterval(() => {
       const lane = Math.floor(Math.random() * 3);
-      setCriminals(prev => [...prev, { id: nextId, lane, y: -10 }]);
-      setNextId(id => id + 1);
+      setCriminals((prev) => [...prev, { id: nextId, lane, y: -10 }]);
+      setNextId((id) => id + 1);
     }, 2000);
 
     return () => clearInterval(spawnInterval);
@@ -46,25 +48,25 @@ export default function PoliceBuddyChase({ onNavigate }: PoliceBuddyChaseProps) 
     if (gameOver) return;
 
     const moveInterval = setInterval(() => {
-      setCriminals(prev => {
-        const updated = prev.map(crim => ({ ...crim, y: crim.y + speed }));
-        
+      setCriminals((prev) => {
+        const updated = prev.map((crim) => ({ ...crim, y: crim.y + speed }));
+
         // Check if caught
-        updated.forEach(crim => {
+        updated.forEach((crim) => {
           if (crim.lane === policeLane && crim.y > 80 && crim.y < 95) {
-            setScore(s => s + 10);
-            setCriminals(prev => prev.filter(c => c.id !== crim.id));
+            setScore((s) => s + 10);
+            setCriminals((prev) => prev.filter((c) => c.id !== crim.id));
           }
         });
 
         // Check if escaped
-        updated.forEach(crim => {
+        updated.forEach((crim) => {
           if (crim.y > 100) {
             setGameOver(true);
           }
         });
-        
-        return updated.filter(crim => crim.y < 110);
+
+        return updated.filter((crim) => crim.y < 110);
       });
     }, 50);
 
@@ -73,7 +75,7 @@ export default function PoliceBuddyChase({ onNavigate }: PoliceBuddyChaseProps) 
 
   useEffect(() => {
     if (score > 0 && score % 50 === 0) {
-      setSpeed(prev => Math.min(prev + 0.5, 8));
+      setSpeed((prev) => Math.min(prev + 0.5, 8));
     }
   }, [score]);
 
@@ -83,19 +85,22 @@ export default function PoliceBuddyChase({ onNavigate }: PoliceBuddyChaseProps) 
     }
   }, [gameOver, score, highScore]);
 
-  const handleKeyPress = useCallback((e: KeyboardEvent) => {
-    if (gameOver) return;
-    
-    if (e.key === 'ArrowLeft' && policeLane > 0) {
-      setPoliceLane(prev => prev - 1);
-    } else if (e.key === 'ArrowRight' && policeLane < 2) {
-      setPoliceLane(prev => prev + 1);
-    }
-  }, [gameOver, policeLane]);
+  const handleKeyPress = useCallback(
+    (e: KeyboardEvent) => {
+      if (gameOver) return;
+
+      if (e.key === "ArrowLeft" && policeLane > 0) {
+        setPoliceLane((prev) => prev - 1);
+      } else if (e.key === "ArrowRight" && policeLane < 2) {
+        setPoliceLane((prev) => prev + 1);
+      }
+    },
+    [gameOver, policeLane],
+  );
 
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
   }, [handleKeyPress]);
 
   return (
@@ -110,8 +115,11 @@ export default function PoliceBuddyChase({ onNavigate }: PoliceBuddyChaseProps) 
       <div className="relative w-full h-[600px] bg-gradient-to-b from-blue-400 to-blue-200 overflow-hidden">
         {/* Road */}
         <div className="absolute inset-0 flex">
-          {[0, 1, 2].map(lane => (
-            <div key={lane} className="flex-1 border-x-4 border-white/30 relative bg-gray-600">
+          {[0, 1, 2].map((lane) => (
+            <div
+              key={lane}
+              className="flex-1 border-x-4 border-white/30 relative bg-gray-600"
+            >
               <div className="absolute inset-0 flex flex-col justify-around">
                 {[...Array(10)].map((_, i) => (
                   <div key={i} className="h-8 w-2 bg-yellow-300 mx-auto" />
@@ -137,21 +145,21 @@ export default function PoliceBuddyChase({ onNavigate }: PoliceBuddyChaseProps) 
           className="absolute bottom-16 transition-all duration-200"
           style={{
             left: `${16.67 + policeLane * 33.33}%`,
-            transform: 'translateX(-50%)',
+            transform: "translateX(-50%)",
           }}
         >
           <div className="text-5xl">🚓</div>
         </div>
 
         {/* Criminals */}
-        {criminals.map(criminal => (
+        {criminals.map((criminal) => (
           <div
             key={criminal.id}
             className="absolute transition-all"
             style={{
               left: `${16.67 + criminal.lane * 33.33}%`,
               top: `${criminal.y}%`,
-              transform: 'translateX(-50%)',
+              transform: "translateX(-50%)",
             }}
           >
             <div className="text-4xl">🏃</div>

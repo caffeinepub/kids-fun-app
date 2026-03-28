@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
-import GameLayout from '../../components/GameLayout';
-import { ModulePage } from '../../App';
+import { useCallback, useEffect, useState } from "react";
+import type { ModulePage } from "../../App";
+import GameLayout from "../../components/GameLayout";
 
 interface Obstacle {
   id: number;
@@ -12,7 +12,9 @@ interface SuperSpeedyRacerProps {
   onNavigate: (page: ModulePage) => void;
 }
 
-export default function SuperSpeedyRacer({ onNavigate }: SuperSpeedyRacerProps) {
+export default function SuperSpeedyRacer({
+  onNavigate,
+}: SuperSpeedyRacerProps) {
   const [score, setScore] = useState(0);
   const [playerLane, setPlayerLane] = useState(1);
   const [obstacles, setObstacles] = useState<Obstacle[]>([]);
@@ -35,8 +37,8 @@ export default function SuperSpeedyRacer({ onNavigate }: SuperSpeedyRacerProps) 
 
     const spawnInterval = setInterval(() => {
       const lane = Math.floor(Math.random() * 3);
-      setObstacles(prev => [...prev, { id: nextId, lane, y: -10 }]);
-      setNextId(id => id + 1);
+      setObstacles((prev) => [...prev, { id: nextId, lane, y: -10 }]);
+      setNextId((id) => id + 1);
     }, 1500);
 
     return () => clearInterval(spawnInterval);
@@ -46,25 +48,25 @@ export default function SuperSpeedyRacer({ onNavigate }: SuperSpeedyRacerProps) 
     if (gameOver) return;
 
     const moveInterval = setInterval(() => {
-      setObstacles(prev => {
-        const updated = prev.map(obs => ({ ...obs, y: obs.y + speed }));
-        
+      setObstacles((prev) => {
+        const updated = prev.map((obs) => ({ ...obs, y: obs.y + speed }));
+
         // Check collision
-        const collision = updated.find(obs => 
-          obs.lane === playerLane && obs.y > 80 && obs.y < 95
+        const collision = updated.find(
+          (obs) => obs.lane === playerLane && obs.y > 80 && obs.y < 95,
         );
         if (collision) {
           setGameOver(true);
         }
-        
+
         // Score for passed obstacles
-        updated.forEach(obs => {
+        updated.forEach((obs) => {
           if (obs.y > 100 && obs.y < 100 + speed) {
-            setScore(prev => prev + 1);
+            setScore((prev) => prev + 1);
           }
         });
-        
-        return updated.filter(obs => obs.y < 110);
+
+        return updated.filter((obs) => obs.y < 110);
       });
     }, 50);
 
@@ -73,7 +75,7 @@ export default function SuperSpeedyRacer({ onNavigate }: SuperSpeedyRacerProps) 
 
   useEffect(() => {
     if (score > 0 && score % 20 === 0) {
-      setSpeed(prev => Math.min(prev + 0.5, 10));
+      setSpeed((prev) => Math.min(prev + 0.5, 10));
     }
   }, [score]);
 
@@ -83,19 +85,22 @@ export default function SuperSpeedyRacer({ onNavigate }: SuperSpeedyRacerProps) 
     }
   }, [gameOver, score, highScore]);
 
-  const handleKeyPress = useCallback((e: KeyboardEvent) => {
-    if (gameOver) return;
-    
-    if (e.key === 'ArrowLeft' && playerLane > 0) {
-      setPlayerLane(prev => prev - 1);
-    } else if (e.key === 'ArrowRight' && playerLane < 2) {
-      setPlayerLane(prev => prev + 1);
-    }
-  }, [gameOver, playerLane]);
+  const handleKeyPress = useCallback(
+    (e: KeyboardEvent) => {
+      if (gameOver) return;
+
+      if (e.key === "ArrowLeft" && playerLane > 0) {
+        setPlayerLane((prev) => prev - 1);
+      } else if (e.key === "ArrowRight" && playerLane < 2) {
+        setPlayerLane((prev) => prev + 1);
+      }
+    },
+    [gameOver, playerLane],
+  );
 
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
   }, [handleKeyPress]);
 
   return (
@@ -110,8 +115,11 @@ export default function SuperSpeedyRacer({ onNavigate }: SuperSpeedyRacerProps) 
       <div className="relative w-full h-[600px] bg-gray-600 overflow-hidden">
         {/* Road */}
         <div className="absolute inset-0 flex">
-          {[0, 1, 2].map(lane => (
-            <div key={lane} className="flex-1 border-x-4 border-white/30 relative bg-gray-700">
+          {[0, 1, 2].map((lane) => (
+            <div
+              key={lane}
+              className="flex-1 border-x-4 border-white/30 relative bg-gray-700"
+            >
               {/* Lane markings */}
               <div className="absolute inset-0 flex flex-col justify-around">
                 {[...Array(10)].map((_, i) => (
@@ -127,21 +135,21 @@ export default function SuperSpeedyRacer({ onNavigate }: SuperSpeedyRacerProps) 
           className="absolute bottom-16 transition-all duration-200"
           style={{
             left: `${16.67 + playerLane * 33.33}%`,
-            transform: 'translateX(-50%)',
+            transform: "translateX(-50%)",
           }}
         >
           <div className="text-5xl">🏎️</div>
         </div>
 
         {/* Obstacles */}
-        {obstacles.map(obstacle => (
+        {obstacles.map((obstacle) => (
           <div
             key={obstacle.id}
             className="absolute transition-all"
             style={{
               left: `${16.67 + obstacle.lane * 33.33}%`,
               top: `${obstacle.y}%`,
-              transform: 'translateX(-50%)',
+              transform: "translateX(-50%)",
             }}
           >
             <div className="text-4xl">🚗</div>
